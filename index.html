@@ -21,6 +21,19 @@
         img { width: 100%; display: block; height: auto; vertical-align: middle; }
         .hidden { display: none !important; }
 
+        /* --- Full Screen Background --- */
+        #background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Puts it behind all other content */
+            background-image: url('https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-26-04-595.jpg?updatedAt=1762469792768');
+            background-size: cover;
+            background-position: center;
+        }
+
         /* --- Splash Screen --- */
         #splash-screen {
             position: fixed;
@@ -59,7 +72,8 @@
         /* --- Main Content & Loading Animation --- */
         #main-page-content-wrapper, #cart-page-content-wrapper { position: relative; }
         main {
-           background-color: white; padding-bottom: 120px;
+           background-color: transparent; /* Changed to see background */
+           padding-bottom: 120px;
            min-height: 300px;
         }
         main.loading { opacity: 0; transition: opacity 0.3s ease-out; }
@@ -127,6 +141,9 @@
 </head>
 <body>
 
+    <!-- Background Image -->
+    <div id="background-image"></div>
+
     <!-- Splash Screen -->
     <div id="splash-screen"></div>
 
@@ -136,7 +153,7 @@
     <div id="main-page" class="page-wrapper">
         <header class="sticky-header">
             <div id="header-clickable-area" class="header-image-container">
-                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-17-22-623.jpg?updatedAt=1762440602067" alt="Header">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header">
             </div>
             <div class="sub-header">
                 <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_23-38-48-742.jpg?updatedAt=1762452741649" alt="Sub Header">
@@ -164,7 +181,7 @@
     <div id="cart-page" class="page-wrapper hidden">
         <header class="sticky-header">
             <div class="header-image-container">
-                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-17-22-623.jpg?updatedAt=1762440602067" alt="Header">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header">
             </div>
             <div class="sub-header">
                 <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_00-02-43-268.jpg?updatedAt=1762453985516" alt="Cart Special Sub Header">
