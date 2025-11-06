@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mobile Page - Final</title>
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Fix for iPhone Fullscreen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
+
+    <style>
+        /* General Setup */
+        :root { --loader-time: 2s; }
+        body, html {
+            margin: 0; padding: 0; width: 100%;
+            background-color: white; font-family: sans-serif;
+        }
+        img { width: 100%; display: block; height: auto; vertical-align: middle; }
+        .hidden { display: none !important; }
+
+        /* --- Full Screen Background --- */
+        #background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Puts it behind all other content */
+            background-image: url('https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-26-04-595.jpg?updatedAt=1762469792768');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* --- Splash Screen --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999; /* Highest z-index to be on top */
+            background-image: url('https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-28-11-055.jpg?updatedAt=1762441127768');
+            background-size: cover;
+            background-position: center;
+            background-color: #ffffff; /* Fallback color */
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* For fade out */
+        }
+        #splash-screen.splash-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* --- Header & Sub-Header --- */
+        .sticky-header {
+            position: sticky; top: 0; z-index: 1000;
+            background-color: transparent; /* THIS IS THE FIX */
+            padding-top: env(safe-area-inset-top); /* This ensures content isn't hidden by the notch */
+        }
+        .sub-header {
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 200px;
+            overflow: hidden;
+            will-change: max-height;
+        }
+        .sub-header-hidden {
+            max-height: 0;
+        }
+
+        /* --- Main Content & Loading Animation --- */
+        #main-page-content-wrapper, #cart-page-content-wrapper { position: relative; }
+        main {
+           background-color: transparent; /* Changed to see background */
+           padding-bottom: 120px;
+           min-height: 300px;
+        }
+        main.loading { opacity: 0; transition: opacity 0.3s ease-out; }
+        .loader {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px; background: linear-gradient(90deg, #ffd700, #ffa500);
+            transform: translateY(-100%);
+            transition: transform 0.4s ease-in-out;
+            z-index: 999; overflow: hidden;
+        }
+        .loader::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: loader-inner var(--loader-time) linear infinite;
+        }
+        .loader.active { transform: translateY(0); }
+        @keyframes loader-inner { 0% { left: -100%; } 100% { left: 100%; } }
+
+        /* --- Universal Footer & Pop-ups --- */
+        .footer-grid-container { position: relative; }
+        .footer-grid {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: grid; grid-template-columns: repeat(6, 1fr);
+            z-index: 1;
+        }
+        .footer-link { cursor: pointer; }
+        .sliding-footer {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; z-index: 500;
+            transition: transform 0.3s ease-in-out;
+            will-change: transform;
+        }
+        .footer-hidden { transform: translateY(100%); }
+        .popup-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1001; display: flex; align-items: flex-end;
+        }
+        .page-wrapper.blur > *:not(.sticky-header, .popup-container) {
+            filter: blur(5px);
+        }
+        .popup-content { width: 100%; }
+
+        /* --- Admin Panel --- */
+        .admin-panel {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.95); z-index: 2000;
+            color: white; padding: 20px; overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .admin-panel h2, .admin-panel h3 { margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 5px;}
+        .admin-panel input { width: calc(100% - 12px); padding: 5px; margin-bottom: 10px; background: #333; color: white; border: 1px solid #555; }
+        .admin-panel button { padding: 8px 12px; margin-right: 10px; cursor: pointer; background: #555; color: white; border: none; }
+        .admin-panel button.primary { background: #ffd700; color: black; }
+        .admin-panel button.danger { background: #b71c1c; }
+        .admin-bundle-list li, .admin-url-list li { margin-bottom: 10px; padding: 10px; background: #222; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+        .admin-bundle-list span, .admin-url-list span { word-break: break-all; padding-right: 10px; }
+        #admin-bundle-editor { border-top: 2px solid #ffd700; margin-top: 20px; padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- Background Image -->
+    <div id="background-image"></div>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen"></div>
+
+    <!-- ======================= -->
+    <!--      MAIN PAGE          -->
+    <!-- ======================= -->
+    <div id="main-page" class="page-wrapper">
+        <header class="sticky-header">
+            <div id="header-clickable-area" class="header-image-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header">
+            </div>
+            <div class="sub-header">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_23-38-48-742.jpg?updatedAt=1762452741649" alt="Sub Header">
+            </div>
+        </header>
+        <div id="main-page-content-wrapper">
+            <div class="loader"></div>
+            <main id="main-page-content"></main>
+        </div>
+        <footer class="sliding-footer">
+            <div class="footer-grid-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-38-33-559.jpg?updatedAt=1762441866973" alt="Footer">
+                <div class="footer-grid">
+                    <a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a>
+                    <div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div>
+                    <div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ======================= -->
+    <!--      CART PAGE          -->
+    <!-- ======================= -->
+    <div id="cart-page" class="page-wrapper hidden">
+        <header class="sticky-header">
+            <div class="header-image-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header">
+            </div>
+            <div class="sub-header">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_00-02-43-268.jpg?updatedAt=1762453985516" alt="Cart Special Sub Header">
+            </div>
+        </header>
+        <div id="cart-page-content-wrapper">
+            <div class="loader"></div>
+            <main id="cart-page-content">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_23-59-32-684.jpg?updatedAt=1762453796056" alt="Cart Image">
+            </main>
+        </div>
+        <footer class="sliding-footer">
+            <div class="footer-grid-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_00-48-14-627.jpg?updatedAt=1762456721818" alt="Cart Footer">
+                <div class="footer-grid">
+                    <a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a>
+                    <div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div>
+                    <div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Pop-ups -->
+    <div id="popup-1" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-46-828.png?updatedAt=1762460531235" alt="Special Popup"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <div id="popup-2" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_02-08-55-599.jpg?updatedAt=1762461555587" alt="Special Popup 2"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <div id="popup-3" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-16-726.png?updatedAt=1762460530551" alt="Special Popup 3"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel hidden">
+        <div id="admin-bundle-list-view">
+            <h2>Content Bundles</h2><ul id="admin-bundle-list"></ul>
+            <button id="admin-add-bundle-btn" class="primary">Add New Bundle</button>
+            <button id="admin-close-btn">Close</button>
+        </div>
+        <div id="admin-bundle-editor" class="hidden">
+            <h2 id="admin-editor-title">Editing Bundle</h2>
+            <input type="url" id="admin-url-input" placeholder="Enter image URL">
+            <button id="admin-add-url-btn">Add Image to Bundle</button>
+            <h3>Images in this Bundle</h3><ul id="admin-url-list"></ul>
+            <button id="admin-save-bundle-btn" class="primary">Save and Back</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- Splash Screen Logic ---
+            const splashScreen = document.getElementById('splash-screen');
+            // Check if the splash screen has already been shown in this session
+            if (sessionStorage.getItem('splashShown')) {
+                // If it has (i.e., page was refreshed), hide it immediately
+                splashScreen.style.display = 'none';
+            } else {
+                // If it hasn't (i.e., app is starting), show it, set the flag, and then hide it after a delay
+                sessionStorage.setItem('splashShown', 'true');
+                setTimeout(() => {
+                    splashScreen.classList.add('splash-hidden');
+                }, 2500); // Hide after 2.5 seconds
+            }
+
+            // Page containers & elements
+            const mainPage = document.getElementById('main-page');
+            const cartPage = document.getElementById('cart-page');
+            const popups = [document.getElementById('popup-1'), document.getElementById('popup-2'), document.getElementById('popup-3')];
+            
+            const mainSubHeader = document.querySelector('#main-page .sub-header');
+            const mainFooter = document.querySelector('#main-page .sliding-footer');
+            const cartFooter = document.querySelector('#cart-page .sliding-footer');
+            
+            const adminPanel = document.getElementById('admin-panel');
+            const headerClickableArea = document.getElementById('header-clickable-area');
+            const bundleListView = document.getElementById('admin-bundle-list-view');
+            const bundleEditorView = document.getElementById('admin-bundle-editor');
+            const bundleList = document.getElementById('admin-bundle-list');
+            const addBundleBtn = document.getElementById('admin-add-bundle-btn');
+            const closeAdminBtn = document.getElementById('admin-close-btn');
+            const editorTitle = document.getElementById('admin-editor-title');
+            const urlInput = document.getElementById('admin-url-input');
+            const addUrlBtn = document.getElementById('admin-add-url-btn');
+            const urlList = document.getElementById('admin-url-list');
+            const saveBundleBtn = document.getElementById('admin-save-bundle-btn');
+
+            let lastScrollTop = 0;
+            let headerClickCount = 0;
+            let headerClickTimer;
+            let bundles = [];
+            let currentEditingBundleIndex = -1;
+
+            // --- Core Functions ---
+            function handleScroll() {
+                let st = window.pageYOffset || document.documentElement.scrollTop;
+                const onCartPage = !cartPage.classList.contains('hidden');
+                
+                if (!onCartPage) {
+                    if (st > 50) mainSubHeader.classList.add('sub-header-hidden');
+                    else mainSubHeader.classList.remove('sub-header-hidden');
+                }
+
+                const activeFooter = onCartPage ? cartFooter : mainFooter;
+                if (st > lastScrollTop && st > 50) activeFooter.classList.add('footer-hidden');
+                else activeFooter.classList.remove('footer-hidden');
+                
+                lastScrollTop = st <= 0 ? 0 : st;
+            }
+
+            function closeAllPopups() {
+                popups.forEach(p => {
+                    p.classList.add('hidden');
+                    p.style.top = ''; // Reset inline style
+                    p.style.height = ''; // Reset inline style
+                });
+                mainPage.classList.remove('blur');
+                cartPage.classList.remove('blur');
+            }
+            function showHomePage() {
+                closeAllPopups(); cartPage.classList.add('hidden');
+                mainPage.classList.remove('hidden'); window.scrollTo(0, 0); handleScroll();
+            }
+            function showCartPage() {
+                closeAllPopups(); mainPage.classList.add('hidden');
+                cartPage.classList.remove('hidden'); window.scrollTo(0, 0); 
+                runLoadingAnimation('#cart-page-content', false);
+                handleScroll();
+            }
+            function showPopup(popupElement) {
+                closeAllPopups(); // First, close any open popups and reset styles
+
+                const activePage = cartPage.classList.contains('hidden') ? mainPage : cartPage;
+                const activeHeader = activePage.querySelector('.sticky-header');
+
+                // Dynamically set the popup's position to be below the header
+                if (activeHeader) {
+                    const headerHeight = activeHeader.offsetHeight;
+                    popupElement.style.top = `${headerHeight}px`;
+                    popupElement.style.height = `calc(100% - ${headerHeight}px)`;
+                }
+
+                popupElement.classList.remove('hidden');
+                activePage.classList.add('blur');
+            }
+
+            // --- Admin Panel & Dynamic Content ---
+            const defaultContent = [ "https://ik.imagekit.io/goldencodes/Picsart_25-11-06_21-07-27-558.jpg?updatedAt=1762443478788", "https://ik.imagekit.io/goldencodes/Picsart_25-11-06_21-54-28-996.jpg?updatedAt=1762446300267" ];
+
+            function runLoadingAnimation(contentSelector, changeContentCallback) {
+                const contentArea = document.querySelector(contentSelector);
+                const loader = contentArea.parentElement.querySelector('.loader');
+                
+                contentArea.classList.add('loading');
+                loader.classList.add('active');
+
+                setTimeout(() => {
+                    if (changeContentCallback) {
+                        changeContentCallback();
+                    }
+                    loader.classList.remove('active');
+                    setTimeout(() => contentArea.classList.remove('loading'), 100);
+                }, 2000);
+            }
+            
+            function loadBundlesFromStorage() { bundles = JSON.parse(localStorage.getItem('contentBundles') || '[]'); }
+            function saveBundlesToStorage() { localStorage.setItem('contentBundles', JSON.stringify(bundles)); }
+
+            function showBundleListView() {
+                bundleListView.classList.remove('hidden');
+                bundleEditorView.classList.add('hidden'); renderBundleList();
+            }
+
+            function showBundleEditor(index) {
+                currentEditingBundleIndex = index;
+                bundleListView.classList.add('hidden');
+                bundleEditorView.classList.remove('hidden');
+                editorTitle.textContent = `Editing: ${bundles[index].name}`;
+                renderUrlList();
+            }
+
+            function renderBundleList() {
+                bundleList.innerHTML = '';
+                bundles.forEach((bundle, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${bundle.name} (${bundle.urls.length} images)</span><div><button data-index="${index}" class="edit-bundle-btn">Edit</button><button data-index="${index}" class="delete-bundle-btn danger">Delete</button></div>`;
+                    bundleList.appendChild(li);
+                });
+            }
+            
+            function renderUrlList() {
+                urlList.innerHTML = '';
+                const urls = bundles[currentEditingBundleIndex].urls;
+                urls.forEach((url, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${url}</span><button data-index="${index}" class="delete-url-btn danger">Delete</button>`;
+                    urlList.appendChild(li);
+                });
+            }
+            
+            headerClickableArea.addEventListener('click', () => {
+                headerClickCount++; clearTimeout(headerClickTimer);
+                headerClickTimer = setTimeout(() => { headerClickCount = 0; }, 1500);
+                if (headerClickCount === 5) {
+                    headerClickCount = 0; loadBundlesFromStorage();
+                    showBundleListView(); adminPanel.classList.remove('hidden');
+                }
+            });
+
+            closeAdminBtn.addEventListener('click', () => adminPanel.classList.add('hidden'));
+            addBundleBtn.addEventListener('click', () => {
+                const name = prompt("Enter a name for the new bundle:");
+                if (name) { bundles.push({ name: name, urls: [] }); showBundleEditor(bundles.length - 1); }
+            });
+
+            bundleList.addEventListener('click', (e) => {
+                const index = e.target.dataset.index;
+                if (e.target.classList.contains('edit-bundle-btn')) showBundleEditor(index);
+                if (e.target.classList.contains('delete-bundle-btn')) {
+                    if (confirm(`Are you sure you want to delete "${bundles[index].name}"?`)) {
+                        bundles.splice(index, 1); saveBundlesToStorage(); renderBundleList();
+                    }
+                }
+            });
+
+            addUrlBtn.addEventListener('click', () => {
+                const url = urlInput.value.trim();
+                if (url) { bundles[currentEditingBundleIndex].urls.push(url); urlInput.value = ''; renderUrlList(); }
+            });
+            urlList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-url-btn')) {
+                    bundles[currentEditingBundleIndex].urls.splice(e.target.dataset.index, 1); renderUrlList();
+                }
+            });
+            saveBundleBtn.addEventListener('click', () => { saveBundlesToStorage(); showBundleListView(); });
+
+            // --- Initial Page Load ---
+            loadBundlesFromStorage();
+            let contentToRender;
+            if (bundles.length > 0) {
+                const randomBundle = bundles[Math.floor(Math.random() * bundles.length)];
+                contentToRender = randomBundle.urls;
+            } else { contentToRender = defaultContent; }
+            
+            runLoadingAnimation('#main-page-content', () => {
+                const contentArea = document.getElementById('main-page-content');
+                contentArea.innerHTML = contentToRender.map(url => `<img src="${url}" alt="Main Content">`).join('');
+            });
+
+            // --- Universal Triggers ---
+            document.querySelectorAll('.home-trigger').forEach(el => el.addEventListener('click', (e) => { e.preventDefault(); if (mainPage.classList.contains('hidden')) { showHomePage(); } else { window.location.reload(); } }));
+            document.querySelectorAll('.cart-trigger').forEach(el => el.addEventListener('click', showCartPage));
+            document.querySelectorAll('.popup-trigger-1').forEach(el => el.addEventListener('click', () => showPopup(popups[0])));
+            document.querySelectorAll('.popup-trigger-2').forEach(el => el.addEventListener('click', () => showPopup(popups[1])));
+            document.querySelectorAll('.popup-trigger-3').forEach(el => el.addEventListener('click', () => showPopup(popups[2])));
+            
+            window.addEventListener('scroll', handleScroll, false);
+            popups.forEach(p => p.addEventListener('click', (e) => { if (e.target === p) closeAllPopups(); }));
+        });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
