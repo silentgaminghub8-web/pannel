@@ -1,0 +1,21 @@
+{
+  "name": "Mobile Page - Final",
+  "short_name": "MobileFinal",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "A mobile web application.",
+  "icons": [
+    {
+      "src": "https://ik.imagekit.io/goldencodes/Picsart_25-11-07_03-31-48-162.jpg?updatedAt=1762466657252",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://ik.imagekit.io/goldencodes/Picsart_25-11-07_03-31-48-162.jpg?updatedAt=1762466657252",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
