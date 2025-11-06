@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mobile Page - Final</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         /* General Setup */
         :root { --loader-time: 2s; }
@@ -361,6 +362,17 @@
             window.addEventListener('scroll', handleScroll, false);
             popups.forEach(p => p.addEventListener('click', (e) => { if (e.target === p) closeAllPopups(); }));
         });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
