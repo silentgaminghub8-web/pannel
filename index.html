@@ -2,488 +2,365 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silent Gamers | Command Center</title>
-    
-    <!-- External Libraries: Chartist for Graphs & Google Fonts -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
-    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Page - Final</title>
     <style>
-        /* --- THEME & CONFIGURATION --- */
-        :root {
-            --bg-dark: #111827;
-            --glass-bg: rgba(30, 41, 59, 0.5);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
-            --accent-gold: #f59e0b;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --header-height: 80px;
+        /* General Setup */
+        :root { --loader-time: 2s; }
+        body, html {
+            margin: 0; padding: 0; width: 100%;
+            background-color: white; font-family: sans-serif;
+        }
+        img { width: 100%; display: block; height: auto; vertical-align: middle; }
+        .hidden { display: none !important; }
+
+        /* --- Header & Sub-Header --- */
+        .sticky-header {
+            position: sticky; top: 0; z-index: 1000;
+            background-color: white;
+        }
+        /* This is the key fix for the "blank spot" issue. The animation now collapses the height. */
+        .sub-header {
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 200px; /* Should be larger than the actual sub-header height */
+            overflow: hidden;
+            will-change: max-height;
+        }
+        .sub-header-hidden {
+            max-height: 0;
         }
 
-        /* --- BASE & RESET --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 1% 1%, rgba(245, 158, 11, 0.1), transparent 30%),
-                              radial-gradient(circle at 99% 99%, rgba(16, 185, 129, 0.1), transparent 40%);
+        /* --- Main Content & Loading Animation --- */
+        #main-page-content-wrapper, #cart-page-content-wrapper { position: relative; }
+        main {
+           background-color: white; padding-bottom: 120px;
+           min-height: 300px; /* Prevents page collapse during load */
         }
-        
-        /* --- LOADER --- */
-        #loader {
-            position: fixed;
-            top: 0; left: 0;
+        main.loading { opacity: 0; transition: opacity 0.3s ease-out; }
+        .loader {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px; background: linear-gradient(90deg, #ffd700, #ffa500);
+            transform: translateY(-100%);
+            transition: transform 0.4s ease-in-out;
+            z-index: 999; overflow: hidden;
+        }
+        .loader::after {
+            content: ''; position: absolute; top: 0; left: -100%;
             width: 100%; height: 100%;
-            background: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: loader-inner var(--loader-time) linear infinite;
         }
-        .spinner {
-            width: 60px; height: 60px;
-            border: 5px solid var(--glass-border);
-            border-top-color: var(--accent-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader.active { transform: translateY(0); }
+        @keyframes loader-inner { 0% { left: -100%; } 100% { left: 100%; } }
 
-        /* --- MAIN LAYOUT & HEADER --- */
-        #main-content {
-            opacity: 0;
-            transition: opacity 0.5s ease;
+        /* --- Universal Footer & Pop-ups --- */
+        .footer-grid-container { position: relative; }
+        .footer-grid {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: grid; grid-template-columns: repeat(6, 1fr);
+            z-index: 1;
         }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
-        main { padding-top: var(--header-height); }
-        .site-header {
+        .footer-link { cursor: pointer; }
+        .sliding-footer {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; z-index: 500;
+            transition: transform 0.3s ease-in-out;
+            will-change: transform;
+        }
+        .footer-hidden { transform: translateY(100%); }
+        .popup-container {
             position: fixed; top: 0; left: 0;
-            width: 100%; height: var(--header-height);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1001; display: flex; align-items: flex-end;
         }
-        .logo-img {
-            height: 55px;
-            border-radius: 50%;
-            border: 2px solid rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        /* This rule correctly keeps the header un-blurred */
+        .page-wrapper.blur > *:not(.sticky-header, .popup-container) {
+            filter: blur(5px);
         }
-        .logo-img:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
-        }
-        .site-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 4px #fff, 0 0 10px var(--accent-gold), 0 0 20px var(--accent-gold);
-        }
+        .popup-content { width: 100%; }
 
-        /* --- HAMBURGER MENU & NAVIGATION --- */
-        .menu-trigger { background: none; border: none; cursor: pointer; width: 40px; height: 40px; display: flex; flex-direction: column; justify-content: space-around; z-index: 1002; }
-        .menu-trigger span { display: block; width: 100%; height: 3px; background-color: var(--text-primary); border-radius: 3px; transition: all 0.3s ease-in-out; }
-        .menu-trigger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
-        .menu-trigger.active span:nth-child(2) { opacity: 0; }
-        .menu-trigger.active span:nth-child(3) { transform: rotate(-45deg) translate(8px, -8px); }
-        .main-nav { position: fixed; top: 0; right: 0; width: 50%; max-width: 400px; height: 100vh; z-index: 999; display: flex; align-items: center; justify-content: center; background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-left: 1px solid var(--glass-border); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); }
-        .main-nav.active { transform: translateX(0); }
-        .nav-list { list-style: none; text-align: center; }
-        .nav-list li { margin: 2rem 0; }
-        .nav-list a { color: var(--text-primary); text-decoration: none; font-size: 1.5rem; font-weight: 600; padding: 10px 20px; position: relative; transition: color 0.3s ease; }
-        .nav-list a:hover { color: var(--accent-gold); text-shadow: 0 0 10px var(--accent-gold); }
-
-        /* --- SECTION & CARD STYLING --- */
-        .section { padding: 3rem 0; }
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 2.5rem;
-            font-weight: 700;
+        /* --- Admin Panel --- */
+        .admin-panel {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.95); z-index: 2000;
+            color: white; padding: 20px; overflow-y: auto;
+            box-sizing: border-box;
         }
-        
-        /* --- URGENT ACTION BUTTONS (Perfectly Placed) --- */
-        .urgent-actions {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        .action-btn {
-            display: none; /* Hidden by default */
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            border: 2px solid transparent;
-            border-radius: 10px;
-            color: #fff;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 300%; height: 300%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3), transparent 40%);
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.5s ease;
-        }
-        .action-btn:hover::before { transform: translate(-50%, -50%) scale(1); }
-        .action-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-
-        .btn-payout { background: linear-gradient(45deg, var(--accent-red), #b91c1c); }
-        .btn-request { background: linear-gradient(45deg, var(--accent-green), #047857); }
-
-        /* --- STATS GRID --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-        .stat-card {
-            position: relative;
-            padding: 2rem;
-            border-radius: 16px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        /* Glowing border on hover */
-        .stat-card::before, .graph-card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 16px;
-            border: 2px solid transparent;
-            background: linear-gradient(45deg, var(--accent-green), var(--accent-gold)) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        .stat-card:hover, .graph-card:hover { transform: translateY(-10px); }
-        .stat-card:hover::before, .graph-card:hover::before { opacity: 1; }
-
-        .stat-card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; color: var(--text-secondary); }
-        .stat-card-icon { width: 24px; height: 24px; }
-        .stat-value { font-family: 'Orbitron', sans-serif; font-size: 2.75rem; font-weight: 900; margin-bottom: 0.5rem; }
-        .stat-sub-value { font-size: 1rem; color: var(--text-secondary); }
-        .stat-sub-value .token-red { color: var(--accent-red); font-weight: 600; }
-        .stat-sub-value .token-blue { color: #60a5fa; font-weight: 600; }
-
-        /* --- GRAPHS --- */
-        .graphs-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
-        .graph-card { position: relative; padding: 2rem; border-radius: 16px; background: var(--glass-bg); border: 1px solid var(--glass-border); }
-        .graph-card h3 { font-family: 'Orbitron', sans-serif; text-align: center; margin-bottom: 1.5rem; font-weight: 500; }
-        
-        /* Chartist Customization */
-        .ct-label { fill: var(--text-secondary); color: var(--text-secondary); font-size: 0.85rem; }
-        .ct-grid { stroke: var(--glass-border); }
-        .ct-series-a .ct-line, .ct-series-a .ct-point { stroke: var(--accent-gold); stroke-width: 3px; }
-        .ct-series-a .ct-area { fill: url(#area-gradient); } /* Use SVG Gradient */
-        .ct-chart-pie .ct-label, .ct-chart-donut .ct-label { fill: var(--text-primary); font-size: 1rem; font-weight: 600; }
-        .ct-series-a .ct-slice-pie, .ct-series-a .ct-slice-donut { fill: var(--accent-green); }
-        .ct-series-b .ct-slice-pie, .ct-series-b .ct-slice-donut { fill: var(--accent-red); }
-        .ct-series-c .ct-slice-pie { fill: #60a5fa; } /* Blue for tokens */
-        .ct-legend { list-style: none; display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; }
-        .ct-legend li { color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem; }
-        .ct-legend li::before { content: ''; width: 12px; height: 12px; border-radius: 50%; }
-        .ct-legend .ct-series-0::before { background-color: var(--accent-green); }
-        .ct-legend .ct-series-1::before { background-color: var(--accent-red); }
-        
-        /* --- MANAGEMENT LINKS --- */
-        .management-links { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
-        .mgmt-btn {
-            text-decoration: none; color: var(--text-secondary);
-            padding: 1rem 2rem; border: 2px solid var(--glass-border); border-radius: 50px;
-            transition: all 0.3s ease;
-        }
-        .mgmt-btn:hover {
-            color: var(--text-primary);
-            background-color: var(--accent-gold);
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 20px var(--accent-gold);
-            transform: translateY(-5px);
-        }
-        
-        /* --- FOOTER --- */
-        .site-footer { text-align: center; padding: 3rem 1rem; margin-top: 2rem; border-top: 1px solid var(--glass-border); color: var(--text-secondary); }
-
-        /* --- RESPONSIVE DESIGN --- */
-        @media (max-width: 1024px) {
-            .graphs-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            :root { --header-height: 70px; }
-            .container { padding: 0 1rem; }
-            .site-title { font-size: 1.8rem; }
-            .logo-img { height: 50px; }
-            .stat-value { font-size: 2.25rem; }
-        }
-        @media (max-width: 480px) {
-            .site-title { display: none; }
-            .site-header { justify-content: space-between; }
-        }
+        .admin-panel h2, .admin-panel h3 { margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 5px;}
+        .admin-panel input { width: calc(100% - 12px); padding: 5px; margin-bottom: 10px; background: #333; color: white; border: 1px solid #555; }
+        .admin-panel button { padding: 8px 12px; margin-right: 10px; cursor: pointer; background: #555; color: white; border: none; }
+        .admin-panel button.primary { background: #ffd700; color: black; }
+        .admin-panel button.danger { background: #b71c1c; }
+        .admin-bundle-list li, .admin-url-list li { margin-bottom: 10px; padding: 10px; background: #222; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+        .admin-bundle-list span, .admin-url-list span { word-break: break-all; padding-right: 10px; }
+        #admin-bundle-editor { border-top: 2px solid #ffd700; margin-top: 20px; padding-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-    </div>
-
-    <div id="main-content">
-        <header class="site-header">
-            <a href="index.html" class="logo-link">
-                <img src="https://ik.imagekit.io/silentgamers/Picsart_25-09-19_15-42-42-048.png?updatedAt=1758287984590&ik-s=818768f764ed7e928bf055f4f632c881cb77ec24" alt="Silent Gamers Logo" class="logo-img">
-            </a>
-            <h1 class="site-title">SILENT GAMERS</h1>
-            <button class="menu-trigger" aria-label="Open navigation menu" aria-expanded="false">
-                <span></span><span></span><span></span>
-            </button>
-        </header>
-
-        <nav class="main-nav">
-            <ul class="nav-list">
-                <li><a href="index.html">Main Dashboard</a></li>
-                <li><a href="payout.html">Requests</a></li>
-                <li><a href="shop.html">Token adding request</a></li>
-                <li><a href="tournament.html">Today Tournament</a></li>
-                <li><a href="profit.html">balance</a></li>
-                <li><a href="edit.html">edit</a></li>
-            </ul>
-        </nav>
-
-        <main>
-            <div class="container">
-                <section class="section">
-                    <div class="urgent-actions">
-                        <a href="payout.html" id="payout-btn" class="action-btn btn-payout">New Payouts Waiting</a>
-                        <a href="shop.html" id="request-btn" class="action-btn btn-request">New Token Requests</a>
-                    </div>
-
-                    <div class="stats-grid">
-                        <!-- Stat Card 1 -->
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <svg class="stat-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962A3 3 0 013 10.5V18a3 3 0 01-3-3v-2.25m15 5.25v-2.25m-15 0a3 3 0 013-3H6a3 3 0 013 3v2.25m0 0a3 3 0 013-3h3a3 3 0 013 3v2.25m0 0a3 3 0 013-3h3a3 3 0 013 3v2.25" /></svg>
-                                <span>Total Users</span>
-                            </div>
-                            <p id="total-users" class="stat-value">0</p>
-                            <p class="stat-sub-value">All Time Registered</p>
-                        </div>
-                        <!-- Stat Card 2 -->
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <svg class="stat-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25-2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 3a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m-3 9h18" /></svg>
-                                <span>Total Tokens</span>
-                            </div>
-                            <p id="total-tokens" class="stat-value">0</p>
-                            <div class="stat-sub-value">
-                                <span id="red-tokens" class="token-red">R: 0</span> | <span id="blue-tokens" class="token-blue">B: 0</span>
-                            </div>
-                        </div>
-                        <!-- Stat Card 3 -->
-                        <div class="stat-card">
-                           <div class="stat-card-header">
-                                <svg class="stat-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" /></svg>
-                                <span>New Users</span>
-                            </div>
-                            <p id="new-users" class="stat-value">0</p>
-                            <p class="stat-sub-value">Awaiting Registration</p>
-                        </div>
-                        <!-- Stat Card 4 -->
-                        <div class="stat-card">
-                            <div class="stat-card-header">
-                                <svg class="stat-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                                <span>Blocked Players</span>
-                            </div>
-                            <p id="blocked-players" class="stat-value" style="color: var(--accent-red);">0</p>
-                            <p class="stat-sub-value">Access Restricted</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <h2 class="section-title">Data Visualization</h2>
-                    <div class="graphs-grid">
-                        <div class="graph-card" style="grid-column: 1 / -1;">
-                            <h3>Tournament Registrations Trend</h3>
-                            <div class="ct-chart" id="tournament-chart"></div>
-                        </div>
-                        <div class="graph-card">
-                            <h3>Player Status</h3>
-                            <div class="ct-chart" id="player-status-chart"></div>
-                        </div>
-                        <div class="graph-card">
-                            <h3>Token Distribution</h3>
-                            <div class="ct-chart" id="token-dist-chart"></div>
-                        </div>
-                    </div>
-                </section>
-                
-                <section class="section">
-                    <div class="management-links">
-                        <a href="links.html" class="mgmt-btn">Set Up Tournament Links</a>
-                        <a href="tournament.html" class="mgmt-btn">View Tournament Players List</a>
-                    </div>
-                </section>
+    <!-- ======================= -->
+    <!--      MAIN PAGE          -->
+    <!-- ======================= -->
+    <div id="main-page" class="page-wrapper">
+        <header class="sticky-header">
+            <div id="header-clickable-area" class="header-image-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-17-22-623.jpg?updatedAt=1762440602067" alt="Header">
             </div>
-        </main>
-
-        <footer class="site-footer">
-            <p>&copy; 2024 Silent Gamers Command Center. All Rights Reserved.</p>
+            <div class="sub-header">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_23-38-48-742.jpg?updatedAt=1762452741649" alt="Sub Header">
+            </div>
+        </header>
+        <div id="main-page-content-wrapper">
+            <div class="loader"></div>
+            <main id="main-page-content"></main>
+        </div>
+        <footer class="sliding-footer">
+            <div class="footer-grid-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-38-33-559.jpg?updatedAt=1762441866973" alt="Footer">
+                <div class="footer-grid">
+                    <a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a>
+                    <div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div>
+                    <div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div>
+                </div>
+            </div>
         </footer>
     </div>
 
+    <!-- ======================= -->
+    <!--      CART PAGE          -->
+    <!-- ======================= -->
+    <div id="cart-page" class="page-wrapper hidden">
+        <header class="sticky-header">
+            <div class="header-image-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-17-22-623.jpg?updatedAt=1762440602067" alt="Header">
+            </div>
+            <div class="sub-header">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_00-02-43-268.jpg?updatedAt=1762453985516" alt="Cart Special Sub Header">
+            </div>
+        </header>
+        <div id="cart-page-content-wrapper">
+            <div class="loader"></div>
+            <main id="cart-page-content">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_23-59-32-684.jpg?updatedAt=1762453796056" alt="Cart Image">
+            </main>
+        </div>
+        <footer class="sliding-footer">
+            <div class="footer-grid-container">
+                <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_00-48-14-627.jpg?updatedAt=1762456721818" alt="Cart Footer">
+                <div class="footer-grid">
+                    <a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a>
+                    <div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div>
+                    <div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Pop-ups -->
+    <div id="popup-1" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-46-828.png?updatedAt=1762460531235" alt="Special Popup"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <div id="popup-2" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_02-08-55-599.jpg?updatedAt=1762461555587" alt="Special Popup 2"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <div id="popup-3" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-16-726.png?updatedAt=1762460530551" alt="Special Popup 3"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel hidden">
+        <div id="admin-bundle-list-view">
+            <h2>Content Bundles</h2><ul id="admin-bundle-list"></ul>
+            <button id="admin-add-bundle-btn" class="primary">Add New Bundle</button>
+            <button id="admin-close-btn">Close</button>
+        </div>
+        <div id="admin-bundle-editor" class="hidden">
+            <h2 id="admin-editor-title">Editing Bundle</h2>
+            <input type="url" id="admin-url-input" placeholder="Enter image URL">
+            <button id="admin-add-url-btn">Add Image to Bundle</button>
+            <h3>Images in this Bundle</h3><ul id="admin-url-list"></ul>
+            <button id="admin-save-bundle-btn" class="primary">Save and Back</button>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuTrigger = document.querySelector('.menu-trigger');
-            const mainNav = document.querySelector('.main-nav');
-            menuTrigger.addEventListener('click', () => {
-                menuTrigger.classList.toggle('active');
-                mainNav.classList.toggle('active');
+        document.addEventListener("DOMContentLoaded", function() {
+            // Page containers & elements
+            const mainPage = document.getElementById('main-page');
+            const cartPage = document.getElementById('cart-page');
+            const popups = [document.getElementById('popup-1'), document.getElementById('popup-2'), document.getElementById('popup-3')];
+            
+            const mainSubHeader = document.querySelector('#main-page .sub-header');
+            const mainFooter = document.querySelector('#main-page .sliding-footer');
+            const cartFooter = document.querySelector('#cart-page .sliding-footer');
+            
+            const adminPanel = document.getElementById('admin-panel');
+            const headerClickableArea = document.getElementById('header-clickable-area');
+            const bundleListView = document.getElementById('admin-bundle-list-view');
+            const bundleEditorView = document.getElementById('admin-bundle-editor');
+            const bundleList = document.getElementById('admin-bundle-list');
+            const addBundleBtn = document.getElementById('admin-add-bundle-btn');
+            const closeAdminBtn = document.getElementById('admin-close-btn');
+            const editorTitle = document.getElementById('admin-editor-title');
+            const urlInput = document.getElementById('admin-url-input');
+            const addUrlBtn = document.getElementById('admin-add-url-btn');
+            const urlList = document.getElementById('admin-url-list');
+            const saveBundleBtn = document.getElementById('admin-save-bundle-btn');
+
+            let lastScrollTop = 0;
+            let headerClickCount = 0;
+            let headerClickTimer;
+            let bundles = [];
+            let currentEditingBundleIndex = -1;
+
+            // --- Core Functions ---
+            function handleScroll() {
+                let st = window.pageYOffset || document.documentElement.scrollTop;
+                const onCartPage = !cartPage.classList.contains('hidden');
+                
+                if (!onCartPage) {
+                    if (st > 50) mainSubHeader.classList.add('sub-header-hidden');
+                    else mainSubHeader.classList.remove('sub-header-hidden');
+                }
+
+                const activeFooter = onCartPage ? cartFooter : mainFooter;
+                if (st > lastScrollTop && st > 50) activeFooter.classList.add('footer-hidden');
+                else activeFooter.classList.remove('footer-hidden');
+                
+                lastScrollTop = st <= 0 ? 0 : st;
+            }
+
+            function closeAllPopups() {
+                popups.forEach(p => p.classList.add('hidden'));
+                mainPage.classList.remove('blur'); cartPage.classList.remove('blur');
+            }
+            function showHomePage() {
+                closeAllPopups(); cartPage.classList.add('hidden');
+                mainPage.classList.remove('hidden'); window.scrollTo(0, 0); handleScroll();
+            }
+            function showCartPage() {
+                closeAllPopups(); mainPage.classList.add('hidden');
+                cartPage.classList.remove('hidden'); window.scrollTo(0, 0); 
+                runLoadingAnimation('#cart-page-content', false); // Run animation, don't change content
+                handleScroll();
+            }
+            function showPopup(popupElement) {
+                closeAllPopups(); popupElement.classList.remove('hidden');
+                const activePage = cartPage.classList.contains('hidden') ? mainPage : cartPage;
+                activePage.classList.add('blur');
+            }
+
+            // --- Admin Panel & Dynamic Content ---
+            const defaultContent = [ "https://ik.imagekit.io/goldencodes/Picsart_25-11-06_21-07-27-558.jpg?updatedAt=1762443478788", "https://ik.imagekit.io/goldencodes/Picsart_25-11-06_21-54-28-996.jpg?updatedAt=1762446300267" ];
+
+            function runLoadingAnimation(contentSelector, changeContentCallback) {
+                const contentArea = document.querySelector(contentSelector);
+                const loader = contentArea.parentElement.querySelector('.loader');
+                
+                contentArea.classList.add('loading');
+                loader.classList.add('active');
+
+                setTimeout(() => {
+                    if (changeContentCallback) {
+                        changeContentCallback();
+                    }
+                    loader.classList.remove('active');
+                    setTimeout(() => contentArea.classList.remove('loading'), 100);
+                }, 2000);
+            }
+            
+            function loadBundlesFromStorage() { bundles = JSON.parse(localStorage.getItem('contentBundles') || '[]'); }
+            function saveBundlesToStorage() { localStorage.setItem('contentBundles', JSON.stringify(bundles)); }
+
+            function showBundleListView() {
+                bundleListView.classList.remove('hidden');
+                bundleEditorView.classList.add('hidden'); renderBundleList();
+            }
+
+            function showBundleEditor(index) {
+                currentEditingBundleIndex = index;
+                bundleListView.classList.add('hidden');
+                bundleEditorView.classList.remove('hidden');
+                editorTitle.textContent = `Editing: ${bundles[index].name}`;
+                renderUrlList();
+            }
+
+            function renderBundleList() {
+                bundleList.innerHTML = '';
+                bundles.forEach((bundle, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${bundle.name} (${bundle.urls.length} images)</span><div><button data-index="${index}" class="edit-bundle-btn">Edit</button><button data-index="${index}" class="delete-bundle-btn danger">Delete</button></div>`;
+                    bundleList.appendChild(li);
+                });
+            }
+            
+            function renderUrlList() {
+                urlList.innerHTML = '';
+                const urls = bundles[currentEditingBundleIndex].urls;
+                urls.forEach((url, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${url}</span><button data-index="${index}" class="delete-url-btn danger">Delete</button>`;
+                    urlList.appendChild(li);
+                });
+            }
+            
+            headerClickableArea.addEventListener('click', () => {
+                headerClickCount++; clearTimeout(headerClickTimer);
+                headerClickTimer = setTimeout(() => { headerClickCount = 0; }, 1500);
+                if (headerClickCount === 5) {
+                    headerClickCount = 0; loadBundlesFromStorage();
+                    showBundleListView(); adminPanel.classList.remove('hidden');
+                }
             });
 
-            // --- YOUR NEW, CORRECT WEB APP URL IS HERE ---
-            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyGCWjDu7vDC1vPr5dhd4cROxVC_aevVKDVTAguu3VYazyVwiUV9TP-ocG9qAIYqaHa/exec';
-            
-            const loader = document.getElementById('loader');
-            const mainContent = document.getElementById('main-content');
+            closeAdminBtn.addEventListener('click', () => adminPanel.classList.add('hidden'));
+            addBundleBtn.addEventListener('click', () => {
+                const name = prompt("Enter a name for the new bundle:");
+                if (name) { bundles.push({ name: name, urls: [] }); showBundleEditor(bundles.length - 1); }
+            });
 
-            async function loadDashboardData() {
-                try {
-                    const response = await fetch(WEB_APP_URL, { 
-                        method: 'POST', 
-                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
-                        // This prevents CORS issues in some strict browser environments
-                        redirect: 'follow' 
-                    });
-                    if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
-                    const data = await response.json();
-                    populateDashboard(data);
-                } catch (error) {
-                    showError(error);
-                } finally {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.style.display = 'none', 500);
-                    mainContent.style.opacity = '1';
+            bundleList.addEventListener('click', (e) => {
+                const index = e.target.dataset.index;
+                if (e.target.classList.contains('edit-bundle-btn')) showBundleEditor(index);
+                if (e.target.classList.contains('delete-bundle-btn')) {
+                    if (confirm(`Are you sure you want to delete "${bundles[index].name}"?`)) {
+                        bundles.splice(index, 1); saveBundlesToStorage(); renderBundleList();
+                    }
                 }
-            }
-            loadDashboardData();
-        });
+            });
 
-        function populateDashboard(data) {
-            if (!data.success) {
-                showError({ message: data.error });
-                return;
-            }
+            addUrlBtn.addEventListener('click', () => {
+                const url = urlInput.value.trim();
+                if (url) { bundles[currentEditingBundleIndex].urls.push(url); urlInput.value = ''; renderUrlList(); }
+            });
+            urlList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-url-btn')) {
+                    bundles[currentEditingBundleIndex].urls.splice(e.target.dataset.index, 1); renderUrlList();
+                }
+            });
+            saveBundleBtn.addEventListener('click', () => { saveBundlesToStorage(); showBundleListView(); });
 
-            const animateValue = (el, end, duration = 1500) => {
-                let start = 0;
-                let startTimestamp = null;
-                const step = (timestamp) => {
-                    if (!startTimestamp) startTimestamp = timestamp;
-                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                    el.innerText = Math.floor(progress * (end - start) + start).toLocaleString();
-                    if (progress < 1) window.requestAnimationFrame(step);
-                };
-                window.requestAnimationFrame(step);
-            };
-
-            animateValue(document.getElementById('total-users'), data.stats.totalUsers);
-            animateValue(document.getElementById('total-tokens'), data.stats.totalRedTokens + data.stats.totalBlueTokens);
-            animateValue(document.getElementById('new-users'), data.stats.newUsers);
-            animateValue(document.getElementById('blocked-players'), data.stats.blockedPlayers);
+            // --- Initial Page Load ---
+            loadBundlesFromStorage();
+            let contentToRender;
+            if (bundles.length > 0) {
+                const randomBundle = bundles[Math.floor(Math.random() * bundles.length)];
+                contentToRender = randomBundle.urls;
+            } else { contentToRender = defaultContent; }
             
-            document.getElementById('red-tokens').innerText = `R: ${data.stats.totalRedTokens.toLocaleString()}`;
-            document.getElementById('blue-tokens').innerText = `B: ${data.stats.totalBlueTokens.toLocaleString()}`;
+            runLoadingAnimation('#main-page-content', () => {
+                const contentArea = document.getElementById('main-page-content');
+                contentArea.innerHTML = contentToRender.map(url => `<img src="${url}" alt="Main Content">`).join('');
+            });
 
-            if (data.buttonVisibility.showPayoutButton) document.getElementById('payout-btn').style.display = 'inline-block';
-            if (data.buttonVisibility.showRequestButton) document.getElementById('request-btn').style.display = 'inline-block';
-
-            // --- Initialize Graphs with enhanced options ---
-            // 1. Tournament Line Chart with Gradient
-            if (data.graphData.tournamentEntries.labels.length > 0) {
-                const chart = new Chartist.Line('#tournament-chart', data.graphData.tournamentEntries, {
-                    low: 0, showArea: true, fullWidth: true, chartPadding: { right: 40 },
-                    axisY: { onlyInteger: true },
-                });
-                chart.on('created', (ctx) => {
-                    const defs = ctx.svg.elem('defs');
-                    defs.elem('linearGradient', { id: 'area-gradient', x1: 0, y1: 0, x2: 0, y2: 1 })
-                        .elem('stop', { offset: 0, 'stop-color': 'rgba(245, 158, 11, 0.4)' })
-                        .parent().elem('stop', { offset: 1, 'stop-color': 'rgba(245, 158, 11, 0)' });
-                });
-            }
-
-            // 2. Player Status Donut Chart
-            if (data.graphData.playerStatus.series.some(v => v > 0)) {
-                new Chartist.Pie('#player-status-chart', data.graphData.playerStatus, {
-                    donut: true, donutWidth: 40, startAngle: 270, showLabel: false,
-                    plugins: [Chartist.plugins.legend({ legendNames: ['Active', 'Blocked'] })]
-                });
-            }
-
-            // 3. Token Distribution Pie Chart
-            if (data.graphData.tokenDistribution.series.some(v => v > 0)) {
-                const tokenData = { labels: ['Red', 'Blue'], series: data.graphData.tokenDistribution.series };
-                new Chartist.Pie('#token-dist-chart', tokenData, { showLabel: true,
-                    labelInterpolationFnc: v => `${Math.round(v / tokenData.series.reduce((a, b) => a + b) * 100)}%`
-                });
-            }
-        }
-
-        function showError(error) {
-            console.error('Dashboard Error:', error);
-            const container = document.querySelector('.container');
-            container.innerHTML = `<div style="text-align: center; padding: 4rem; color: var(--accent-red);"><h2>Failed to Load Dashboard</h2><p>${error.message}</p></div>`;
-        }
-        // Add Chartist plugin for legend
-        (function (window, document, Chartist) { 'use strict';
-          Chartist.plugins = Chartist.plugins || {};
-          Chartist.plugins.legend = function (options) {
-            return function legend(chart) {
-              const legendEl = document.createElement('ul');
-              legendEl.className = 'ct-legend';
-              if(chart.data.series.length && chart.data.series[0].data){ chart.data.series = chart.data.series[0].data; } // Fix for pie charts
-              chart.data.series.forEach((series, i) => {
-                const li = document.createElement('li');
-                li.className = `ct-series-${i}`;
-                li.textContent = options.legendNames[i];
-                legendEl.appendChild(li);
-              });
-              chart.container.appendChild(legendEl);
-            };
-          };
-        }(window, document, Chartist));
+            // --- Universal Triggers ---
+            document.querySelectorAll('.home-trigger').forEach(el => el.addEventListener('click', (e) => { e.preventDefault(); if (mainPage.classList.contains('hidden')) { showHomePage(); } else { window.location.reload(); } }));
+            document.querySelectorAll('.cart-trigger').forEach(el => el.addEventListener('click', showCartPage));
+            document.querySelectorAll('.popup-trigger-1').forEach(el => el.addEventListener('click', () => showPopup(popups[0])));
+            document.querySelectorAll('.popup-trigger-2').forEach(el => el.addEventListener('click', () => showPopup(popups[1])));
+            document.querySelectorAll('.popup-trigger-3').forEach(el => el.addEventListener('click', () => showPopup(popups[2])));
+            
+            window.addEventListener('scroll', handleScroll, false);
+            popups.forEach(p => p.addEventListener('click', (e) => { if (e.target === p) closeAllPopups(); }));
+        });
     </script>
-
 </body>
 </html>
