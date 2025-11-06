@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mobile Page - Final</title>
     <link rel="manifest" href="manifest.json">
+
+    <!-- Fix for iPhone Fullscreen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ffffff">
+
     <style>
         /* General Setup */
         :root { --loader-time: 2s; }
@@ -15,15 +21,34 @@
         img { width: 100%; display: block; height: auto; vertical-align: middle; }
         .hidden { display: none !important; }
 
+        /* --- Splash Screen --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999; /* Highest z-index to be on top */
+            background-image: url('https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-28-11-055.jpg?updatedAt=1762441127768');
+            background-size: cover;
+            background-position: center;
+            background-color: #ffffff; /* Fallback color */
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* For fade out */
+        }
+        #splash-screen.splash-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
         /* --- Header & Sub-Header --- */
         .sticky-header {
             position: sticky; top: 0; z-index: 1000;
             background-color: white;
+            padding-top: env(safe-area-inset-top); /* This ensures content isn't hidden by the notch */
         }
-        /* This is the key fix for the "blank spot" issue. The animation now collapses the height. */
         .sub-header {
             transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 200px; /* Should be larger than the actual sub-header height */
+            max-height: 200px;
             overflow: hidden;
             will-change: max-height;
         }
@@ -35,7 +60,7 @@
         #main-page-content-wrapper, #cart-page-content-wrapper { position: relative; }
         main {
            background-color: white; padding-bottom: 120px;
-           min-height: 300px; /* Prevents page collapse during load */
+           min-height: 300px;
         }
         main.loading { opacity: 0; transition: opacity 0.3s ease-out; }
         .loader {
@@ -78,7 +103,6 @@
             -webkit-backdrop-filter: blur(5px);
             z-index: 1001; display: flex; align-items: flex-end;
         }
-        /* This rule correctly keeps the header un-blurred */
         .page-wrapper.blur > *:not(.sticky-header, .popup-container) {
             filter: blur(5px);
         }
@@ -102,6 +126,9 @@
     </style>
 </head>
 <body>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen"></div>
 
     <!-- ======================= -->
     <!--      MAIN PAGE          -->
@@ -184,6 +211,20 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // --- Splash Screen Logic ---
+            const splashScreen = document.getElementById('splash-screen');
+            // Check if the splash screen has already been shown in this session
+            if (sessionStorage.getItem('splashShown')) {
+                // If it has (i.e., page was refreshed), hide it immediately
+                splashScreen.style.display = 'none';
+            } else {
+                // If it hasn't (i.e., app is starting), show it, set the flag, and then hide it after a delay
+                sessionStorage.setItem('splashShown', 'true');
+                setTimeout(() => {
+                    splashScreen.classList.add('splash-hidden');
+                }, 2500); // Hide after 2.5 seconds
+            }
+
             // Page containers & elements
             const mainPage = document.getElementById('main-page');
             const cartPage = document.getElementById('cart-page');
@@ -230,8 +271,13 @@
             }
 
             function closeAllPopups() {
-                popups.forEach(p => p.classList.add('hidden'));
-                mainPage.classList.remove('blur'); cartPage.classList.remove('blur');
+                popups.forEach(p => {
+                    p.classList.add('hidden');
+                    p.style.top = ''; // Reset inline style
+                    p.style.height = ''; // Reset inline style
+                });
+                mainPage.classList.remove('blur');
+                cartPage.classList.remove('blur');
             }
             function showHomePage() {
                 closeAllPopups(); cartPage.classList.add('hidden');
@@ -240,12 +286,23 @@
             function showCartPage() {
                 closeAllPopups(); mainPage.classList.add('hidden');
                 cartPage.classList.remove('hidden'); window.scrollTo(0, 0); 
-                runLoadingAnimation('#cart-page-content', false); // Run animation, don't change content
+                runLoadingAnimation('#cart-page-content', false);
                 handleScroll();
             }
             function showPopup(popupElement) {
-                closeAllPopups(); popupElement.classList.remove('hidden');
+                closeAllPopups(); // First, close any open popups and reset styles
+
                 const activePage = cartPage.classList.contains('hidden') ? mainPage : cartPage;
+                const activeHeader = activePage.querySelector('.sticky-header');
+
+                // Dynamically set the popup's position to be below the header
+                if (activeHeader) {
+                    const headerHeight = activeHeader.offsetHeight;
+                    popupElement.style.top = `${headerHeight}px`;
+                    popupElement.style.height = `calc(100% - ${headerHeight}px)`;
+                }
+
+                popupElement.classList.remove('hidden');
                 activePage.classList.add('blur');
             }
 
