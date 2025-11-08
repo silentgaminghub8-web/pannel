@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Page</title>
+    <style>
+        /* --- Global & Page Styles --- */
+        :root {
+            --primary-blue: #007bff;
+            --light-grey: #f0f2f2;
+            --medium-grey: #ccc;
+            --text-color: #0F1111;
+        }
+        body, html {
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-grey);
+            color: var(--text-color);
+        }
+        .fixed-header, .fixed-footer {
+            position: fixed; left: 0; width: 100%; z-index: 10;
+        }
+        .fixed-header { top: 0; }
+        .fixed-footer { bottom: 0; }
+        .fixed-header img, .fixed-footer img, .full-width-image img {
+            width: 100%; height: auto; display: block;
+        }
+        .full-width-image.no-gap { margin-top: -1px; }
+        .content { padding-top: 100px; padding-bottom: 100px; } /* Placeholder, will be set by JS */
+
+        /* --- Modules --- */
+        .module {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .module-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .module-title { font-weight: bold; font-size: 18px; }
+        .see-all, .edit-button {
+            text-decoration: none; color: var(--primary-blue); font-size: 14px;
+            background: none; border: none; cursor: pointer; padding: 0;
+        }
+        .edit-button { margin-right: 5px; }
+
+        /* Quick Access */
+        .quick-access {
+            background-color: #fff; overflow-x: auto; white-space: nowrap;
+            padding: 15px; border-bottom: 1px solid #ddd;
+        }
+        .quick-access-inner { display: inline-block; }
+        .pill-button {
+            background-color: #fff; border: 1px solid var(--medium-grey); border-radius: 50px;
+            padding: 10px 20px; margin-right: 10px; font-size: 14px; cursor: pointer;
+        }
+
+        /* Card Row */
+        .card-row { display: flex; overflow-x: auto; padding-bottom: 15px; }
+        .card-row::-webkit-scrollbar { display: none; }
+        .card {
+            flex: 0 0 140px; width: 140px; height: 140px;
+            background-color: #fff; border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: 10px; display: flex; align-items: center;
+            justify-content: center; padding: 10px; box-sizing: border-box;
+        }
+        .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .placeholder-text { color: #666; font-size: 14px; }
+
+        /* Keep Shopping Footer */
+        .module-footer { text-align: center; margin-top: 10px; }
+        .see-more-link {
+            color: #555; text-decoration: none; display: inline-flex;
+            align-items: center; font-size: 14px;
+        }
+        .arrow-down { width: 24px; height: 24px; fill: currentColor; }
+
+        /* Your Lists Module */
+        .list-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px; border: 1px solid #ddd; border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .list-card-text { display: flex; flex-direction: column; }
+        .list-title { font-weight: bold; }
+        .list-subtitle { font-size: 12px; color: #555; }
+        .list-card-previews { display: flex; gap: 5px; }
+        .preview-square {
+            width: 40px; height: 40px; background-color: #f0f0f0;
+            border-radius: 4px; background-size: cover; background-position: center;
+        }
+        .extra-items {
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; color: #333;
+        }
+
+        /* Your Account Module */
+        .account-buttons { display: flex; gap: 10px; }
+        .account-button {
+            flex: 1; padding: 15px 10px; font-size: 14px;
+            background-color: #fff; border: 1px solid #ddd;
+            border-radius: 8px; text-align: center; cursor: pointer;
+        }
+
+        /* Need Help Module */
+        .help-module { text-align: center; }
+        .help-title { font-size: 18px; margin-bottom: 15px; }
+        .help-button {
+            width: calc(100% - 20px); padding: 15px; background-color: #fff;
+            border: 1px solid #ddd; border-radius: 8px; font-size: 16px;
+            cursor: pointer; margin: 0 auto;
+        }
+
+        /* --- Admin Panel Overlay Styles --- */
+        .admin-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 100;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .admin-overlay.visible { display: flex; opacity: 1; }
+        .admin-container {
+            width: 90%; max-width: 700px; background-color: #fff;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; overflow: hidden; height: 90vh; max-height: 800px;
+        }
+        .admin-header {
+            padding: 20px; border-bottom: 1px solid #eee;
+        }
+        .admin-header h1 { margin: 0 0 5px 0; font-size: 22px; }
+        .admin-header p { margin: 0; color: #666; }
+        .admin-tabs { display: flex; border-bottom: 1px solid #eee; }
+        .admin-tab {
+            flex: 1; padding: 15px 10px; text-align: center; cursor: pointer;
+            background-color: #f8f9fa; color: #6c757d; border-bottom: 3px solid transparent;
+            transition: background-color 0.2s, border-color 0.2s; white-space: nowrap;
+        }
+        .admin-tab.active { background-color: #fff; border-bottom-color: var(--primary-blue); color: #000; }
+        .admin-content { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .admin-tab-content { display: none; }
+        .admin-tab-content.active { display: block; }
+        .admin-note { color: #555; font-size: 14px; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+        .url-input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .url-preview {
+            width: 50px; height: 50px; flex-shrink: 0; background-color: #eee;
+            border-radius: 6px; background-size: cover; background-position: center;
+        }
+        .url-input {
+            flex-grow: 1; padding: 12px; border: 1px solid var(--medium-grey);
+            border-radius: 4px; font-size: 14px;
+        }
+        .remove-url-btn {
+            background: #e6e6e6; border: none; color: #555; font-weight: bold; width: 30px; height: 30px;
+            border-radius: 50%; cursor: pointer; flex-shrink: 0;
+        }
+        .remove-url-btn:hover { background-color: #dc3545; color: white; }
+        .add-url-btn {
+            display: block; width: 100%; padding: 12px; background-color: #f8f9fa;
+            border: 1px dashed var(--medium-grey); border-radius: 4px; cursor: pointer; margin-top: 15px;
+        }
+        .admin-footer {
+            padding: 15px 20px; border-top: 1px solid #eee; background-color: #fff;
+            display: flex; gap: 10px;
+        }
+        .admin-button {
+            flex: 1; padding: 12px; border: none; border-radius: 6px;
+            font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none;
+        }
+        .admin-button.primary { background-color: var(--primary-blue); color: white; }
+        .admin-button.secondary { background-color: #6c757d; color: white; }
+        .save-feedback {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background-color: #28a745; color: white; padding: 10px 20px;
+            border-radius: 6px; opacity: 0; transition: all 0.4s ease; z-index: 101;
+        }
+        .save-feedback.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <header class="fixed-header">
+        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header" id="header-img">
+    </header>
+
+    <main class="content">
+        <div class="full-width-image no-gap">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_00-40-33-042.jpg?updatedAt=1762629100597" alt="Sub Header">
+        </div>
+
+        <div class="quick-access">
+            <div class="quick-access-inner">
+                <button class="pill-button">Orders</button>
+                <button class="pill-button">Buy Again</button>
+                <button class="pill-button">Account</button>
+                <button class="pill-button">Lists</button>
+            </div>
+        </div>
+
+        <div class="module">
+            <div class="module-header">
+                <span class="module-title">Your Orders</span>
+                <a href="#" class="see-all">See all</a>
+            </div>
+            <div class="card-row" id="yourOrders-cards"></div>
+        </div>
+
+        <div class="module">
+            <div class="module-header">
+                <span class="module-title">Buy Again</span>
+                <a href="#" class="see-all">See all</a>
+            </div>
+            <div class="card-row" id="buyAgain-cards"></div>
+        </div>
+
+        <div class="module">
+            <div class="module-header">
+                <span class="module-title">Keep shopping for</span>
+                <div>
+                    <button class="edit-button" id="openAdminButton">Edit</button> |
+                    <a href="#" class="see-all">Browsing history</a>
+                </div>
+            </div>
+            <div class="card-row" id="keepShopping-cards"></div>
+            <div class="module-footer">
+                <a href="#" class="see-more-link">
+                    <svg class="arrow-down" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg>
+                    See more
+                </a>
+            </div>
+        </div>
+        
+        <div class="module">
+            <div class="module-header">
+                <span class="module-title">Your Lists</span>
+                <a href="#" class="see-all">See all</a>
+            </div>
+            <div class="list-card">
+                <div class="list-card-text">
+                    <span class="list-title">Shopping List</span>
+                    <span class="list-subtitle">Private • Default</span>
+                </div>
+                <div class="list-card-previews">
+                    <div class="preview-square" id="list-preview-1"></div>
+                    <div class="preview-square" id="list-preview-2"></div>
+                    <div class="preview-square extra-items">+2</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="module">
+            <div class="module-header">
+                <span class="module-title">Your Account</span>
+                <a href="#" class="see-all">See all</a>
+            </div>
+            <div class="account-buttons">
+                <button class="account-button">Your Orders</button>
+                <button class="account-button">Your Addresses</button>
+                <button class="account-button">Amazon Pay UPI</button>
+            </div>
+        </div>
+
+        <div class="full-width-image">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_02-08-25-361.jpg?updatedAt=1762634330892" alt="Decorative Image">
+        </div>
+
+        <div class="module help-module">
+            <h3 class="help-title">Need more help?</h3>
+            <button class="help-button">Visit customer service</button>
+        </div>
+
+    </main>
+
+    <footer class="fixed-footer">
+        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_01-17-05-266.jpg?updatedAt=1762631248379" alt="Footer" id="footer-img">
+    </footer>
+    
+    <!-- Admin Panel Overlay -->
+    <div class="admin-overlay" id="adminPanel">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>Manage Page Images</h1>
+                <p>Add or remove image URLs. Previews update automatically.</p>
+            </div>
+            <div class="admin-tabs" id="adminTabsContainer"></div>
+            <div class="admin-content" id="adminContentContainer"></div>
+            <div class="admin-footer">
+                <button id="closeAdminButton" class="admin-button secondary">Close</button>
+                <button id="saveButton" class="admin-button primary">Save & Close</button>
+            </div>
+        </div>
+    </div>
+    <div class="save-feedback" id="saveFeedback">Saved Successfully!</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const SECTIONS = [
+            { key: 'yourOrders', title: 'Your Orders', note: 'Add URLs for the square product cards.' },
+            { key: 'buyAgain', title: 'Buy Again', note: 'Add URLs for the square product cards.' },
+            { key: 'keepShopping', title: 'Keep Shopping', note: 'Add URLs for the square product cards.' },
+            { key: 'yourLists', title: 'Your Lists', note: 'Add the first two image URLs for the list preview.' }
+        ];
+
+        const adminPanel = document.getElementById('adminPanel');
+        const openAdminButton = document.getElementById('openAdminButton');
+        const closeAdminButton = document.getElementById('closeAdminButton');
+        const saveButton = document.getElementById('saveButton');
+        const adminTabsContainer = document.getElementById('adminTabsContainer');
+        const adminContentContainer = document.getElementById('adminContentContainer');
+
+        function setContentPadding() {
+            const headerHeight = document.getElementById('header-img').offsetHeight;
+            const footerHeight = document.getElementById('footer-img').offsetHeight;
+            document.querySelector('.content').style.paddingTop = `${headerHeight}px`;
+            document.querySelector('.content').style.paddingBottom = `${footerHeight}px`;
+        }
+
+        function createCard(imageUrl) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<img src="${imageUrl}" alt="Product Image">`;
+            return card;
+        }
+
+        function loadCardSection(sectionKey) {
+            const container = document.getElementById(`${sectionKey}-cards`);
+            if (!container) return;
+            const images = JSON.parse(localStorage.getItem(sectionKey)) || [];
+            container.innerHTML = '';
+            if (images.length > 0 && images.some(url => url.trim())) {
+                images.forEach(url => { if (url.trim()) container.appendChild(createCard(url)); });
+            } else {
+                container.innerHTML = '<p class="placeholder-text">Click "Edit" to add images.</p>';
+            }
+        }
+
+        function loadListPreviews() {
+            const listImages = JSON.parse(localStorage.getItem('yourLists')) || [];
+            document.getElementById('list-preview-1').style.backgroundImage = listImages[0] ? `url(${listImages[0]})` : 'none';
+            document.getElementById('list-preview-2').style.backgroundImage = listImages[1] ? `url(${listImages[1]})` : 'none';
+        }
+        
+        function refreshAllDynamicContent() {
+            loadCardSection('yourOrders');
+            loadCardSection('buyAgain');
+            loadCardSection('keepShopping');
+            loadListPreviews();
+        }
+
+        // --- Admin Panel Logic ---
+        function createUrlInput(url = '') {
+            const group = document.createElement('div');
+            group.className = 'url-input-group';
+            group.innerHTML = `
+                <div class="url-preview"></div>
+                <input type="text" class="url-input" placeholder="https://..." value="">
+                <button class="remove-url-btn">&times;</button>
+            `;
+            const textInput = group.querySelector('.url-input');
+            const preview = group.querySelector('.url-preview');
+            textInput.value = url;
+            if (url) preview.style.backgroundImage = `url(${url})`;
+
+            textInput.addEventListener('input', () => {
+                preview.style.backgroundImage = textInput.value ? `url(${textInput.value})` : 'none';
+            });
+            group.querySelector('.remove-url-btn').addEventListener('click', () => group.remove());
+            return group;
+        }
+
+        function buildAdminPanel() {
+            SECTIONS.forEach((section, index) => {
+                adminTabsContainer.innerHTML += `<div class="admin-tab" data-tab="${section.key}">${section.title}</div>`;
+                const content = document.createElement('div');
+                content.className = 'admin-tab-content';
+                content.id = `${section.key}-content`;
+                content.innerHTML = `
+                    <p class="admin-note">${section.note}</p>
+                    <div id="${section.key}-urls"></div>
+                    <button class="add-url-btn" data-target="${section.key}-urls">+ Add New URL</button>
+                `;
+                adminContentContainer.appendChild(content);
+
+                if (index === 0) {
+                    adminTabsContainer.firstElementChild.classList.add('active');
+                    content.classList.add('active');
+                }
+            });
+
+            adminTabsContainer.addEventListener('click', e => {
+                if (e.target.matches('.admin-tab')) {
+                    const tabKey = e.target.dataset.tab;
+                    adminTabsContainer.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                    adminContentContainer.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById(`${tabKey}-content`).classList.add('active');
+                }
+            });
+
+            adminContentContainer.addEventListener('click', e => {
+                if(e.target.matches('.add-url-btn')) {
+                    const targetId = e.target.dataset.target;
+                    document.getElementById(targetId).appendChild(createUrlInput());
+                }
+            });
+        }
+
+        function populateAdminPanel() {
+            SECTIONS.forEach(section => {
+                const urls = JSON.parse(localStorage.getItem(section.key)) || [];
+                const urlListContainer = document.getElementById(`${section.key}-urls`);
+                urlListContainer.innerHTML = '';
+                if (urls.length > 0) {
+                    urls.forEach(url => urlListContainer.appendChild(createUrlInput(url)));
+                } else {
+                    urlListContainer.appendChild(createUrlInput());
+                }
+            });
+        }
+        
+        function openAdmin() { populateAdminPanel(); adminPanel.classList.add('visible'); }
+        function closeAdmin() { adminPanel.classList.remove('visible'); }
+
+        function saveChanges() {
+            SECTIONS.forEach(section => {
+                const urlContainer = document.getElementById(`${section.key}-urls`);
+                const inputs = urlContainer.querySelectorAll('.url-input');
+                const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
+                localStorage.setItem(section.key, JSON.stringify(urls));
+            });
+            const feedback = document.getElementById('saveFeedback');
+            feedback.classList.add('visible');
+            setTimeout(() => feedback.classList.remove('visible'), 2000);
+            
+            refreshAllDynamicContent();
+            setTimeout(closeAdmin, 300);
+        }
+
+        // --- Event Listeners & Initial Calls ---
+        window.addEventListener('load', () => {
+            setContentPadding();
+            buildAdminPanel();
+            refreshAllDynamicContent();
+        });
+        window.addEventListener('resize', setContentPadding);
+        
+        openAdminButton.addEventListener('click', openAdmin);
+        closeAdminButton.addEventListener('click', closeAdmin);
+        saveButton.addEventListener('click', saveChanges);
+        adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdmin(); });
+    });
+    </script>
+</body>
+</html>
