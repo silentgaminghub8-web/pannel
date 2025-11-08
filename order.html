@@ -176,7 +176,6 @@
             background-color: #28a745; color: white; padding: 10px 20px;
             border-radius: 6px; opacity: 0; transition: all 0.4s ease; z-index: 101;
         }
-        .save-feedback.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
@@ -192,7 +191,7 @@
 
         <div class="quick-access">
             <div class="quick-access-inner">
-                <button class="pill-button">Orders</button>
+                <a href="order2.html" class="pill-button" style="text-decoration:none; color: var(--text-color);">Orders</a>
                 <button class="pill-button">Buy Again</button>
                 <button class="pill-button">Account</button>
                 <button class="pill-button">Lists</button>
@@ -202,7 +201,7 @@
         <div class="module">
             <div class="module-header">
                 <span class="module-title">Your Orders</span>
-                <a href="#" class="see-all">See all</a>
+                <a href="order2.html" class="see-all">See all</a>
             </div>
             <div class="card-row" id="yourOrders-cards"></div>
         </div>
