@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Your Orders</title>
+    <style>
+        /* General Body and Page Setup */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #0F1111;
+        }
+
+        .page {
+            display: none; /* Pages are hidden by default */
+            padding-bottom: 100px; /* Space for the footer */
+            padding-top: 50px; /* Space for the header */
+        }
+
+        .page.active {
+            display: block; /* The active page is shown */
+        }
+
+        /* Header and Footer (Fixed Overlays) */
+        .fixed-header, .fixed-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .fixed-header {
+            top: 0;
+        }
+
+        .fixed-footer {
+            bottom: 0;
+            cursor: pointer; /* Indicates the footer is clickable */
+        }
+
+        .fixed-header img, .fixed-footer img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Main Page Specific Styles */
+        #main-page .admin-panel-link img {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .module {
+            padding: 16px;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .module-header h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .module-header .see-more {
+            font-size: 0.9rem;
+            color: #007185;
+            text-decoration: none;
+            font-weight: normal;
+            cursor: pointer; /* Change cursor to indicate it's clickable */
+        }
+
+        .buy-again-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .buy-again-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .buy-again-card img {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .buy-again-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .separator {
+            height: 8px;
+            background-color: #EAEDED;
+            border: none;
+            margin: 0;
+        }
+
+        .purchase-history-header h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+        }
+
+        .purchase-history-header p {
+            font-size: 0.9rem;
+            color: #565959;
+            margin: 0;
+        }
+        
+        /* --- PURCHASE HISTORY CARD STYLES --- */
+        .purchase-item-card {
+            display: flex; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            margin-bottom: 12px;
+            background-color: #fff; 
+            overflow: hidden; 
+            align-items: stretch; 
+        }
+
+        .purchase-item-card .item-image {
+            flex-basis: 100px; 
+            flex-shrink: 0;
+            padding: 12px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #eee; 
+            background-color: #F0F2F2;
+        }
+
+        .purchase-item-card .item-image img {
+            max-width: 100%; 
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .purchase-item-card .item-info {
+            flex-grow: 1; 
+            padding: 16px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+        }
+
+        .purchase-item-card .item-info .item-name {
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            color: #0F1111;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+         .purchase-item-card .item-info .item-name:hover {
+            color: #007185;
+         }
+
+        .purchase-item-card .item-info .item-status {
+            font-size: 0.9rem;
+            color: #565959;
+            margin: 0;
+        }
+        
+        /* Order Details Page Styles */
+        .product-info-module {
+            display: flex;
+            padding: 16px;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .product-info-module .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+        
+        .product-info-module .product-details .product-name {
+            color: #007185;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .product-info-module .product-details .share-item {
+            color: #007185;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .delivery-status-module {
+            padding: 16px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .delivery-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .delivery-status .icon {
+            background-color: #007185;
+            color: white;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .delivery-status .text-bold {
+            font-weight: bold;
+        }
+
+        .delivery-feedback {
+            margin-bottom: 16px;
+        }
+
+        .delivery-feedback .feedback-text {
+            font-size: 0.8rem;
+            color: #565959;
+            margin-bottom: 4px;
+        }
+        
+        .delivery-feedback .stars {
+            color: #FFA41C;
+            font-size: 1.5rem;
+        }
+
+        .list-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #ddd;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .list-button .button-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .list-button .button-text .sub-text {
+            font-size: 0.8rem;
+            color: #565959;
+            margin-top: 2px;
+        }
+        
+        .list-button .arrow {
+            color: #888;
+        }
+        
+        .module-with-buttons {
+            padding: 0 16px;
+        }
+
+        .module-with-buttons h3 {
+            font-size: 1.2rem;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .details-page-footer {
+            padding: 16px;
+            color: #565959;
+            font-size: 0.9rem;
+        }
+
+        /* Admin Panel Styles */
+        #admin-page .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .admin-container h1, .admin-container h2 {
+            text-align: center;
+        }
+
+        .form-section {
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-section input[type="text"],
+        .form-section input[type="url"],
+        .form-section input[type="date"],
+        .form-section select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* Important */
+        }
+
+        .form-section button {
+            background-color: #007185;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .form-section button:hover {
+            background-color: #005a6a;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .item-list li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-list .delete-btn {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Header - Visible on all pages -->
+    <header class="fixed-header">
+        <a href="#home">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header Image">
+        </a>
+    </header>
+
+    <!-- PAGE 1: Main "Your Orders" Page -->
+    <div id="main-page" class="page">
+        <div style="padding: 16px;">
+            <h1 style="font-size: 1.8rem; font-weight: bold; margin: 0;">Your Orders</h1>
+        </div>
+        
+        <a href="#admin" class="admin-panel-link">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_03-04-23-916.jpg?updatedAt=1762637690349" alt="Admin Panel">
+        </a>
+
+        <!-- "Buy again" Module -->
+        <div class="module">
+            <div class="module-header">
+                <h2>Buy again</h2>
+                <!-- This link now triggers fullscreen -->
+                <a id="open-fullscreen-btn" class="see-more">See more</a>
+            </div>
+            <div class="buy-again-grid" id="buy-again-container">
+                <!-- Buy Again items will be injected here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Separator -->
+        <hr class="separator">
+
+        <!-- "Purchase history" Module -->
+        <div class="module">
+            <div class="purchase-history-header">
+                <h2>Purchase history</h2>
+                <p>Past three months</p>
+            </div>
+            <div id="purchase-history-container">
+                <!-- Purchase History items will be injected here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: Order Details Page -->
+    <div id="details-page" class="page">
+        <div class="content" id="order-details-content">
+            <!-- Order details will be dynamically generated here -->
+        </div>
+    </div>
+
+    <!-- PAGE 3: Admin Panel -->
+    <div id="admin-page" class="page">
+        <div class="admin-container">
+            <a href="#home">&larr; Back to Main Page</a>
+            <h1>Admin Panel</h1>
+            <p>Add or remove items from the main page. All data is saved in your browser's local storage.</p>
+            
+            <div class="form-section">
+                <h2>Add New Item</h2>
+                <form id="addItemForm">
+                    <label for="itemType">Item Type:</label>
+                    <select id="itemType" name="itemType" required>
+                        <option value="buyAgain">Buy Again</option>
+                        <option value="purchaseHistory">Purchase History</option>
+                    </select>
+
+                    <label for="itemName">Product Name:</label>
+                    <input type="text" id="itemName" name="itemName" required>
+
+                    <label for="itemImage">Image URL:</label>
+                    <input type="url" id="itemImage" name="itemImage" required>
+
+                    <label for="orderDate">Order Date:</label>
+                    <input type="date" id="orderDate" name="orderDate" required>
+
+                    <label for="deliveryDate">Delivery Date (for Purchase History):</label>
+                    <input type="date" id="deliveryDate" name="deliveryDate">
+                    
+                    <label for="eligibleDate">Replacement Eligible Date (for Purchase History):</label>
+                    <input type="date" id="eligibleDate" name="eligibleDate">
+
+                    <button type="submit">Add Item</button>
+                </form>
+            </div>
+
+            <div class="current-items">
+                <h2>Current "Buy Again" Items</h2>
+                <ul class="item-list" id="buy-again-admin-list"></ul>
+                
+                <h2>Current "Purchase History" Items</h2>
+                <ul class="item-list" id="purchase-history-admin-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Footer - Visible on all pages -->
+    <footer class="fixed-footer">
+        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_01-17-05-266.jpg?updatedAt=1762631248379" alt="Footer Image">
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- DATABASE (LOCAL STORAGE) ---
+    const DB = {
+        get: (key) => JSON.parse(localStorage.getItem(key)) || [],
+        set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+    };
+    
+    // --- INITIAL/DEFAULT DATA ---
+    function initializeDefaultData() {
+        if (!localStorage.getItem('initialized')) {
+            const defaultBuyAgain = [
+                { id: 1, name: 'Writing Pad', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg' },
+                { id: 2, name: 'Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg' },
+            ];
+            const defaultPurchaseHistory = [
+                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15' },
+                 { id: 102, name: 'Mobile Prepaid Recharge', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07' },
+            ];
+            DB.set('buyAgainItems', defaultBuyAgain);
+            DB.set('purchaseHistoryItems', defaultPurchaseHistory);
+            localStorage.setItem('initialized', 'true');
+        }
+    }
+
+    // --- ROUTING ---
+    const pages = document.querySelectorAll('.page');
+
+    function showPage(pageId, params = null) {
+        pages.forEach(page => page.classList.remove('active'));
+        
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            window.scrollTo(0, 0);
+
+            if (pageId === 'details-page' && params) {
+                renderOrderDetails(params.id);
+            } else if (pageId === 'main-page') {
+                renderAllMainPageContent();
+            } else if (pageId === 'admin-page') {
+                renderAdminLists();
+            }
+        }
+    }
+    
+    function handleRouteChange() {
+        const hash = window.location.hash || '#home';
+        
+        if (hash.startsWith('#details-')) {
+            const id = parseInt(hash.split('-')[1]);
+            showPage('details-page', { id });
+        } else if (hash === '#admin') {
+            showPage('admin-page');
+        } else {
+            showPage('main-page');
+        }
+    }
+
+    // --- DATE FORMATTING UTILITY ---
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    }
+
+    // --- RENDERING FUNCTIONS ---
+    function renderBuyAgainItems() {
+        const items = DB.get('buyAgainItems');
+        const container = document.getElementById('buy-again-container');
+        container.innerHTML = '';
+        items.forEach(item => {
+            container.innerHTML += `
+                <div class="buy-again-card">
+                    <img src="${item.imageUrl}" alt="${item.name}">
+                    <p>${item.name}</p>
+                </div>
+            `;
+        });
+    }
+
+    function renderPurchaseHistory() {
+        const items = DB.get('purchaseHistoryItems');
+        const container = document.getElementById('purchase-history-container');
+        container.innerHTML = '';
+        items.forEach(item => {
+            container.innerHTML += `
+                <div class="purchase-item-card">
+                    <div class="item-image">
+                        <img src="${item.imageUrl}" alt="${item.name}">
+                    </div>
+                    <div class="item-info">
+                        <a href="#details-${item.id}" class="item-name">${item.name}</a>
+                        <p class="item-status">Delivered on ${formatDate(item.deliveryDate)}</p>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function renderOrderDetails(itemId) {
+        const items = DB.get('purchaseHistoryItems');
+        const item = items.find(p => p.id === itemId);
+        const container = document.getElementById('order-details-content');
+
+        if (!item) {
+            container.innerHTML = '<p>Order not found.</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="product-info-module">
+                <img src="${item.imageUrl}" alt="${item.name}" class="product-image">
+                <div class="product-details">
+                    <a href="#" class="product-name">${item.name}</a>
+                    <a href="#" class="share-item">Share this item</a>
+                </div>
+            </div>
+            <div class="delivery-status-module">
+                <div class="delivery-status">
+                    <div class="icon">&#10003;</div>
+                    <div>
+                        <div class="text-bold">Delivered on ${formatDate(item.deliveryDate)}</div>
+                        <div>Package was handed to resident</div>
+                    </div>
+                </div>
+                <div class="delivery-feedback">
+                    <div class="feedback-text">Your delivery feedback</div>
+                    <div class="stars">★★★★★</div>
+                </div>
+                <a href="#" class="list-button">
+                    <span>Track package</span>
+                    <span class="arrow">&gt;</span>
+                </a>
+            </div>
+            <hr class="separator">
+            <div class="module-with-buttons">
+                <h3>Need help with your item?</h3>
+                <a href="#" class="list-button"><span>Get product support</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button">
+                    <span class="button-text">
+                        Replace item
+                        <span class="sub-text">Eligible till ${formatDate(item.eligibleDate)}</span>
+                    </span>
+                    <span class="arrow">&gt;</span>
+                </a>
+            </div>
+            <hr class="separator">
+            <div class="module-with-buttons">
+                <h3>How's your item?</h3>
+                <a href="#" class="list-button"><span>Write a product review</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Create a video review</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Leave seller feedback</span><span class="arrow">&gt;</span></a>
+            </div>
+            <hr class="separator">
+            <div class="module-with-buttons">
+                 <h3>Order info</h3>
+                 <a href="#" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
+                 <a href="#" class="list-button"><span>Share gift receipt</span><span class="arrow">&gt;</span></a>
+                 <a href="#" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
+            </div>
+            <div class="details-page-footer">
+                Ordered on ${formatDate(item.orderDate)}
+            </div>
+        `;
+    }
+    
+    function renderAdminLists() {
+        const buyAgainItems = DB.get('buyAgainItems');
+        const buyAgainList = document.getElementById('buy-again-admin-list');
+        buyAgainList.innerHTML = '';
+        buyAgainItems.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${item.name}</span> <button class="delete-btn" data-id="${item.id}" data-type="buyAgain">Delete</button>`;
+            buyAgainList.appendChild(li);
+        });
+
+        const purchaseHistoryItems = DB.get('purchaseHistoryItems');
+        const purchaseHistoryList = document.getElementById('purchase-history-admin-list');
+        purchaseHistoryList.innerHTML = '';
+        purchaseHistoryItems.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${item.name}</span> <button class="delete-btn" data-id="${item.id}" data-type="purchaseHistory">Delete</button>`;
+            purchaseHistoryList.appendChild(li);
+        });
+    }
+
+    function renderAllMainPageContent() {
+        renderBuyAgainItems();
+        renderPurchaseHistory();
+    }
+
+    // --- ADMIN PANEL LOGIC ---
+    const addItemForm = document.getElementById('addItemForm');
+    addItemForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const type = e.target.itemType.value;
+        const name = e.target.itemName.value;
+        const imageUrl = e.target.itemImage.value;
+        const orderDate = e.target.orderDate.value;
+        const deliveryDate = e.target.deliveryDate.value;
+        const eligibleDate = e.target.eligibleDate.value;
+        const newItem = { id: Date.now(), name, imageUrl, orderDate, deliveryDate, eligibleDate };
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        const items = DB.get(key);
+        items.push(newItem);
+        DB.set(key, items);
+        renderAdminLists();
+        addItemForm.reset();
+    });
+
+    document.querySelector('.admin-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+            const id = parseInt(e.target.dataset.id);
+            const type = e.target.dataset.type;
+            const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+            let items = DB.get(key);
+            items = items.filter(item => item.id !== id);
+            DB.set(key, items);
+            renderAdminLists();
+        }
+    });
+
+    // --- FULLSCREEN FUNCTIONALITY ---
+    const fullscreenBtn = document.getElementById('open-fullscreen-btn');
+    const elem = document.documentElement; // The <html> element
+
+    /* Function to open fullscreen mode */
+    function openFullscreen() {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Safari */
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE11 */
+            elem.msRequestFullscreen();
+        }
+    }
+
+    fullscreenBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent link from doing anything else
+        openFullscreen();
+    });
+    
+    // --- NEW FOOTER CLICK FUNCTIONALITY ---
+    const footer = document.querySelector('.fixed-footer');
+    footer.addEventListener('click', () => {
+        window.location.hash = '#home';
+    });
+
+
+    // --- INITIALIZATION ---
+    initializeDefaultData();
+    window.addEventListener('hashchange', handleRouteChange);
+    handleRouteChange(); // Initial route handling
+});
+</script>
+
+</body>
+</html>
