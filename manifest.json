@@ -1,22 +1,23 @@
 {
   "name": "Mobile Page - Final",
-  "short_name": "Amazon",
+  "short_name": "MobileFinal",
+  "description": "A mobile web application.",
   "start_url": "/pannel/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
-  "description": "A mobile web application.",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "https://ik.imagekit.io/goldencodes/Picsart_25-11-07_03-31-48-162.jpg?updatedAt=1762466657252",
-      "sizes": "192x192",
       "type": "image/jpeg",
+      "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
       "src": "https://ik.imagekit.io/goldencodes/Picsart_25-11-07_03-31-48-162.jpg?updatedAt=1762466657252",
-      "sizes": "512x512",
       "type": "image/jpeg",
+      "sizes": "512x512",
       "purpose": "any maskable"
     }
   ]
