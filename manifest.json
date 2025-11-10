@@ -1,7 +1,7 @@
 {
   "name": "Mobile Page - Final",
   "short_name": "Amazon",
-  "start_url": "/",
+  "start_url": "/pannel/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
