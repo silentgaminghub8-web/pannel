@@ -1,10 +1,12 @@
+// Cache ka naya naam
 const CACHE_NAME = 'mobile-pannel-v1'; 
+
+// Naye project ke liye cache karne wali files
 const urlsToCache = [
   '/pannel/',
   '/pannel/index.html'
 ];
 
-// Install service worker and cache essential assets
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -16,7 +18,6 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activate service worker and clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -33,8 +34,11 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// Serve cached content when offline
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
