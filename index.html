@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Page - Final</title>
+    
+    <!-- PWA Links -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_03-31-48-162.jpg?updatedAt=1762466657252">
+    
+    <style>
+        /* Simple styles inspired by your working PWA */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            font-family: sans-serif; 
+            background-color: #ffffff; 
+        }
+        img { 
+            max-width: 100%; 
+            display: block; 
+        }
+        .header { 
+            background: #fff; 
+            padding: 0; /* No padding as image is full-width */
+            text-align: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+        main { 
+            padding: 0; 
+        }
+        .install-container { 
+            text-align: center; 
+            padding: 20px 15px; 
+            background-color: #f7f7f7;
+            border-bottom: 1px solid #eee;
+        }
+        .install-button {
+            display: none; /* JavaScript will make this visible */
+            background-color: #ffd700;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .install-button:hover {
+            transform: scale(1.03);
+        }
+        .content-image { 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header">
+    </header>
+
+    <main>
+        <!-- Install Button Container -->
+        <div class="install-container">
+            <button id="install-pwa-btn" class="install-button">Install App Now</button>
+        </div>
+
+        <!-- Your App Content -->
+        <div class="content-image">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_21-07-27-558.jpg?updatedAt=1762443478788" alt="Main Content 1">
+        </div>
+        <div class="content-image">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_21-54-28-996.jpg?updatedAt=1762446300267" alt="Main Content 2">
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- THIS IS THE EXACT INSTALL SCRIPT FROM YOUR WORKING PWA ---
+            let deferredPrompt;
+            const installPwaBtn = document.getElementById('install-pwa-btn');
+
+            // Check if app is already installed
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            if (isStandalone) {
+                console.log('App is already installed and running in standalone mode.');
+            } else {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    if (installPwaBtn) {
+                        installPwaBtn.style.display = 'block'; // Show the button
+                    }
+                });
+            }
+
+            if (installPwaBtn) {
+                installPwaBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        installPwaBtn.style.display = 'none'; // Hide button after click
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                    }
+                });
+            }
+
+            window.addEventListener('appinstalled', () => {
+                if (installPwaBtn) {
+                    installPwaBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+            
+            // --- THIS IS THE EXACT SERVICE WORKER SCRIPT FROM YOUR WORKING PWA ---
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    // The path is corrected for your new project
+                    navigator.serviceWorker.register('/pannel/sw.js')
+                        .then(registration => console.log('ServiceWorker registered successfully with scope: ', registration.scope))
+                        .catch(err => console.log('ServiceWorker registration failed: ', err));
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
