@@ -1,6 +1,6 @@
 {
   "name": "Mobile Page - Final",
-  "short_name": "MobileFinal",
+  "short_name": "Amazon",
   "description": "A mobile web application.",
   "start_url": "/pannel/index.html",
   "display": "standalone",
