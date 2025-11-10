@@ -1,8 +1,6 @@
 const CACHE_NAME = 'my-site-cache-v1';
 const urlsToCache = [
-  '/',
-  '/styles/main.css',
-  '/script/main.js'
+  '/'
 ];
 
 self.addEventListener('install', function(event) {
@@ -24,6 +22,7 @@ self.addEventListener('fetch', function(event) {
         if (response) {
           return response;
         }
+        // Not in cache, so get it from the network
         return fetch(event.request);
       }
     )
