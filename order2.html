@@ -16,12 +16,57 @@
         .page {
             display: none; /* Pages are hidden by default */
             padding-bottom: 100px; /* Space for the footer */
-            padding-top: 50px; /* Space for the header */
+            /* padding-top is now set dynamically by JavaScript */
         }
 
         .page.active {
             display: block; /* The active page is shown */
         }
+        
+        /* COMMAND 1: MODIFIED LOADER ANIMATION */
+        #progress-bar-loader {
+            position: fixed;
+            /* 'top' is set by JS to be exactly under the header */
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: transparent;
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+            overflow: hidden; /* Ensures the gradient animation is contained */
+        }
+        #progress-bar-loader.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.1s ease, visibility 0s;
+        }
+        #progress-bar-loader::before {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 100%;
+            /* A seamless gradient that is twice the width of the bar */
+            background-image: linear-gradient(to right, #FFA41C, #FFD814, #FFA41C);
+            background-size: 200% auto;
+            /* The new animation that shifts the background position */
+            animation: progressBarFlow 1.2s linear infinite;
+        }
+        /* This animation creates a flowing effect without the bar leaving the screen */
+        @keyframes progressBarFlow {
+            0% {
+                background-position: 0% 0;
+            }
+            100% {
+                background-position: -100% 0;
+            }
+        }
+        .content-loading {
+            visibility: hidden;
+            min-height: 500px; /* Prevent page jumping */
+        }
+
 
         /* Header and Footer (Fixed Overlays) */
         .fixed-header, .fixed-footer {
@@ -103,7 +148,6 @@
             margin: 0;
             font-size: 0.9rem;
             text-align: left;
-            /* CHANGE 1: Truncation styles */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -128,7 +172,6 @@
             margin: 0;
         }
 
-        /* --- PURCHASE HISTORY CARD STYLES --- */
         .purchase-item-card {
             display: flex;
             border: 1px solid #ddd;
@@ -137,13 +180,13 @@
             background-color: #fff;
             overflow: hidden;
             align-items: stretch;
-            height: 100px; /* CHANGE 2: Reduce height of orders box */
+            height: 100px;
         }
 
         .purchase-item-card .item-image {
-            flex-basis: 90px; /* CHANGE 2: Reduced from 100px */
+            flex-basis: 90px;
             flex-shrink: 0;
-            padding: 8px; /* CHANGE 2: Reduced from 12px */
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -159,11 +202,11 @@
 
         .purchase-item-card .item-info {
             flex-grow: 1;
-            padding: 12px 16px; /* CHANGE 2: Reduced vertical padding */
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            overflow: hidden; /* Ensure content doesn't overflow */
+            overflow: hidden;
         }
 
         .purchase-item-card .item-info .item-name {
@@ -172,7 +215,6 @@
             color: #0F1111;
             cursor: pointer;
             text-decoration: none;
-            /* CHANGE 1: Truncation styles */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -197,25 +239,40 @@
         }
 
         .product-info-module .product-image {
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
             object-fit: contain;
+        }
+
+        .product-info-module .product-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 150px; /* Match image height for alignment */
         }
 
         .product-info-module .product-details .product-name {
             color: #007185;
-            font-weight: bold;
+            font-weight: normal;
             text-decoration: none;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             display: block;
             margin-bottom: 8px;
+        }
+        .product-info-module .product-details .product-name:hover {
+            text-decoration: underline;
         }
 
         .product-info-module .product-details .share-item {
             color: #007185;
             text-decoration: none;
             font-size: 0.9rem;
+            cursor: pointer;
         }
+        .product-info-module .product-details .share-item:hover {
+            text-decoration: underline;
+        }
+
 
         .delivery-status-module {
             padding: 16px;
@@ -300,6 +357,17 @@
             color: #565959;
             font-size: 0.9rem;
         }
+        
+        #image-page-content img {
+            width: 100%;
+            height: auto;
+        }
+
+        .details-page-ad-image {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
 
         /* Admin Panel Styles */
         #admin-page .admin-container {
@@ -334,37 +402,33 @@
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ccc;
-            box-sizing: border-box; /* Important */
+            box-sizing: border-box;
         }
 
-        /* CHANGE 4: Styles for input wrapper and clear icon */
         .form-section .input-wrapper {
             position: relative;
             margin-bottom: 15px;
         }
         .form-section .input-wrapper input,
         .form-section .input-wrapper select {
-            margin-bottom: 0; /* Remove margin from input as wrapper has it */
+            margin-bottom: 0;
         }
         .clear-input {
             position: absolute;
             right: 12px;
-            top: 36px; /* Adjust for label height */
+            top: 36px;
             transform: translateY(-50%);
             cursor: pointer;
             font-size: 22px;
             color: #999;
             font-weight: bold;
             line-height: 1;
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10+ */
-            user-select: none; /* Standard */
+            user-select: none;
         }
         .clear-input:hover {
             color: #333;
         }
         .input-wrapper select + .clear-input {
-            /* Position clear icon away from select dropdown arrow */
             right: 30px;
         }
 
@@ -455,6 +519,8 @@
 </head>
 <body>
 
+<div id="progress-bar-loader"></div>
+
 <!-- Fixed Header - Visible on all pages -->
 <header class="fixed-header">
     <a href="#home">
@@ -464,36 +530,38 @@
 
 <!-- PAGE 1: Main "Your Orders" Page -->
 <div id="main-page" class="page">
-    <div style="padding: 16px;">
-        <h1 style="font-size: 1.8rem; font-weight: bold; margin: 0;">Your Orders</h1>
-    </div>
-
-    <a href="#admin" class="admin-panel-link">
-        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_03-04-23-916.jpg?updatedAt=1762637690349" alt="Admin Panel">
-    </a>
-
-    <!-- "Buy again" Module -->
-    <div class="module">
-        <div class="module-header">
-            <h2>Buy again</h2>
-            <a id="open-fullscreen-btn" class="see-more">See more</a>
+    <div class="content">
+        <div style="padding: 16px;">
+            <h1 style="font-size: 1.8rem; font-weight: bold; margin: 0;">Your Orders</h1>
         </div>
-        <div class="buy-again-grid" id="buy-again-container">
-            <!-- Buy Again items will be injected here by JavaScript -->
-        </div>
-    </div>
 
-    <!-- Separator -->
-    <hr class="separator">
+        <a href="#admin" class="admin-panel-link">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_03-04-23-916.jpg?updatedAt=1762637690349" alt="Admin Panel">
+        </a>
 
-    <!-- "Purchase history" Module -->
-    <div class="module">
-        <div class="purchase-history-header">
-            <h2>Purchase history</h2>
-            <p>Past three months</p>
+        <!-- "Buy again" Module -->
+        <div class="module">
+            <div class="module-header">
+                <h2>Buy again</h2>
+                <a id="open-fullscreen-btn" class="see-more">See more</a>
+            </div>
+            <div class="buy-again-grid" id="buy-again-container">
+                <!-- Buy Again items will be injected here by JavaScript -->
+            </div>
         </div>
-        <div id="purchase-history-container">
-            <!-- Purchase History items will be injected here by JavaScript -->
+
+        <!-- Separator -->
+        <hr class="separator">
+
+        <!-- "Purchase history" Module -->
+        <div class="module">
+            <div class="purchase-history-header">
+                <h2>Purchase history</h2>
+                <p>Past three months</p>
+            </div>
+            <div id="purchase-history-container">
+                <!-- Purchase History items will be injected here by JavaScript -->
+            </div>
         </div>
     </div>
 </div>
@@ -507,9 +575,21 @@
 
 <!-- PAGE 3: Admin Panel -->
 <div id="admin-page" class="page">
-    <div class="admin-container">
+    <div class="admin-container content">
         <a href="#home">&larr; Back to Main Page</a>
         <h1>Admin Panel</h1>
+        
+        <div class="form-section">
+            <h2>Extra Settings</h2>
+            <div class="input-wrapper">
+                <label for="extraImageUrl">Details Page Ad Image URL:</label>
+                <input type="url" id="extraImageUrl" name="extraImageUrl">
+                <span class="clear-input">&times;</span>
+            </div>
+            <button id="saveExtraSettingsBtn">Save Extra Settings</button>
+        </div>
+
+
         <p>Add, edit, reorder, or remove items. All data is saved in your browser's local storage.</p>
 
         <div class="form-section">
@@ -537,7 +617,13 @@
                     <input type="url" id="itemImage" name="itemImage" required>
                     <span class="clear-input">&times;</span>
                 </div>
-                <!-- CHANGE 3: Add image preview -->
+                
+                <div class="input-wrapper">
+                    <label for="itemImagePageUrl">Image Page URL:</label>
+                    <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
+                    <span class="clear-input">&times;</span>
+                </div>
+
                 <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100px; height: auto; margin-top: 10px; margin-bottom: 15px; display: none; border-radius: 4px;">
 
                 <div class="input-wrapper">
@@ -578,6 +664,14 @@
     </div>
 </div>
 
+<!-- PAGE 4: Full Image View Page -->
+<div id="image-page" class="page">
+    <div class="content" id="image-page-content">
+        <!-- Full width image will be injected here -->
+    </div>
+</div>
+
+
 <!-- Fixed Footer - Visible on all pages -->
 <footer class="fixed-footer">
     <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_01-17-05-266.jpg?updatedAt=1762631248379" alt="Footer Image">
@@ -588,47 +682,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const DB = {
         get: (key) => JSON.parse(localStorage.getItem(key)) || [],
         set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+        getValue: (key) => localStorage.getItem(key) || '',
+        setValue: (key, value) => localStorage.setItem(key, value),
     };
 
     function initializeDefaultData() {
         if (!localStorage.getItem('initialized')) {
             const defaultBuyAgain = [
-                { id: 1, name: 'Writing Pad for Notes and Doodling', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg', orderDate: '2025-10-15', deliveryDate: '', eligibleDate: '' },
-                { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', orderDate: '2025-10-20', deliveryDate: '', eligibleDate: '' },
+                { id: 1, name: 'Writing Pad for Notes and Doodling', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L.jpg', orderDate: '2025-10-15', deliveryDate: '', eligibleDate: '' },
+                { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20', deliveryDate: '', eligibleDate: '' },
             ];
             const defaultPurchaseHistory = [
-                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15' },
-                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07' },
+                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15' },
+                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07' },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
             DB.set('purchaseHistoryItems', defaultPurchaseHistory);
+            DB.setValue('extraImageUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251111_205647_Amazon.jpg?updatedAt=1762881134774');
             localStorage.setItem('initialized', 'true');
         }
     }
 
     const pages = document.querySelectorAll('.page');
+    
     function showPage(pageId, params = null) {
-        pages.forEach(page => page.classList.remove('active'));
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) {
-            targetPage.classList.add('active');
-            window.scrollTo(0, 0);
+        const loader = document.getElementById('progress-bar-loader');
+        const currentlyActivePage = document.querySelector('.page.active .content');
 
-            if (pageId === 'details-page' && params) {
-                renderOrderDetails(params.id);
-            } else if (pageId === 'main-page') {
-                renderAllMainPageContent();
-            } else if (pageId === 'admin-page') {
-                renderAdminLists();
-            }
+        if (currentlyActivePage) {
+            currentlyActivePage.classList.add('content-loading');
         }
+        loader.classList.add('visible');
+
+        setTimeout(() => {
+            pages.forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                if (pageId === 'details-page' && params) {
+                    renderOrderDetails(params.id);
+                } else if (pageId === 'image-page' && params) {
+                    renderImagePage(params);
+                } else if (pageId === 'main-page') {
+                    renderAllMainPageContent();
+                } else if (pageId === 'admin-page') {
+                    renderAdminPanel();
+                }
+                
+                targetPage.classList.add('active');
+                const newContent = targetPage.querySelector('.content');
+                if (newContent) {
+                    newContent.classList.remove('content-loading');
+                }
+                window.scrollTo(0, 0);
+            }
+            loader.classList.remove('visible');
+        }, 500);
     }
+
 
     function handleRouteChange() {
         const hash = window.location.hash || '#home';
         if (hash.startsWith('#details-')) {
             const id = parseInt(hash.split('-')[1]);
             showPage('details-page', { id });
+        } else if (hash.startsWith('#image-')) {
+            const [, id, type] = hash.split('-');
+            showPage('image-page', { id: parseInt(id), type });
         } else if (hash === '#admin') {
             showPage('admin-page');
         } else {
@@ -641,22 +760,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     }
-    
-    // CHANGE 1: Function to truncate long names
-    function truncateName(name, maxLength = 30) {
-        if (name.length > maxLength) {
-            return name.substring(0, maxLength).trim() + '....';
-        }
-        return name;
-    }
 
     function renderBuyAgainItems() {
         const items = DB.get('buyAgainItems');
         const container = document.getElementById('buy-again-container');
         container.innerHTML = '';
         items.forEach(item => {
-            // Using CSS ellipsis is generally better, but this matches the "...." request
-            // CSS will still act as a fallback.
             container.innerHTML += `
                 <div class="buy-again-card">
                     <img src="${item.imageUrl}" alt="${item.name}">
@@ -681,6 +790,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    function renderImagePage(params) {
+        const { id, type } = params;
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        const items = DB.get(key);
+        const item = items.find(i => i.id === id);
+        const container = document.getElementById('image-page-content');
+        
+        if (item && item.imagePageUrl) {
+            container.innerHTML = `<img src="${item.imagePageUrl}" alt="${item.name}">`;
+        } else {
+            container.innerHTML = '<p>Image not available.</p>';
+        }
+    }
+
     function renderOrderDetails(itemId) {
         const items = DB.get('purchaseHistoryItems');
         const item = items.find(p => p.id === itemId);
@@ -689,12 +812,21 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '<p>Order not found.</p>';
             return;
         }
+        
+        const imageLinkStart = item.imagePageUrl ? `<a href="#image-${item.id}-purchaseHistory">` : '';
+        const imageLinkEnd = item.imagePageUrl ? `</a>` : '';
+        
+        const extraImageUrl = DB.getValue('extraImageUrl');
+        const extraImageHtml = extraImageUrl ? `<img src="${extraImageUrl}" alt="Advertisement" class="details-page-ad-image">` : '';
+
         container.innerHTML = `
             <div class="product-info-module">
-                <img src="${item.imageUrl}" alt="${item.name}" class="product-image">
+                ${imageLinkStart}
+                    <img src="${item.imageUrl}" alt="${item.name}" class="product-image">
+                ${imageLinkEnd}
                 <div class="product-details">
-                    <a href="#" class="product-name">${item.name}</a>
-                    <a href="#" class="share-item">Share this item</a>
+                    <span class="product-name">${item.name}</span>
+                    <span class="share-item" data-product-name="${item.name}">Share this item</span>
                 </div>
             </div>
             <div class="delivery-status-module">
@@ -724,7 +856,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </a>
             </div>
             <hr class="separator">
-            <div class="details-page-footer">Ordered on ${formatDate(item.orderDate)}</div>`;
+            <div class="details-page-footer">Ordered on ${formatDate(item.orderDate)}</div>
+            ${extraImageHtml}
+            `;
     }
 
     function renderAdminList(type) {
@@ -747,8 +881,9 @@ document.addEventListener('DOMContentLoaded', () => {
             listElement.appendChild(li);
         });
     }
-
-    function renderAdminLists() {
+    
+    function renderAdminPanel() {
+        document.getElementById('extraImageUrl').value = DB.getValue('extraImageUrl');
         renderAdminList('buyAgain');
         renderAdminList('purchaseHistory');
     }
@@ -761,8 +896,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const addItemForm = document.getElementById('addItemForm');
     const formTitle = document.getElementById('form-title');
     const formSubmitBtn = document.getElementById('form-submit-btn');
-    const imagePreview = document.getElementById('imagePreview'); // CHANGE 3
-    const itemImageInput = document.getElementById('itemImage'); // CHANGE 3
+    const imagePreview = document.getElementById('imagePreview');
+    const itemImageInput = document.getElementById('itemImage');
 
     function resetFormState() {
         formTitle.textContent = 'Add New Item';
@@ -770,8 +905,6 @@ document.addEventListener('DOMContentLoaded', () => {
         formSubmitBtn.classList.remove('update-mode');
         addItemForm.reset();
         document.getElementById('editingItemId').value = '';
-        
-        // CHANGE 3: Hide image preview on form reset
         imagePreview.style.display = 'none';
         imagePreview.src = '';
     }
@@ -786,48 +919,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const itemData = {
             name: e.target.itemName.value,
             imageUrl: e.target.itemImage.value,
+            imagePageUrl: e.target.itemImagePageUrl.value,
             orderDate: e.target.orderDate.value,
             deliveryDate: e.target.deliveryDate.value,
             eligibleDate: e.target.eligibleDate.value,
         };
 
-        if (editingId) { // UPDATE existing item
+        if (editingId) {
             const itemIndex = items.findIndex(item => item.id === editingId);
             if (itemIndex > -1) {
                 items[itemIndex] = { ...items[itemIndex], ...itemData };
             }
-        } else { // ADD new item
+        } else {
             const newItem = { id: Date.now(), ...itemData };
             items.push(newItem);
         }
 
         DB.set(key, items);
-        renderAdminLists();
+        renderAdminPanel();
         resetFormState();
     });
 
     document.querySelector('.admin-container').addEventListener('click', (e) => {
         const button = e.target;
+        
+        if (button.id === 'saveExtraSettingsBtn') {
+            const extraUrl = document.getElementById('extraImageUrl').value;
+            DB.setValue('extraImageUrl', extraUrl);
+            alert('Extra settings saved!');
+            return;
+        }
+
         const id = parseInt(button.dataset.id);
         const type = button.dataset.type;
+        if (!type) return;
         const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
         let items = DB.get(key);
 
         if (button.classList.contains('delete-btn')) {
             items = items.filter(item => item.id !== id);
             DB.set(key, items);
-            renderAdminLists();
         } else if (button.classList.contains('flip-btn')) {
             items.reverse();
             DB.set(key, items);
-            renderAdminLists();
         } else if (button.classList.contains('reorder-btn')) {
             const itemToReorder = items.find(item => item.id === id);
             if (itemToReorder) {
                 const newItem = { ...itemToReorder, id: Date.now() };
                 items.push(newItem);
                 DB.set(key, items);
-                renderAdminLists();
             }
         } else if (button.classList.contains('edit-btn')) {
             const itemToEdit = items.find(item => item.id === id);
@@ -839,14 +979,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editingItemId').value = itemToEdit.id;
                 document.getElementById('itemType').value = type;
                 document.getElementById('itemName').value = itemToEdit.name;
-                itemImageInput.value = itemToEdit.imageUrl; // Use variable
+                itemImageInput.value = itemToEdit.imageUrl;
+                document.getElementById('itemImagePageUrl').value = itemToEdit.imagePageUrl || '';
                 document.getElementById('orderDate').value = itemToEdit.orderDate;
                 document.getElementById('deliveryDate').value = itemToEdit.deliveryDate || '';
                 document.getElementById('eligibleDate').value = itemToEdit.eligibleDate || '';
 
-                // CHANGE 3: Show preview for item being edited
                 if (itemImageInput.value) {
-                    imagePreview.src = itemImageInput.value;
+                    imagePreview.src = itemToEdit.imageUrl;
                     imagePreview.style.display = 'block';
                 } else {
                     imagePreview.style.display = 'none';
@@ -854,10 +994,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 formTitle.scrollIntoView({ behavior: 'smooth' });
             }
+            return;
         }
+        renderAdminPanel();
     });
 
-    // CHANGE 3: Event listener for image preview
     itemImageInput.addEventListener('input', () => {
         const url = itemImageInput.value;
         if (url) {
@@ -868,28 +1009,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // CHANGE 4: Event listener for clear input 'x' icons
     addItemForm.addEventListener('click', (e) => {
         if (e.target.classList.contains('clear-input')) {
             const inputField = e.target.parentElement.querySelector('input, select');
             if (inputField) {
                 inputField.value = '';
-                // Trigger input event to update dependents, like image preview
                 inputField.dispatchEvent(new Event('input'));
             }
         }
     });
 
+    document.body.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('share-item')) {
+            const productName = e.target.dataset.productName;
+            const shareUrl = 'https://www.amazon.in/Apple-iPhone-15-128-GB/dp/B0CHX6NQMD?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&smid=AJ6SIZC8YQDZX&th=1';
+            const shareText = `Check out this product: ${productName}`;
 
-    const adminLists = document.querySelectorAll('.item-list');
-    let draggedItemId = null;
-    adminLists.forEach(list => {
-        // Drag and drop logic remains the same...
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Amazon Product', text: shareText, url: shareUrl });
+                } catch (err) { console.error('Error sharing:', err); }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                    alert('Link copied to clipboard!');
+                } catch (err) { alert('Failed to copy link.'); }
+            }
+        }
     });
     
     const footer = document.querySelector('.fixed-footer');
     footer.addEventListener('click', () => { window.location.hash = '#home'; });
 
+    const header = document.querySelector('.fixed-header');
+    const loader = document.getElementById('progress-bar-loader');
+    
+    function adjustLayoutForHeader() {
+        const headerImg = header.querySelector('img');
+        const performAdjustment = () => {
+            const headerHeight = header.offsetHeight;
+            loader.style.top = `${headerHeight}px`;
+            pages.forEach(page => {
+                page.style.paddingTop = `${headerHeight}px`;
+            });
+        };
+
+        if (headerImg.complete) {
+            performAdjustment();
+        } else {
+            headerImg.addEventListener('load', performAdjustment);
+        }
+        window.addEventListener('resize', performAdjustment);
+    }
+
+    adjustLayoutForHeader();
     initializeDefaultData();
     window.addEventListener('hashchange', handleRouteChange);
     handleRouteChange();
