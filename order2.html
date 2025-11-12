@@ -23,7 +23,6 @@
             display: block; /* The active page is shown */
         }
         
-        /* COMMAND 1: MODIFIED LOADER ANIMATION */
         #progress-bar-loader {
             position: fixed;
             /* 'top' is set by JS to be exactly under the header */
@@ -47,20 +46,13 @@
             display: block;
             height: 100%;
             width: 100%;
-            /* A seamless gradient that is twice the width of the bar */
             background-image: linear-gradient(to right, #FFA41C, #FFD814, #FFA41C);
             background-size: 200% auto;
-            /* The new animation that shifts the background position */
             animation: progressBarFlow 1.2s linear infinite;
         }
-        /* This animation creates a flowing effect without the bar leaving the screen */
         @keyframes progressBarFlow {
-            0% {
-                background-position: 0% 0;
-            }
-            100% {
-                background-position: -100% 0;
-            }
+            0% { background-position: 0% 0; }
+            100% { background-position: -100% 0; }
         }
         .content-loading {
             visibility: hidden;
@@ -442,6 +434,7 @@
             cursor: pointer;
             width: 100%;
             font-size: 1rem;
+            margin-top: 10px;
         }
 
         .form-section button:hover {
@@ -453,6 +446,15 @@
         }
         .form-section button.update-mode:hover {
              background-color: #e69519;
+        }
+        /* COMMAND 2: Autofill button style */
+        .form-section .autofill-btn {
+            background-color: #6c757d;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .form-section .autofill-btn:hover {
+            background-color: #5a6268;
         }
 
 
@@ -626,9 +628,23 @@
 
                 <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100px; height: auto; margin-top: 10px; margin-bottom: 15px; display: none; border-radius: 4px;">
 
+                <!-- COMMAND 1: ADDED DELIVERY STATUS TOGGLE -->
+                <div class="input-wrapper">
+                    <label for="deliveryStatus">Delivery Status Text:</label>
+                    <select id="deliveryStatus" name="deliveryStatus">
+                        <option value="Delivered on">Delivered on</option>
+                        <option value="Delivered Today">Delivered Today</option>
+                        <option value="Arriving tomorrow">Arriving tomorrow</option>
+                        <option value="Arriving on">Arriving on</option>
+                        <option value="Arriving today">Arriving today</option>
+                    </select>
+                    <span class="clear-input">&times;</span>
+                </div>
+
                 <div class="input-wrapper">
                     <label for="orderDate">Order Date:</label>
-                    <input type="date" id="orderDate" name="orderDate" required>
+                    <!-- COMMAND 2: REMOVED REQUIRED -->
+                    <input type="date" id="orderDate" name="orderDate">
                     <span class="clear-input">&times;</span>
                 </div>
 
@@ -643,6 +659,9 @@
                     <input type="date" id="eligibleDate" name="eligibleDate">
                     <span class="clear-input">&times;</span>
                 </div>
+                
+                <!-- COMMAND 2: ADDED AUTOFILL BUTTON -->
+                <button type="button" id="autofill-dates-btn" class="autofill-btn">Autofill Dates</button>
 
                 <button type="submit" id="form-submit-btn">Add Item</button>
             </form>
@@ -693,8 +712,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20', deliveryDate: '', eligibleDate: '' },
             ];
             const defaultPurchaseHistory = [
-                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15' },
-                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07' },
+                 // COMMAND 1: Added deliveryStatusText to default data
+                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', deliveryStatusText: 'Delivered on' },
+                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', deliveryStatusText: 'Delivered on' },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
             DB.set('purchaseHistoryItems', defaultPurchaseHistory);
@@ -758,7 +778,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatDate(dateString) {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        // Adjust for timezone offset to prevent date from shifting
+        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
+        return adjustedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
     function renderBuyAgainItems() {
@@ -774,17 +797,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // COMMAND 1: MODIFIED renderPurchaseHistory
     function renderPurchaseHistory() {
         const items = DB.get('purchaseHistoryItems');
         const container = document.getElementById('purchase-history-container');
         container.innerHTML = '';
         items.forEach(item => {
+            const statusText = item.deliveryStatusText || 'Delivered on'; // Fallback for old items
+            let statusDisplay = '';
+
+            // Check if status requires a date
+            if (['Delivered on', 'Arriving on'].includes(statusText)) {
+                statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+            } else {
+                statusDisplay = statusText;
+            }
+
             container.innerHTML += `
                 <div class="purchase-item-card">
                     <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
                     <div class="item-info">
                          <a href="#details-${item.id}" class="item-name">${item.name}</a>
-                        <p class="item-status">Delivered on ${formatDate(item.deliveryDate)}</p>
+                        <p class="item-status">${statusDisplay}</p>
                     </div>
                 </div>`;
         });
@@ -804,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // COMMAND 1: MODIFIED renderOrderDetails
     function renderOrderDetails(itemId) {
         const items = DB.get('purchaseHistoryItems');
         const item = items.find(p => p.id === itemId);
@@ -818,6 +853,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const extraImageUrl = DB.getValue('extraImageUrl');
         const extraImageHtml = extraImageUrl ? `<img src="${extraImageUrl}" alt="Advertisement" class="details-page-ad-image">` : '';
+        
+        const statusText = item.deliveryStatusText || 'Delivered on'; // Fallback
+        let statusDisplay = '';
+        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+        } else {
+            statusDisplay = statusText;
+        }
 
         container.innerHTML = `
             <div class="product-info-module">
@@ -833,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="delivery-status">
                     <div class="icon">&#10003;</div>
                     <div>
-                        <div class="text-bold">Delivered on ${formatDate(item.deliveryDate)}</div>
+                        <div class="text-bold">${statusDisplay}</div>
                         <div>Package was handed to resident</div>
                     </div>
                 </div>
@@ -920,6 +963,9 @@ document.addEventListener('DOMContentLoaded', () => {
             name: e.target.itemName.value,
             imageUrl: e.target.itemImage.value,
             imagePageUrl: e.target.itemImagePageUrl.value,
+            // COMMAND 1: Save delivery status text
+            deliveryStatusText: e.target.deliveryStatus.value,
+            // COMMAND 2: Dates are now optional
             orderDate: e.target.orderDate.value,
             deliveryDate: e.target.deliveryDate.value,
             eligibleDate: e.target.eligibleDate.value,
@@ -981,7 +1027,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('itemName').value = itemToEdit.name;
                 itemImageInput.value = itemToEdit.imageUrl;
                 document.getElementById('itemImagePageUrl').value = itemToEdit.imagePageUrl || '';
-                document.getElementById('orderDate').value = itemToEdit.orderDate;
+                // COMMAND 1: Populate status dropdown
+                document.getElementById('deliveryStatus').value = itemToEdit.deliveryStatusText || 'Delivered on';
+                document.getElementById('orderDate').value = itemToEdit.orderDate || '';
                 document.getElementById('deliveryDate').value = itemToEdit.deliveryDate || '';
                 document.getElementById('eligibleDate').value = itemToEdit.eligibleDate || '';
 
@@ -1038,6 +1086,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // COMMAND 2: AUTOFILL DATES FUNCTIONALITY
+    function formatDateForInput(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    document.getElementById('autofill-dates-btn').addEventListener('click', () => {
+        const today = new Date();
+        const delivery = new Date();
+        delivery.setDate(today.getDate() + 2);
+        const replacement = new Date();
+        replacement.setDate(today.getDate() + 7);
+
+        document.getElementById('orderDate').value = formatDateForInput(today);
+        document.getElementById('deliveryDate').value = formatDateForInput(delivery);
+        document.getElementById('eligibleDate').value = formatDateForInput(replacement);
+    });
+
     const footer = document.querySelector('.fixed-footer');
     footer.addEventListener('click', () => { window.location.hash = '#home'; });
 
@@ -1070,4 +1138,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 </body>
-</html>
+</html>```
