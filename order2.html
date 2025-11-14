@@ -475,7 +475,7 @@
             object-fit: contain;
         }
 
-        /* NEW: Action Carousel Styles */
+        /* Action Carousel Styles */
         .action-carousel-container {
             padding: 16px;
             margin: 0;
@@ -505,6 +505,7 @@
             color: #0F1111;
             text-decoration: none;
             white-space: nowrap; /* Prevent text wrapping */
+            cursor: pointer;
         }
         .shipped-with-info {
             padding: 0 16px 16px 16px;
@@ -1177,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             carouselHtml = `
                 <div class="action-carousel-container">
                     <a href="#" class="action-btn">Update delivery instructions</a>
-                    <a href="${item.shareTrackingLink || '#'}" target="_blank" class="action-btn">Share tracking</a>
+                    <a href="#" class="action-btn share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">Share tracking</a>
                     <a href="#" class="action-btn">Request cancellation</a>
                     <a href="#" class="action-btn">Buy again</a>
                 </div>
@@ -1390,6 +1391,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
                     alert('Link copied to clipboard!');
                 } catch (err) { alert('Failed to copy link.'); }
+            }
+        } else if (e.target.classList.contains('share-tracking-btn')) {
+            e.preventDefault();
+            const trackingLink = e.target.dataset.trackingLink;
+            const productName = e.target.dataset.productName;
+
+            if (!trackingLink) {
+                alert('No tracking link is available for this item.');
+                return;
+            }
+
+            const shareText = `Here is the tracking information for the order: ${productName}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Amazon Order Tracking',
+                        text: shareText,
+                        url: trackingLink
+                    });
+                } catch (err) {
+                    console.error('Error sharing tracking link:', err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(trackingLink);
+                    alert('Tracking link copied to clipboard!');
+                } catch (err) {
+                    alert('Failed to copy tracking link.');
+                }
             }
         }
     });
