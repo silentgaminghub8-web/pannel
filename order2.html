@@ -363,6 +363,7 @@
 
         .module-with-buttons h3 {
             font-size: 1.2rem;
+            font-weight: bold;
             margin-top: 16px;
             margin-bottom: 8px;
         }
@@ -474,8 +475,54 @@
             object-fit: contain;
         }
 
+        /* NEW: Action Carousel Styles */
+        .action-carousel-container {
+            padding: 16px;
+            margin: 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
+            scrollbar-width: none;  /* Hide scrollbar Firefox */
+        }
+        .action-carousel-container::-webkit-scrollbar {
+            display: none; /* Hide scrollbar Chrome, Safari, Opera */
+        }
+        .action-btn {
+            display: inline-block;
+            vertical-align: middle;
+            
+            /* Shape and Size */
+            padding: 10px 18px; /* Vertical and horizontal padding */
+            margin-right: 12px; /* Space between buttons */
+            border-radius: 999px; /* This creates the "pill" shape */
+            
+            /* "Ghost" Style */
+            background-color: #ffffff; /* Explicitly white to match page */
+            border: 1px solid #cccccc; /* Thin, 1px, light gray border */
+            
+            /* Text */
+            font-size: 14px;
+            color: #0F1111;
+            text-decoration: none;
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        .shipped-with-info {
+            padding: 0 16px 16px 16px;
+        }
+        .shipped-with-info h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+        }
+        .shipped-with-info p, .shipped-with-info a {
+            font-size: 1rem;
+            margin: 0 0 4px 0;
+            color: #007185;
+            text-decoration: none;
+        }
+
         /* Admin Panel Styles */
-        #admin-page .admin-container {
+        .admin-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 16px;
@@ -502,6 +549,7 @@
         .form-section input[type="text"],
         .form-section input[type="url"],
         .form-section input[type="date"],
+        .form-section input[type="checkbox"],
         .form-section select,
         .form-section textarea {
             width: 100%;
@@ -511,6 +559,15 @@
             box-sizing: border-box;
             font-family: inherit;
         }
+        .form-section .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-section input[type="checkbox"] {
+            width: auto;
+        }
+
 
         .form-section .input-wrapper {
             position: relative;
@@ -690,7 +747,7 @@
     </div>
 </div>
 
-<!-- PAGE 3: Admin Panel -->
+<!-- PAGE 3: Main Admin Panel -->
 <div id="admin-page" class="page">
     <div class="admin-container content">
         <a href="#home">&larr; Back to Main Page</a>
@@ -820,6 +877,13 @@
     </div>
 </div>
 
+<!-- PAGE 6: Special Item Edit Page -->
+<div id="edit-item-page" class="page">
+    <div class="admin-container content" id="edit-item-content">
+        <!-- Special Admin Panel for a single item will be rendered here -->
+    </div>
+</div>
+
 
 <!-- Fixed Footer - Visible on all pages -->
 <footer class="fixed-footer">
@@ -838,12 +902,35 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeDefaultData() {
         if (!localStorage.getItem('initialized')) {
             const defaultBuyAgain = [
-                { id: 1, name: 'Writing Pad for Notes and Doodling', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L.jpg', orderDate: '2025-10-15', deliveryDate: '', eligibleDate: '' },
-                { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20', deliveryDate: '', eligibleDate: '' },
+                { id: 1, name: 'Writing Pad for Notes and Doodling', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L.jpg', orderDate: '2025-10-15' },
+                { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20' },
             ];
             const defaultPurchaseHistory = [
-                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', deliveryStatusText: 'Delivered on', shareLink: 'https://www.amazon.in/dp/B0CKL65175', shippingAddress: '1 Infinite Loop\nCupertino, CA 95014\nUnited States' },
-                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', deliveryStatusText: 'Delivered on', shareLink: '', shippingAddress: '' },
+                 { 
+                    id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display', 
+                    imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', 
+                    imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', 
+                    orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', 
+                    deliveryStatusText: 'Delivered on', 
+                    shareLink: 'https://www.amazon.in/dp/B0CKL65175', 
+                    shippingAddress: '1 Infinite Loop\nCupertino, CA 95014\nUnited States',
+                    progressStepImageUrl: 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861',
+                    shareTrackingLink: 'https://track.amazon.com/tracking/12345XYZ',
+                    trackingId: 'AMZ987654321',
+                    carouselToggle: true
+                 },
+                 { 
+                    id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
+                    imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', 
+                    imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', 
+                    orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', 
+                    deliveryStatusText: 'Delivered on', 
+                    shareLink: '', shippingAddress: '',
+                    progressStepImageUrl: '',
+                    shareTrackingLink: '',
+                    trackingId: '',
+                    carouselToggle: false
+                 },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
             DB.set('purchaseHistoryItems', defaultPurchaseHistory);
@@ -871,12 +958,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderOrderDetails(params.id);
                 } else if (pageId === 'image-page' && params) {
                     renderImagePage(params);
-                } else if (pageId === 'track-page' && params) { // Route for Track Page
+                } else if (pageId === 'track-page' && params) {
                     renderTrackPage(params.id);
-                    adjustStickyHeaderTop(); // Adjust sticky header after rendering
+                    adjustStickyHeaderTop();
+                } else if (pageId === 'edit-item-page' && params) {
+                    renderEditItemPage(params.id);
                 } else if (pageId === 'admin-page') {
                     renderAdminPanel();
-                } else { // Default to main page
+                } else {
                     renderAllMainPageContent();
                 }
                 
@@ -900,9 +989,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#image-')) {
             const [, id, type] = hash.split('-');
             showPage('image-page', { id: parseInt(id), type });
-        } else if (hash.startsWith('#track-')) { // Handle Track Page Route
+        } else if (hash.startsWith('#track-')) {
             const id = parseInt(hash.split('-')[1]);
             showPage('track-page', { id });
+        } else if (hash.startsWith('#edit-item-')) {
+            const id = parseInt(hash.split('-')[2]);
+            showPage('edit-item-page', { id });
         } else if (hash === '#admin') {
             showPage('admin-page');
         } else {
@@ -1020,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <hr class="separator">
             <div class="module-with-buttons">
                 <h3>Need help with your item?</h3>
-                <a href="#" class="list-button"><span>Get product support</span><span class="arrow">&gt;</span></a>
+                <a href="#edit-item-${item.id}" class="list-button"><span>Get product support</span><span class="arrow">&gt;</span></a>
                 <a href="#" class="list-button">
                     <span class="button-text">
                         Replace item
@@ -1077,6 +1169,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const defaultAddress = "Shipping address not set. Please add it in the Admin Panel.";
         const address = item.shippingAddress || defaultAddress;
 
+        const defaultProgressImg = 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861';
+        const progressImg = item.progressStepImageUrl || defaultProgressImg;
+        
+        let carouselHtml = '';
+        if (item.carouselToggle) {
+            carouselHtml = `
+                <div class="action-carousel-container">
+                    <a href="#" class="action-btn">Update delivery instructions</a>
+                    <a href="${item.shareTrackingLink || '#'}" target="_blank" class="action-btn">Share tracking</a>
+                    <a href="#" class="action-btn">Request cancellation</a>
+                    <a href="#" class="action-btn">Buy again</a>
+                </div>
+                <div class="shipped-with-info">
+                    <h3>Shipped with Amazon</h3>
+                    <p>Tracking ID: ${item.trackingId || 'N/A'}</p>
+                    <a href="#">see all updates</a>
+                </div>
+            `;
+        } else {
+            carouselHtml = `
+                <div class="action-carousel-container">
+                    <a href="#" class="action-btn">Update delivery instructions</a>
+                    <a href="#" class="action-btn">Request cancellation</a>
+                    <a href="#" class="action-btn">Buy again</a>
+                </div>
+            `;
+        }
+
         container.innerHTML = `
             <div class="track-module sticky-track-header">
                 <div class="track-module-header">
@@ -1089,8 +1209,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <hr class="thin-separator">
             </div>
 
-            <img src="https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861" alt="Delivery Status Map" class="full-width-image">
+            <img src="${progressImg}" alt="Delivery Status Map" class="full-width-image">
             
+            ${carouselHtml}
+
             <div class="track-module">
                 <hr class="thick-separator">
                 <div class="shipping-address-section">
@@ -1194,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetFormState();
     });
 
-    document.querySelector('.admin-container').addEventListener('click', (e) => {
+    document.getElementById('admin-page').addEventListener('click', (e) => {
         const button = e.target;
         
         if (button.id === 'saveExtraSettingsBtn') {
@@ -1224,33 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 DB.set(key, items);
             }
         } else if (button.classList.contains('edit-btn')) {
-            const itemToEdit = items.find(item => item.id === id);
-            if (itemToEdit) {
-                formTitle.textContent = 'Edit Item';
-                formSubmitBtn.textContent = 'Update Item';
-                formSubmitBtn.classList.add('update-mode');
-                
-                document.getElementById('editingItemId').value = itemToEdit.id;
-                document.getElementById('itemType').value = type;
-                document.getElementById('itemName').value = itemToEdit.name;
-                itemImageInput.value = itemToEdit.imageUrl;
-                document.getElementById('itemImagePageUrl').value = itemToEdit.imagePageUrl || '';
-                document.getElementById('deliveryStatus').value = itemToEdit.deliveryStatusText || 'Delivered on';
-                document.getElementById('orderDate').value = itemToEdit.orderDate || '';
-                document.getElementById('deliveryDate').value = itemToEdit.deliveryDate || '';
-                document.getElementById('eligibleDate').value = itemToEdit.eligibleDate || '';
-                document.getElementById('shareLink').value = itemToEdit.shareLink || '';
-                document.getElementById('shippingAddress').value = itemToEdit.shippingAddress || '';
-
-                if (itemImageInput.value) {
-                    imagePreview.src = itemToEdit.imageUrl;
-                    imagePreview.style.display = 'block';
-                } else {
-                    imagePreview.style.display = 'none';
-                }
-
-                formTitle.scrollIntoView({ behavior: 'smooth' });
-            }
+            window.location.hash = `#edit-item-${id}`;
             return;
         }
         renderAdminPanel();
@@ -1316,6 +1412,132 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('deliveryDate').value = formatDateForInput(delivery);
         document.getElementById('eligibleDate').value = formatDateForInput(replacement);
     });
+    
+    function renderEditItemPage(itemId) {
+        const container = document.getElementById('edit-item-content');
+        let items = DB.get('purchaseHistoryItems');
+        const item = items.find(i => i.id === itemId);
+
+        if (!item) {
+            container.innerHTML = `<a href="#details-${itemId}">&larr; Back</a><h1>Item not found</h1>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <a href="#details-${item.id}">&larr; Back to Order Details</a>
+            <h1>Edit Product Details</h1>
+            <div class="form-section">
+                <form id="editItemForm">
+                    <!-- Basic Info -->
+                    <h3>Basic Info</h3>
+                    <div class="input-wrapper">
+                        <label for="editItemName">Product Name:</label>
+                        <input type="text" id="editItemName" value="${item.name || ''}">
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editItemImage">Image URL:</label>
+                        <input type="url" id="editItemImage" value="${item.imageUrl || ''}">
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editItemImagePageUrl">Image Page URL:</label>
+                        <input type="url" id="editItemImagePageUrl" value="${item.imagePageUrl || ''}">
+                    </div>
+
+                    <!-- Delivery Info -->
+                    <h3 style="margin-top:20px;">Delivery Info</h3>
+                    <div class="input-wrapper">
+                        <label for="editDeliveryStatus">Delivery Status Text:</label>
+                        <select id="editDeliveryStatus"></select>
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editOrderDate">Order Date:</label>
+                        <input type="date" id="editOrderDate" value="${item.orderDate || ''}">
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editDeliveryDate">Delivery Date:</label>
+                        <input type="date" id="editDeliveryDate" value="${item.deliveryDate || ''}">
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editEligibleDate">Replacement Eligible Date:</label>
+                        <input type="date" id="editEligibleDate" value="${item.eligibleDate || ''}">
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editShippingAddress">Shipping Address:</label>
+                        <textarea id="editShippingAddress" rows="3">${item.shippingAddress || ''}</textarea>
+                    </div>
+
+                    <!-- Tracking & Carousel Info -->
+                    <h3 style="margin-top:20px;">Tracking Page Settings</h3>
+                     <div class="input-wrapper">
+                        <label for="editProgressStepImageUrl">Progress-Step Image URL:</label>
+                        <input type="url" id="editProgressStepImageUrl" value="${item.progressStepImageUrl || ''}">
+                    </div>
+                    <div class="input-wrapper">
+                        <label for="editShareTrackingLink">Share Tracking Link:</label>
+                        <input type="url" id="editShareTrackingLink" value="${item.shareTrackingLink || ''}">
+                    </div>
+                     <div class="input-wrapper">
+                        <label for="editTrackingId">Tracking ID:</label>
+                        <input type="text" id="editTrackingId" value="${item.trackingId || ''}">
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <label for="editCarouselToggle">Carousel Toggle (On/Off):</label>
+                        <input type="checkbox" id="editCarouselToggle" ${item.carouselToggle ? 'checked' : ''}>
+                    </div>
+
+                    <!-- Misc -->
+                    <h3 style="margin-top:20px;">Miscellaneous</h3>
+                     <div class="input-wrapper">
+                        <label for="editShareLink">General Share Link:</label>
+                        <input type="url" id="editShareLink" value="${item.shareLink || ''}">
+                    </div>
+
+                    <button type="submit" id="save-item-changes-btn">Save Changes</button>
+                </form>
+            </div>
+        `;
+
+        // Populate select dropdown and set its value
+        const deliveryStatusSelect = document.getElementById('editDeliveryStatus');
+        const statuses = ['Delivered on', 'Delivered Today', 'Arriving tomorrow', 'Arriving on', 'Arriving today'];
+        statuses.forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status;
+            if (status === (item.deliveryStatusText || 'Delivered on')) {
+                option.selected = true;
+            }
+            deliveryStatusSelect.appendChild(option);
+        });
+
+        document.getElementById('editItemForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex > -1) {
+                const updatedItem = {
+                    ...items[itemIndex],
+                    name: document.getElementById('editItemName').value,
+                    imageUrl: document.getElementById('editItemImage').value,
+                    imagePageUrl: document.getElementById('editItemImagePageUrl').value,
+                    deliveryStatusText: document.getElementById('editDeliveryStatus').value,
+                    orderDate: document.getElementById('editOrderDate').value,
+                    deliveryDate: document.getElementById('editDeliveryDate').value,
+                    eligibleDate: document.getElementById('editEligibleDate').value,
+                    shippingAddress: document.getElementById('editShippingAddress').value,
+                    progressStepImageUrl: document.getElementById('editProgressStepImageUrl').value,
+                    shareTrackingLink: document.getElementById('editShareTrackingLink').value,
+                    trackingId: document.getElementById('editTrackingId').value,
+                    carouselToggle: document.getElementById('editCarouselToggle').checked,
+                    shareLink: document.getElementById('editShareLink').value,
+                };
+                items[itemIndex] = updatedItem;
+                DB.set('purchaseHistoryItems', items);
+                alert('Changes saved!');
+                window.location.hash = `#details-${itemId}`;
+            }
+        });
+    }
+
 
     const footer = document.querySelector('.fixed-footer');
     footer.addEventListener('click', () => { window.location.hash = '#home'; });
