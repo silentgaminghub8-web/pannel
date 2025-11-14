@@ -356,6 +356,10 @@
         .module-with-buttons {
             padding: 0 16px;
         }
+        
+        .module-with-buttons .list-button:first-of-type {
+            border-top: 1px solid #ddd;
+        }
 
         .module-with-buttons h3 {
             font-size: 1.2rem;
@@ -430,6 +434,7 @@
             margin: 0;
             font-size: 1rem;
             line-height: 1.4;
+            white-space: pre-wrap; /* Respect newlines in address */
         }
         .order-info-section h2 {
             font-size: 1.2rem;
@@ -451,7 +456,7 @@
             font-size: 1rem;
         }
 
-        /* NEW: Track Page Sticky Header Styles */
+        /* Track Page Sticky Header Styles */
         .sticky-track-header {
             position: sticky;
             /* 'top' is set by JS */
@@ -497,12 +502,14 @@
         .form-section input[type="text"],
         .form-section input[type="url"],
         .form-section input[type="date"],
-        .form-section select {
+        .form-section select,
+        .form-section textarea {
             width: 100%;
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ccc;
             box-sizing: border-box;
+            font-family: inherit;
         }
 
         .form-section .input-wrapper {
@@ -555,7 +562,7 @@
         .form-section button.update-mode:hover {
              background-color: #e69519;
         }
-        /* COMMAND 2: Autofill button style */
+        /* Autofill button style */
         .form-section .autofill-btn {
             background-color: #6c757d;
             margin-top: 0;
@@ -736,7 +743,6 @@
 
                 <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100px; height: auto; margin-top: 10px; margin-bottom: 15px; display: none; border-radius: 4px;">
 
-                <!-- COMMAND 1: ADDED DELIVERY STATUS TOGGLE -->
                 <div class="input-wrapper">
                     <label for="deliveryStatus">Delivery Status Text:</label>
                     <select id="deliveryStatus" name="deliveryStatus">
@@ -751,7 +757,6 @@
 
                 <div class="input-wrapper">
                     <label for="orderDate">Order Date:</label>
-                    <!-- COMMAND 2: REMOVED REQUIRED -->
                     <input type="date" id="orderDate" name="orderDate">
                     <span class="clear-input">&times;</span>
                 </div>
@@ -768,7 +773,17 @@
                     <span class="clear-input">&times;</span>
                 </div>
                 
-                <!-- COMMAND 2: ADDED AUTOFILL BUTTON -->
+                <div class="input-wrapper">
+                    <label for="shareLink">Share Link (Optional):</label>
+                    <input type="url" id="shareLink" name="shareLink">
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="shippingAddress">Shipping Address (Optional):</label>
+                    <textarea id="shippingAddress" name="shippingAddress" rows="3"></textarea>
+                </div>
+                
                 <button type="button" id="autofill-dates-btn" class="autofill-btn">Autofill Dates</button>
 
                 <button type="submit" id="form-submit-btn">Add Item</button>
@@ -827,8 +842,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20', deliveryDate: '', eligibleDate: '' },
             ];
             const defaultPurchaseHistory = [
-                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', deliveryStatusText: 'Delivered on' },
-                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', deliveryStatusText: 'Delivered on' },
+                 { id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display, Bluetooth Calling, and 7-Day Battery', imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', deliveryStatusText: 'Delivered on', shareLink: 'https://www.amazon.in/dp/B0CKL65175', shippingAddress: '1 Infinite Loop\nCupertino, CA 95014\nUnited States' },
+                 { id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service for All Operators', imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', deliveryStatusText: 'Delivered on', shareLink: '', shippingAddress: '' },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
             DB.set('purchaseHistoryItems', defaultPurchaseHistory);
@@ -985,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${imageLinkEnd}
                 <div class="product-details">
                     <span class="product-name">${item.name}</span>
-                    <span class="share-item" data-product-name="${item.name}">Share this item</span>
+                    <span class="share-item" data-product-name="${item.name}" data-share-link="${item.shareLink || ''}">Share this item</span>
                 </div>
             </div>
             <div class="delivery-status-module">
@@ -1014,6 +1029,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="arrow">&gt;</span>
                 </a>
             </div>
+            
+            <div class="module-with-buttons">
+                <a href="#" class="list-button"><span>Buy it again</span><span class="arrow">&gt;</span></a>
+            </div>
+
+            <hr class="separator">
+
+            <div class="module-with-buttons">
+                <h3>How's your item?</h3>
+                <a href="#" class="list-button"><span>Write a product review</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Create a video review</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Leave seller feedback</span><span class="arrow">&gt;</span></a>
+            </div>
+
+            <div class="module-with-buttons">
+                <h3>Order info</h3>
+                <a href="#" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Share gift receipt</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
+            </div>
+
             <hr class="separator">
             <div class="details-page-footer">Ordered on ${formatDate(item.orderDate)}</div>
             ${extraImageHtml}
@@ -1038,7 +1074,8 @@ document.addEventListener('DOMContentLoaded', () => {
             statusDisplay = statusText;
         }
         
-        const address = "123 Tech Park, Silicon Valley, CA 90210, USA";
+        const defaultAddress = "Shipping address not set. Please add it in the Admin Panel.";
+        const address = item.shippingAddress || defaultAddress;
 
         container.innerHTML = `
             <div class="track-module sticky-track-header">
@@ -1138,6 +1175,8 @@ document.addEventListener('DOMContentLoaded', () => {
             orderDate: e.target.orderDate.value,
             deliveryDate: e.target.deliveryDate.value,
             eligibleDate: e.target.eligibleDate.value,
+            shareLink: e.target.shareLink.value,
+            shippingAddress: e.target.shippingAddress.value,
         };
 
         if (editingId) {
@@ -1200,6 +1239,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('orderDate').value = itemToEdit.orderDate || '';
                 document.getElementById('deliveryDate').value = itemToEdit.deliveryDate || '';
                 document.getElementById('eligibleDate').value = itemToEdit.eligibleDate || '';
+                document.getElementById('shareLink').value = itemToEdit.shareLink || '';
+                document.getElementById('shippingAddress').value = itemToEdit.shippingAddress || '';
 
                 if (itemImageInput.value) {
                     imagePreview.src = itemToEdit.imageUrl;
@@ -1227,7 +1268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addItemForm.addEventListener('click', (e) => {
         if (e.target.classList.contains('clear-input')) {
-            const inputField = e.target.parentElement.querySelector('input, select');
+            const inputField = e.target.parentElement.querySelector('input, select, textarea');
             if (inputField) {
                 inputField.value = '';
                 inputField.dispatchEvent(new Event('input'));
@@ -1238,12 +1279,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('click', async (e) => {
         if (e.target.classList.contains('share-item')) {
             const productName = e.target.dataset.productName;
-            const shareUrl = 'https://www.amazon.in/Apple-iPhone-15-128-GB/dp/B0CHX6NQMD?source=ps-sl-shoppingads-lpcontext&ref_=fplfs&smid=AJ6SIZC8YQDZX&th=1';
+            const defaultShareUrl = 'https://www.amazon.in/';
+            const customShareUrl = e.target.dataset.shareLink;
+            const shareUrl = customShareUrl || defaultShareUrl;
+
             const shareText = `Check out this product: ${productName}`;
 
             if (navigator.share) {
                 try {
-                    await navigator.share({ title: 'Amazon Product', text: shareText, url: shareUrl });
+                    await navigator.share({ title: 'Amazon Product', text: `${shareText}`, url: shareUrl });
                 } catch (err) { console.error('Error sharing:', err); }
             } else {
                 try {
