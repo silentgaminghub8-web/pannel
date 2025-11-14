@@ -474,39 +474,43 @@
             max-height: 80px;
             object-fit: contain;
         }
-
-        /* Action Carousel Styles */
-        .action-carousel-container {
-            padding: 16px;
-            margin: 0;
+        
+        /* EXACT BUTTON STYLES FROM EXAMPLE */
+        .button-carousel {
+            display: flex;
             overflow-x: auto;
-            white-space: nowrap;
-            -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
-            scrollbar-width: none;  /* Hide scrollbar Firefox */
+            flex-wrap: nowrap;
+            padding: 16px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
-        .action-carousel-container::-webkit-scrollbar {
-            display: none; /* Hide scrollbar Chrome, Safari, Opera */
+        .button-carousel::-webkit-scrollbar {
+            display: none;
         }
-        .action-btn {
-            display: inline-block;
-            vertical-align: middle;
-            
-            /* Shape and Size */
-            padding: 10px 18px; /* Vertical and horizontal padding */
-            margin-right: 12px; /* Space between buttons */
-            border-radius: 999px; /* This creates the "pill" shape */
-            
-            /* "Ghost" Style */
-            background-color: #ffffff; /* Explicitly white to match page */
-            border: 1px solid #cccccc; /* Thin, 1px, light gray border */
-            
-            /* Text */
+        .action-button {
+            padding: 10px 16px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            max-width: 180px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            color: #222;
             font-size: 14px;
-            color: #0F1111;
-            text-decoration: none;
-            white-space: nowrap; /* Prevent text wrapping */
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.4;
+            white-space: normal;
             cursor: pointer;
+            text-decoration: none; /* For 'a' tags styled as buttons */
         }
+        .action-button:hover {
+            background-color: #f0f0f0;
+        }
+        .action-button:last-child {
+            margin-right: 0;
+        }
+
         .shipped-with-info {
             padding: 0 16px 16px 16px;
         }
@@ -1176,11 +1180,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let carouselHtml = '';
         if (item.carouselToggle) {
             carouselHtml = `
-                <div class="action-carousel-container">
-                    <a href="#" class="action-btn">Update delivery instructions</a>
-                    <a href="#" class="action-btn share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">Share tracking</a>
-                    <a href="#" class="action-btn">Request cancellation</a>
-                    <a href="#" class="action-btn">Buy again</a>
+                <div class="button-carousel">
+                    <a href="#" class="action-button">Update delivery instructions</a>
+                    <a href="#" class="action-button share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">Share tracking</a>
+                    <a href="#" class="action-button">Request cancellation</a>
+                    <a href="#" class="action-button">Buy again</a>
                 </div>
                 <div class="shipped-with-info">
                     <h3>Shipped with Amazon</h3>
@@ -1190,10 +1194,10 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else {
             carouselHtml = `
-                <div class="action-carousel-container">
-                    <a href="#" class="action-btn">Update delivery instructions</a>
-                    <a href="#" class="action-btn">Request cancellation</a>
-                    <a href="#" class="action-btn">Buy again</a>
+                <div class="button-carousel">
+                    <a href="#" class="action-button">Update delivery instructions</a>
+                    <a href="#" class="action-button">Request cancellation</a>
+                    <a href="#" class="action-button">Buy again</a>
                 </div>
             `;
         }
