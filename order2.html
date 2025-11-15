@@ -535,6 +535,124 @@
             color: #007185;
             text-decoration: none;
         }
+        
+        /* NEW ORDER SUMMARY PAGE STYLES */
+        #order-summary-page .content {
+            background-color: #EAEDED; /* Light gray gutter background */
+        }
+        .summary-top-bar {
+            background-color: #f0f2f2;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .summary-top-bar .back-arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+        .summary-top-bar .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .summary-card {
+            background-color: #ffffff;
+            margin-bottom: 8px;
+            padding: 16px;
+        }
+        .summary-card h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 12px 0;
+        }
+        .summary-card .card-line {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+        .summary-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .summary-grid .label { font-weight: bold; }
+        .summary-grid .label.regular { font-weight: normal; }
+        .summary-grid .value { text-align: right; }
+        
+        .summary-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #007185;
+            cursor: pointer;
+        }
+        .summary-nav-row .arrow { font-weight: bold; }
+        
+        .product-card-delivery-status h2 { margin-bottom: 2px; }
+        .product-card-delivery-status p {
+            margin: 0 0 12px 0;
+            font-size: 0.9rem;
+            color: #565959;
+        }
+        
+        .product-card-info {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .product-card-info img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .product-card-info .details p {
+            margin: 0 0 6px 0;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        .product-card-info .details p.title { font-weight: bold; }
+        .product-card-info .details p.price { font-weight: bold; font-size: 1.1rem; }
+        .product-card-info .details p .seller-label { color: grey; }
+        .product-card-info .details p .seller-name { color: #007185; text-decoration: none; }
+
+
+        .summary-button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .summary-action-button {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: #0F1111;
+            display: inline-block;
+        }
+        
+        .payment-card p {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+        }
+        .address-card p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .summary-card .summary-grid .value.bold {
+            font-weight: bold;
+        }
+
 
         /* Admin Panel Styles */
         .admin-container {
@@ -578,6 +696,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 15px;
         }
         .form-section input[type="checkbox"] {
             width: auto;
@@ -900,6 +1019,13 @@
     </div>
 </div>
 
+<!-- PAGE 7: Order Summary Page (NEW) -->
+<div id="order-summary-page" class="page">
+    <div class="content" id="order-summary-content">
+         <!-- New order summary content will be injected here -->
+    </div>
+</div>
+
 
 <!-- Fixed Footer - Visible on all pages -->
 <footer class="fixed-footer">
@@ -933,7 +1059,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     progressStepImageUrl: 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861',
                     shareTrackingLink: 'https://track.amazon.com/tracking/12345XYZ',
                     trackingId: 'AMZ987654321',
-                    carouselToggle: true
+                    carouselToggle: true,
+                    // New fields for Order Summary page
+                    orderNumber: "404-1234567-7654321",
+                    handedToResident: true,
+                    sellerInfo: "Appario Retail Private Ltd",
+                    returnInfo: "15 Nov 2025",
+                    price: "1799.00",
+                    itemSubtotal: "1799.00",
+                    shippingCost: "0.00",
+                    grandTotal: "1799.00"
                  },
                  { 
                     id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
@@ -945,7 +1080,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     progressStepImageUrl: '',
                     shareTrackingLink: '',
                     trackingId: '',
-                    carouselToggle: false
+                    carouselToggle: false,
+                    orderNumber: "D01-9876543-2109876",
+                    handedToResident: false,
+                    sellerInfo: "Amazon Pay",
+                    returnInfo: "7 Nov 2025",
+                    price: "299.00",
+                    itemSubtotal: "299.00",
+                    shippingCost: "0.00",
+                    grandTotal: "299.00"
                  },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
@@ -979,6 +1122,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     adjustStickyHeaderTop();
                 } else if (pageId === 'edit-item-page' && params) {
                     renderEditItemPage(params.id);
+                } else if (pageId === 'order-summary-page' && params) {
+                    renderOrderSummaryPage(params.id);
                 } else if (pageId === 'admin-page') {
                     renderAdminPanel();
                 } else {
@@ -1011,12 +1156,38 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#edit-item-')) {
             const id = parseInt(hash.split('-')[2]);
             showPage('edit-item-page', { id });
+        } else if (hash.startsWith('#order-summary-')) {
+            const id = parseInt(hash.split('-')[2]);
+            showPage('order-summary-page', { id });
         } else if (hash === '#admin') {
             showPage('admin-page');
         } else {
             showPage('main-page');
         }
     }
+    
+    function formatIndianCurrency(value) {
+        if (!value && value !== 0) return '';
+        let numStr = String(value).replace(/[^0-9.-]/g, '');
+        let number = parseFloat(numStr);
+        if (isNaN(number)) return '';
+        
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(number);
+    }
+
+    function truncateString(str, num) {
+        if (!str) return '';
+        if (str.length <= num) {
+            return str;
+        }
+        return str.slice(0, num) + '...';
+    }
+
 
     function formatDate(dateString) {
         if (!dateString) return '';
@@ -1153,7 +1324,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <div class="module-with-buttons">
                 <h3>Order info</h3>
-                <a href="#" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
+                <a href="#order-summary-${item.id}" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
                 <a href="#" class="list-button"><span>Share gift receipt</span><span class="arrow">&gt;</span></a>
                 <a href="#" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
             </div>
@@ -1239,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="order-info-section">
                     <h2>Order Info</h2>
                     <hr class="thick-separator-light">
-                    <a href="#details-${itemId}" class="order-details-link">
+                    <a href="#order-summary-${itemId}" class="order-details-link">
                         <span>View order details</span>
                         <span class="arrow">&gt;</span>
                     </a>
@@ -1248,6 +1419,122 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <img src="https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624" alt="Order Details Summary" class="full-width-image">
         `;
+    }
+
+    function renderOrderSummaryPage(itemId) {
+        const container = document.getElementById('order-summary-content');
+        const items = DB.get('purchaseHistoryItems');
+        const item = items.find(p => p.id === itemId);
+
+        if (!item) {
+            container.innerHTML = '<p>Item details not found.</p>';
+            return;
+        }
+
+        const deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
+        const returnInfoText = item.returnInfo ? `Return window closed on ${item.returnInfo}` : '';
+
+        container.innerHTML = `
+            <div class="summary-top-bar">
+                <span id="summary-back-btn" class="back-arrow">&lt;</span>
+                <span class="title">Your Orders</span>
+            </div>
+            <div class="summary-page-background">
+                <!-- Order Details Card -->
+                <div class="summary-card">
+                    <h2>Order Details</h2>
+                    <div class="summary-grid">
+                        <span class="label">Order date</span>
+                        <span class="value">${formatDate(item.orderDate)}</span>
+                    </div>
+                    <div class="summary-grid">
+                        <span class="label regular">Order number</span>
+                        <span class="value">${item.orderNumber || ''}</span>
+                    </div>
+                    <hr class="card-line">
+                    <div class="summary-nav-row">
+                        <span>Download Invoice</span>
+                        <span class="arrow">&gt;</span>
+                    </div>
+                </div>
+
+                <!-- Product Card -->
+                <div class="summary-card">
+                    <div class="product-card-delivery-status">
+                        <h2>${item.deliveryStatusText || 'Delivered on'} ${formatDate(item.deliveryDate)}</h2>
+                        <p>${deliveryStatusText}</p>
+                    </div>
+                    <hr class="card-line">
+                    <div class="product-card-info">
+                        <img src="${item.imageUrl}" alt="${item.name}">
+                        <div class="details">
+                            <p class="title">${item.name}</p>
+                            <p><span class="seller-label">Sold by : </span><a href="#" class="seller-name">${item.sellerInfo || ''}</a></p>
+                            <p>${returnInfoText}</p>
+                            <p class="price">${formatIndianCurrency(item.price)}</p>
+                        </div>
+                    </div>
+                    <div class="summary-button-group">
+                        <a href="#edit-item-${item.id}" class="summary-action-button">Get product support</a>
+                        <a href="#" class="summary-action-button">Buy it again</a>
+                        <a href="#track-${item.id}" class="summary-action-button">Track package</a>
+                        <button class="summary-action-button">Leave seller feedback</button>
+                        <button class="summary-action-button">Leave delivery feedback</button>
+                        <button class="summary-action-button">Write a product review</button>
+                    </div>
+                </div>
+
+                <!-- Payment Method Card -->
+                <div class="summary-card">
+                    <h2>Payment method</h2>
+                    <hr class="card-line">
+                    <div class="payment-card">
+                        <p>American Express Credit Card</p>
+                    </div>
+                </div>
+
+                <!-- Ship To Card -->
+                <div class="summary-card">
+                    <h2>Ship to</h2>
+                    <hr class="card-line">
+                    <div class="address-card">
+                        <p>${item.shippingAddress || ''}</p>
+                    </div>
+                </div>
+
+                <!-- Order Summary Card -->
+                <div class="summary-card">
+                    <h2>Order Summary</h2>
+                    <hr class="card-line">
+                    <div class="summary-grid">
+                        <span class="label regular">Item(s) Subtotal:</span>
+                        <span class="value">${formatIndianCurrency(item.itemSubtotal)}</span>
+                    </div>
+                    <div class="summary-grid">
+                        <span class="label regular">Shipping:</span>
+                        <span class="value">${formatIndianCurrency(item.shippingCost)}</span>
+                    </div>
+                    <hr class="card-line">
+                    <div class="summary-grid">
+                        <span class="label">Grand Total:</span>
+                        <span class="value bold">${formatIndianCurrency(item.grandTotal)}</span>
+                    </div>
+                </div>
+                
+                <!-- Recommended for you card -->
+                <div class="summary-card">
+                    <h2>Recommended for you based on "${truncateString(item.name, 20)}"</h2>
+                    <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251115_121149_Chrome.jpg" alt="Recommended Products" style="width: 100%; height: auto; display: block;">
+                </div>
+
+                <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206" alt="Promotional Image" style="width: 100%; height: auto; display: block; padding: 0 8px 8px 8px; box-sizing: border-box;">
+
+            </div>
+        `;
+        
+        document.getElementById('summary-back-btn').addEventListener('click', () => {
+            window.history.back();
+        });
     }
 
     function renderAdminList(type) {
@@ -1476,67 +1763,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 <form id="editItemForm">
                     <!-- Basic Info -->
                     <h3>Basic Info</h3>
-                    <div class="input-wrapper">
-                        <label for="editItemName">Product Name:</label>
-                        <input type="text" id="editItemName" value="${item.name || ''}">
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editItemImage">Image URL:</label>
-                        <input type="url" id="editItemImage" value="${item.imageUrl || ''}">
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editItemImagePageUrl">Image Page URL:</label>
-                        <input type="url" id="editItemImagePageUrl" value="${item.imagePageUrl || ''}">
-                    </div>
+                    <div class="input-wrapper"><label for="editItemName">Product Name:</label><input type="text" id="editItemName" value="${item.name || ''}"></div>
+                    <div class="input-wrapper"><label for="editItemImage">Image URL:</label><input type="url" id="editItemImage" value="${item.imageUrl || ''}"></div>
+                    <div class="input-wrapper"><label for="editItemImagePageUrl">Image Page URL:</label><input type="url" id="editItemImagePageUrl" value="${item.imagePageUrl || ''}"></div>
+                    <div class="input-wrapper"><label for="editSellerInfo">Seller Info (Name only):</label><input type="text" id="editSellerInfo" value="${item.sellerInfo || ''}"></div>
+                    <div class="input-wrapper"><label for="editReturnInfo">Return Window Closed Date (e.g., 15 Nov 2025):</label><input type="text" id="editReturnInfo" value="${item.returnInfo || ''}"></div>
+                    <div class="input-wrapper"><label for="editPrice">Price (e.g., 1799.00):</label><input type="text" id="editPrice" value="${item.price || ''}"></div>
 
                     <!-- Delivery Info -->
                     <h3 style="margin-top:20px;">Delivery Info</h3>
-                    <div class="input-wrapper">
-                        <label for="editDeliveryStatus">Delivery Status Text:</label>
-                        <select id="editDeliveryStatus"></select>
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editOrderDate">Order Date:</label>
-                        <input type="date" id="editOrderDate" value="${item.orderDate || ''}">
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editDeliveryDate">Delivery Date:</label>
-                        <input type="date" id="editDeliveryDate" value="${item.deliveryDate || ''}">
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editEligibleDate">Replacement Eligible Date:</label>
-                        <input type="date" id="editEligibleDate" value="${item.eligibleDate || ''}">
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editShippingAddress">Shipping Address:</label>
-                        <textarea id="editShippingAddress" rows="3">${item.shippingAddress || ''}</textarea>
-                    </div>
+                    <div class="input-wrapper"><label for="editDeliveryStatus">Delivery Status Text:</label><select id="editDeliveryStatus"></select></div>
+                    <div class="input-wrapper"><label for="editOrderDate">Order Date:</label><input type="date" id="editOrderDate" value="${item.orderDate || ''}"></div>
+                    <div class="input-wrapper"><label for="editDeliveryDate">Delivery Date:</label><input type="date" id="editDeliveryDate" value="${item.deliveryDate || ''}"></div>
+                    <div class="input-wrapper"><label for="editEligibleDate">Replacement Eligible Date:</label><input type="date" id="editEligibleDate" value="${item.eligibleDate || ''}"></div>
+                    <div class="input-wrapper"><label for="editShippingAddress">Shipping Address:</label><textarea id="editShippingAddress" rows="3">${item.shippingAddress || ''}</textarea></div>
+                    <div class="checkbox-wrapper"><label for="editHandedToResident">Package was handed to resident:</label><input type="checkbox" id="editHandedToResident" ${item.handedToResident ? 'checked' : ''}></div>
+                    
+                    <!-- Order Summary Page Info -->
+                    <h3 style="margin-top:20px;">Order Summary Details</h3>
+                    <div class="input-wrapper"><label for="editOrderNumber">Order Number:</label><input type="text" id="editOrderNumber" value="${item.orderNumber || ''}"></div>
+                    <div class="input-wrapper"><label for="editItemSubtotal">Item(s) Subtotal:</label><input type="text" id="editItemSubtotal" value="${item.itemSubtotal || ''}"></div>
+                    <div class="input-wrapper"><label for="editShippingCost">Shipping Cost:</label><input type="text" id="editShippingCost" value="${item.shippingCost || ''}"></div>
+                    <div class="input-wrapper"><label for="editGrandTotal">Grand Total:</label><input type="text" id="editGrandTotal" value="${item.grandTotal || ''}"></div>
 
                     <!-- Tracking & Carousel Info -->
                     <h3 style="margin-top:20px;">Tracking Page Settings</h3>
-                     <div class="input-wrapper">
-                        <label for="editProgressStepImageUrl">Progress-Step Image URL:</label>
-                        <input type="url" id="editProgressStepImageUrl" value="${item.progressStepImageUrl || ''}">
-                    </div>
-                    <div class="input-wrapper">
-                        <label for="editShareTrackingLink">Share Tracking Link:</label>
-                        <input type="url" id="editShareTrackingLink" value="${item.shareTrackingLink || ''}">
-                    </div>
-                     <div class="input-wrapper">
-                        <label for="editTrackingId">Tracking ID:</label>
-                        <input type="text" id="editTrackingId" value="${item.trackingId || ''}">
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <label for="editCarouselToggle">Carousel Toggle (On/Off):</label>
-                        <input type="checkbox" id="editCarouselToggle" ${item.carouselToggle ? 'checked' : ''}>
-                    </div>
+                    <div class="input-wrapper"><label for="editProgressStepImageUrl">Progress-Step Image URL:</label><input type="url" id="editProgressStepImageUrl" value="${item.progressStepImageUrl || ''}"></div>
+                    <div class="input-wrapper"><label for="editShareTrackingLink">Share Tracking Link:</label><input type="url" id="editShareTrackingLink" value="${item.shareTrackingLink || ''}"></div>
+                    <div class="input-wrapper"><label for="editTrackingId">Tracking ID:</label><input type="text" id="editTrackingId" value="${item.trackingId || ''}"></div>
+                    <div class="checkbox-wrapper"><label for="editCarouselToggle">Carousel Toggle (On/Off):</label><input type="checkbox" id="editCarouselToggle" ${item.carouselToggle ? 'checked' : ''}></div>
 
                     <!-- Misc -->
                     <h3 style="margin-top:20px;">Miscellaneous</h3>
-                     <div class="input-wrapper">
-                        <label for="editShareLink">General Share Link:</label>
-                        <input type="url" id="editShareLink" value="${item.shareLink || ''}">
-                    </div>
+                    <div class="input-wrapper"><label for="editShareLink">General Share Link:</label><input type="url" id="editShareLink" value="${item.shareLink || ''}"></div>
 
                     <button type="submit" id="save-item-changes-btn">Save Changes</button>
                 </form>
@@ -1565,11 +1824,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     name: document.getElementById('editItemName').value,
                     imageUrl: document.getElementById('editItemImage').value,
                     imagePageUrl: document.getElementById('editItemImagePageUrl').value,
+                    sellerInfo: document.getElementById('editSellerInfo').value,
+                    returnInfo: document.getElementById('editReturnInfo').value,
+                    price: document.getElementById('editPrice').value,
                     deliveryStatusText: document.getElementById('editDeliveryStatus').value,
                     orderDate: document.getElementById('editOrderDate').value,
                     deliveryDate: document.getElementById('editDeliveryDate').value,
                     eligibleDate: document.getElementById('editEligibleDate').value,
                     shippingAddress: document.getElementById('editShippingAddress').value,
+                    handedToResident: document.getElementById('editHandedToResident').checked,
+                    orderNumber: document.getElementById('editOrderNumber').value,
+                    itemSubtotal: document.getElementById('editItemSubtotal').value,
+                    shippingCost: document.getElementById('editShippingCost').value,
+                    grandTotal: document.getElementById('editGrandTotal').value,
                     progressStepImageUrl: document.getElementById('editProgressStepImageUrl').value,
                     shareTrackingLink: document.getElementById('editShareTrackingLink').value,
                     trackingId: document.getElementById('editTrackingId').value,
