@@ -104,6 +104,16 @@
             display: block;
         }
 
+        /* Invisible Back Button Tap Area */
+        #back-tap-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25%; /* Covers the left quarter of the header */
+            height: 100%;
+            z-index: 1001; /* Ensures it's on top of the header image link */
+        }
+
         /* Main Page Specific Styles */
         #main-page .admin-panel-link img {
             width: 100%;
@@ -702,8 +712,9 @@
 
 <!-- Fixed Header - Visible on all pages -->
 <header class="fixed-header">
+    <div id="back-tap-area"></div>
     <a href="#home">
-        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header Image">
+        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-15_11-12-35-748.jpg" alt="Header Image">
     </a>
 </header>
 
@@ -1576,6 +1587,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const footer = document.querySelector('.fixed-footer');
     footer.addEventListener('click', () => { window.location.hash = '#home'; });
+
+    document.getElementById('back-tap-area').addEventListener('click', () => {
+        window.history.back();
+    });
 
     const header = document.querySelector('.fixed-header');
     const loader = document.getElementById('progress-bar-loader');
