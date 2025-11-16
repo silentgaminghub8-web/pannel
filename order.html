@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mobile Page</title>
     <style>
         /* --- Global & Page Styles --- */
@@ -12,41 +12,143 @@
             --medium-grey: #ccc;
             --text-color: #0F1111;
         }
-        body, html {
-            margin: 0; padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--light-grey);
-            color: var(--text-color);
+        /* COMMAND 1: Disable Text Selection & Tap Highlight */
+        * {
+            -webkit-tap-highlight-color: transparent; /* For iOS/Android */
+            -webkit-touch-callout: none; /* Disable callout, like on image long-press */
+            -webkit-user-select: none;   /* Safari */
+            -khtml-user-select: none;    /* Konqueror HTML */
+            -moz-user-select: none;      /* Old versions of Firefox */
+            -ms-user-select: none;       /* Internet Explorer/Edge */
+            user-select: none;           /* Non-prefixed version, currently supported by Chrome, Opera, and Firefox */
         }
+        /* Re-enable selection for form inputs */
+        input, textarea, select {
+            -webkit-user-select: auto;
+            -khtml-user-select: auto;
+            -moz-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
+        }
+
+        /* General Body and Page Setup */
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #0F1111;
+        }
+
+        .page {
+            display: none; /* Pages are hidden by default */
+            padding-bottom: 100px; /* Space for the footer */
+        }
+
+        .page.active {
+            display: block; /* The active page is shown */
+        }
+        
+        #home-page {
+             background-color: var(--light-grey);
+        }
+        
+        #home-page .content {
+             /* Padding-top and bottom set by JS */
+             padding-top: 100px;
+             padding-bottom: 100px;
+        }
+
+        #progress-bar-loader {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: transparent;
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+            overflow: hidden;
+        }
+        #progress-bar-loader.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.1s ease, visibility 0s;
+        }
+        #progress-bar-loader::before {
+            content: '';
+            display: block;
+            height: 100%;
+            width: 100%;
+            background-image: linear-gradient(to right, #FFA41C, #FFD814, #FFA41C);
+            background-size: 200% auto;
+            animation: progressBarFlow 1.2s linear infinite;
+        }
+        @keyframes progressBarFlow {
+            0% { background-position: 0% 0; }
+            100% { background-position: -100% 0; }
+        }
+        .content-loading {
+            visibility: hidden;
+            min-height: 500px; /* Prevent page jumping */
+        }
+
+
+        /* Header and Footer (Fixed Overlays) */
         .fixed-header, .fixed-footer {
-            position: fixed; left: 0; width: 100%; z-index: 10;
+            position: fixed;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
         }
-        .fixed-header { top: 0; }
-        .fixed-footer { bottom: 0; }
+
+        .fixed-header {
+            top: 0;
+            background-color: #ffffff;
+        }
+
+        .fixed-footer {
+            bottom: 0;
+            cursor: pointer;
+        }
+
         .fixed-header img, .fixed-footer img, .full-width-image img {
-            width: 100%; height: auto; display: block;
+            width: 100%;
+            height: auto;
+            display: block;
         }
         .full-width-image.no-gap { margin-top: -1px; }
-        .content { padding-top: 100px; padding-bottom: 100px; } /* Placeholder, will be set by JS */
 
-        /* --- Modules --- */
-        .module {
+        /* Invisible Back Button Tap Area */
+        #back-tap-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25%;
+            height: 100%;
+            z-index: 1001;
+        }
+        
+        /* --- Home Page Modules --- */
+        #home-page .module {
             background-color: #fff;
             padding: 15px;
             margin-bottom: 10px;
         }
-        .module-header {
+        #home-page .module-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 12px;
         }
-        .module-title { font-weight: bold; font-size: 18px; }
+        #home-page .module-title { font-weight: bold; font-size: 18px; }
         .see-all, .edit-button {
             text-decoration: none; color: var(--primary-blue); font-size: 14px;
             background: none; border: none; cursor: pointer; padding: 0;
         }
         .edit-button { margin-right: 5px; }
 
-        /* Quick Access */
+
+        /* Quick Access Pills */
         .quick-access {
             background-color: #fff; overflow-x: auto; white-space: nowrap;
             padding: 15px; border-bottom: 1px solid #ddd;
@@ -57,7 +159,7 @@
             padding: 10px 20px; margin-right: 10px; font-size: 14px; cursor: pointer;
         }
 
-        /* Card Row */
+        /* Card Row for Home Page */
         .card-row { display: flex; overflow-x: auto; padding-bottom: 15px; }
         .card-row::-webkit-scrollbar { display: none; }
         .card {
@@ -68,17 +170,17 @@
             justify-content: center; padding: 10px; box-sizing: border-box;
         }
         .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .placeholder-text { color: #666; font-size: 14px; }
+        .placeholder-text { color: #666; font-size: 14px; padding-left: 5px; }
 
-        /* Keep Shopping Footer */
-        .module-footer { text-align: center; margin-top: 10px; }
+        /* "Keep Shopping" Footer on Home Page */
+        #home-page .module-footer { text-align: center; margin-top: 10px; }
         .see-more-link {
             color: #555; text-decoration: none; display: inline-flex;
             align-items: center; font-size: 14px;
         }
         .arrow-down { width: 24px; height: 24px; fill: currentColor; }
-
-        /* Your Lists Module */
+        
+        /* "Your Lists" Module on Home Page */
         .list-card {
             display: flex; align-items: center; justify-content: space-between;
             padding: 15px; border: 1px solid #ddd; border-radius: 8px;
@@ -97,7 +199,7 @@
             font-size: 14px; font-weight: bold; color: #333;
         }
 
-        /* Your Account Module */
+        /* "Your Account" Module on Home Page */
         .account-buttons { display: flex; gap: 10px; }
         .account-button {
             flex: 1; padding: 15px 10px; font-size: 14px;
@@ -105,7 +207,7 @@
             border-radius: 8px; text-align: center; cursor: pointer;
         }
 
-        /* Need Help Module */
+        /* "Need Help" Module on Home Page */
         .help-module { text-align: center; }
         .help-title { font-size: 18px; margin-bottom: 15px; }
         .help-button {
@@ -114,7 +216,706 @@
             cursor: pointer; margin: 0 auto;
         }
 
-        /* --- Admin Panel Overlay Styles --- */
+        /* --- Orders Page Specific Styles --- */
+        #orders-page .admin-panel-link img {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        #orders-page .module {
+            padding: 16px;
+        }
+
+        #orders-page .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        #orders-page .module-header h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        #orders-page .module-header .see-more {
+            font-size: 0.9rem;
+            color: #007185;
+            text-decoration: none;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .buy-again-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .buy-again-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .buy-again-card img {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .buy-again-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .separator {
+            height: 8px;
+            background-color: #EAEDED;
+            border: none;
+            margin: 0;
+        }
+
+        .purchase-history-header h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+        }
+
+        .purchase-history-header p {
+            font-size: 0.9rem;
+            color: #565959;
+            margin: 0;
+        }
+
+        .purchase-item-card {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background-color: #fff;
+            overflow: hidden;
+            align-items: stretch;
+            height: 100px;
+        }
+
+        .purchase-item-card .item-image {
+            flex-basis: 90px;
+            flex-shrink: 0;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #eee;
+            background-color: #F0F2F2;
+        }
+
+        .purchase-item-card .item-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .purchase-item-card .item-info {
+            flex-grow: 1;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .purchase-item-card .item-info .item-name {
+            font-weight: bold;
+            margin: 0 0 4px 0;
+            color: #0F1111;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+         .purchase-item-card .item-info .item-name:hover {
+            color: #007185;
+         }
+
+        .purchase-item-card .item-info .item-status {
+            font-size: 0.9rem;
+            color: #565959;
+            margin: 0;
+        }
+
+        /* --- Order Details Page Styles --- */
+        .product-info-module {
+            display: flex;
+            padding: 16px;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .product-info-module .product-image {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .product-info-module .product-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 150px; /* Match image height */
+        }
+
+        .product-info-module .product-details .product-name {
+            color: #007185;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .product-info-module .product-details .product-name:hover {
+            text-decoration: underline;
+        }
+
+        .product-info-module .product-details .share-item {
+            color: #007185;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .product-info-module .product-details .share-item:hover {
+            text-decoration: underline;
+        }
+
+        .delivery-status-module {
+            padding: 16px;
+            border-top: 1px solid #ddd;
+        }
+
+        .delivery-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .delivery-status .icon {
+            background-color: #007185;
+            color: white;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .delivery-status .text-bold {
+            font-weight: bold;
+        }
+
+        .delivery-feedback {
+            margin-bottom: 16px;
+        }
+
+        .delivery-feedback .feedback-text {
+            font-size: 0.8rem;
+            color: #565959;
+            margin-bottom: 4px;
+        }
+
+        .delivery-feedback .stars {
+            color: #FFA41C;
+            font-size: 1.5rem;
+        }
+
+        .list-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #ddd;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .list-button .button-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-button .button-text .sub-text {
+            font-size: 0.8rem;
+            color: #565959;
+            margin-top: 2px;
+        }
+
+        .list-button .arrow {
+            color: #888;
+        }
+
+        .module-with-buttons {
+            padding: 0 16px;
+        }
+        
+        .module-with-buttons .list-button:first-of-type {
+            border-top: 1px solid #ddd;
+        }
+
+        .module-with-buttons h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .details-page-footer {
+            padding: 16px;
+            color: #565959;
+            font-size: 0.9rem;
+        }
+        
+        #image-page-content img {
+            width: 100%;
+            height: auto;
+        }
+
+        .details-page-ad-image {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        /* --- Track Page Styles --- */
+        .track-module {
+            padding: 16px;
+        }
+        .track-module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .track-module-header h2 {
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 0;
+            flex-grow: 1;
+        }
+        .track-module-header .see-all-orders {
+            font-size: 0.9rem;
+            color: #007185;
+            text-decoration: none;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+        .thin-separator {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 0 -16px;
+        }
+        .track-module .full-width-image {
+            margin: 0 -16px;
+            width: calc(100% + 32px);
+        }
+        .thick-separator {
+            border: none;
+            border-top: 8px solid #EAEDED;
+            margin: 0 -16px 16px -16px;
+        }
+        .shipping-address-section h3 {
+             font-size: 1.2rem;
+             margin: 0 0 8px 0;
+        }
+        .shipping-address-section p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+        .order-info-section h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .thick-separator-light {
+             border: none;
+             border-top: 1px solid #ddd;
+             margin: 0;
+        }
+        .order-details-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            text-decoration: none;
+            color: inherit;
+            font-size: 1rem;
+        }
+
+        /* Track Page Sticky Header */
+        .sticky-track-header {
+            position: sticky;
+            background-color: #ffffff;
+            z-index: 999;
+            padding-bottom: 0 !important;
+        }
+        .track-product-image-container {
+            padding: 16px 0;
+            text-align: left;
+        }
+        .track-product-image {
+            max-width: 80px;
+            max-height: 80px;
+            object-fit: contain;
+        }
+        
+        /* Action Button Carousel */
+        .button-carousel {
+            display: flex;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding: 16px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .button-carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .action-button {
+            padding: 10px 16px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            max-width: 180px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            color: #222;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.4;
+            white-space: normal;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .action-button:hover {
+            background-color: #f0f0f0;
+        }
+        .action-button:last-child {
+            margin-right: 0;
+        }
+
+        .shipped-with-info {
+            padding: 0 16px 16px 16px;
+        }
+        .shipped-with-info h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+        }
+        .shipped-with-info p, .shipped-with-info a {
+            font-size: 1rem;
+            margin: 0 0 4px 0;
+            color: #007185;
+            text-decoration: none;
+        }
+        
+        /* --- Order Summary Page Styles --- */
+        #order-summary-page .content {
+            background-color: #EAEDED;
+        }
+        .summary-top-bar {
+            background-color: #f0f2f2;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .summary-top-bar .back-arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+        .summary-top-bar .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .summary-card {
+            background-color: #ffffff;
+            margin-bottom: 8px;
+            padding: 16px;
+        }
+        .summary-card h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 12px 0;
+        }
+        .summary-card .card-line {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+        .summary-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .summary-grid .label { font-weight: bold; }
+        .summary-grid .label.regular { font-weight: normal; }
+        .summary-grid .value { text-align: right; }
+        
+        .summary-nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #007185;
+            cursor: pointer;
+        }
+        .summary-nav-row .arrow { font-weight: bold; }
+        
+        .product-card-delivery-status h2 { margin-bottom: 2px; }
+        .product-card-delivery-status p {
+            margin: 0 0 12px 0;
+            font-size: 0.9rem;
+            color: #565959;
+        }
+        
+        .product-card-info {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .product-card-info img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .product-card-info .details p {
+            margin: 0 0 6px 0;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        .product-card-info .details p.title { font-weight: bold; }
+        .product-card-info .details p.price { font-weight: bold; font-size: 1.1rem; }
+        .product-card-info .details p .seller-label { color: grey; }
+        .product-card-info .details p .seller-name { color: #007185; text-decoration: none; }
+
+
+        .summary-button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .summary-action-button {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: #0F1111;
+            display: inline-block;
+        }
+        
+        .payment-card p {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+        }
+        .address-card p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .summary-card .summary-grid .value.bold {
+            font-weight: bold;
+        }
+
+
+        /* --- Admin Panel Styles (For Orders Page) --- */
+        #admin-page .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        #admin-page .admin-container h1, #admin-page .admin-container h2 {
+            text-align: center;
+        }
+
+        #admin-page .form-section {
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-section input[type="text"],
+        .form-section input[type="url"],
+        .form-section input[type="date"],
+        .form-section input[type="checkbox"],
+        .form-section select,
+        .form-section textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-section .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .form-section input[type="checkbox"] {
+            width: auto;
+        }
+
+
+        .form-section .input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .form-section .input-wrapper input,
+        .form-section .input-wrapper select {
+            margin-bottom: 0;
+        }
+        .clear-input {
+            position: absolute;
+            right: 12px;
+            top: 36px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 22px;
+            color: #999;
+            font-weight: bold;
+            line-height: 1;
+            user-select: none;
+        }
+        .clear-input:hover {
+            color: #333;
+        }
+        .input-wrapper select + .clear-input {
+            right: 30px;
+        }
+
+
+        #admin-page .form-section button {
+            background-color: #007185;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        #admin-page .form-section button:hover {
+            background-color: #005a6a;
+        }
+        
+        #admin-page .form-section button.update-mode {
+            background-color: #FFA41C;
+        }
+        #admin-page .form-section button.update-mode:hover {
+             background-color: #e69519;
+        }
+        #admin-page .form-section .autofill-btn {
+            background-color: #6c757d;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        #admin-page .form-section .autofill-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .item-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .item-list li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .item-list .item-name-admin {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        
+        .item-list .button-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .item-list li.dragging {
+            opacity: 0.5;
+        }
+        
+        .item-list button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .item-list .edit-btn { background-color: #007bff; }
+        .item-list .reorder-btn { background-color: #28a745; }
+        .item-list .delete-btn { background-color: #dc3545; }
+
+        .admin-list-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .flip-btn {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        /* --- Admin Panel Overlay Styles (For Home Page) --- */
         .admin-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6); z-index: 100;
@@ -122,15 +923,16 @@
             opacity: 0; transition: opacity 0.3s ease;
         }
         .admin-overlay.visible { display: flex; opacity: 1; }
-        .admin-container {
+        .admin-overlay .admin-container {
             width: 90%; max-width: 700px; background-color: #fff;
             border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             display: flex; flex-direction: column; overflow: hidden; height: 90vh; max-height: 800px;
+            padding: 0; /* Override default padding */
         }
         .admin-header {
             padding: 20px; border-bottom: 1px solid #eee;
         }
-        .admin-header h1 { margin: 0 0 5px 0; font-size: 22px; }
+        .admin-header h1 { margin: 0 0 5px 0; font-size: 22px; text-align: left;}
         .admin-header p { margin: 0; color: #666; }
         .admin-tabs { display: flex; border-bottom: 1px solid #eee; }
         .admin-tab {
@@ -180,10 +982,18 @@
 </head>
 <body>
 
-    <header class="fixed-header">
-        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header" id="header-img">
-    </header>
+<div id="progress-bar-loader"></div>
 
+<!-- Fixed Header - Visible on all pages -->
+<header class="fixed-header">
+    <div id="back-tap-area"></div>
+    <a href="#home">
+        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938" alt="Header Image" id="header-img">
+    </a>
+</header>
+
+<!-- PAGE 0: Home Page -->
+<div id="home-page" class="page">
     <main class="content">
         <div class="full-width-image no-gap">
             <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_00-40-33-042.jpg?updatedAt=1762629100597" alt="Sub Header">
@@ -191,7 +1001,7 @@
 
         <div class="quick-access">
             <div class="quick-access-inner">
-                <a href="order2.html" class="pill-button" style="text-decoration:none; color: var(--text-color);">Orders</a>
+                <a href="#orders" class="pill-button" style="text-decoration:none; color: var(--text-color);">Orders</a>
                 <button class="pill-button">Buy Again</button>
                 <button class="pill-button">Account</button>
                 <button class="pill-button">Lists</button>
@@ -201,7 +1011,7 @@
         <div class="module">
             <div class="module-header">
                 <span class="module-title">Your Orders</span>
-                <a href="order2.html" class="see-all">See all</a>
+                <a href="#orders" class="see-all">See all</a>
             </div>
             <div class="card-row" id="yourOrders-cards"></div>
         </div>
@@ -219,7 +1029,7 @@
                 <span class="module-title">Keep shopping for</span>
                 <div>
                     <button class="edit-button" id="openAdminButton">Edit</button> |
-                    <a href="#" class="see-all">Browsing history</a>
+                    <a href="#" class="see-all" style="margin-left: 5px;">Browsing history</a>
                 </div>
             </div>
             <div class="card-row" id="keepShopping-cards"></div>
@@ -244,7 +1054,7 @@
                 <div class="list-card-previews">
                     <div class="preview-square" id="list-preview-1"></div>
                     <div class="preview-square" id="list-preview-2"></div>
-                    <div class="preview-square extra-items">+2</div>
+                    <div class="preview-square extra-items" id="list-extra-items">+0</div>
                 </div>
             </div>
         </div>
@@ -269,187 +1079,1243 @@
             <h3 class="help-title">Need more help?</h3>
             <button class="help-button">Visit customer service</button>
         </div>
-
     </main>
+</div>
 
-    <footer class="fixed-footer">
-        <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_01-17-05-266.jpg?updatedAt=1762631248379" alt="Footer" id="footer-img">
-    </footer>
-    
-    <!-- Admin Panel Overlay -->
-    <div class="admin-overlay" id="adminPanel">
-        <div class="admin-container">
-            <div class="admin-header">
-                <h1>Manage Page Images</h1>
-                <p>Add or remove image URLs. Previews update automatically.</p>
+<!-- PAGE 1: "Your Orders" Page -->
+<div id="orders-page" class="page">
+    <div class="content">
+        <div style="padding: 16px;">
+            <h1 style="font-size: 1.8rem; font-weight: bold; margin: 0;">Your Orders</h1>
+        </div>
+
+        <a href="#admin" class="admin-panel-link">
+            <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_03-04-23-916.jpg?updatedAt=1762637690349" alt="Admin Panel">
+        </a>
+
+        <div class="module">
+            <div class="module-header">
+                <h2>Buy again</h2>
+                <a class="see-more">See more</a>
             </div>
-            <div class="admin-tabs" id="adminTabsContainer"></div>
-            <div class="admin-content" id="adminContentContainer"></div>
-            <div class="admin-footer">
-                <button id="closeAdminButton" class="admin-button secondary">Close</button>
-                <button id="saveButton" class="admin-button primary">Save & Close</button>
+            <div class="buy-again-grid" id="buy-again-container"></div>
+        </div>
+
+        <hr class="separator">
+
+        <div class="module">
+            <div class="purchase-history-header">
+                <h2>Purchase history</h2>
+                <p>Past three months</p>
             </div>
+            <div id="purchase-history-container"></div>
         </div>
     </div>
-    <div class="save-feedback" id="saveFeedback">Saved Successfully!</div>
+</div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const SECTIONS = [
-            { key: 'yourOrders', title: 'Your Orders', note: 'Add URLs for the square product cards.' },
-            { key: 'buyAgain', title: 'Buy Again', note: 'Add URLs for the square product cards.' },
-            { key: 'keepShopping', title: 'Keep Shopping', note: 'Add URLs for the square product cards.' },
-            { key: 'yourLists', title: 'Your Lists', note: 'Add the first two image URLs for the list preview.' }
-        ];
+<!-- PAGE 2: Order Details Page -->
+<div id="details-page" class="page">
+    <div class="content" id="order-details-content"></div>
+</div>
 
-        const adminPanel = document.getElementById('adminPanel');
-        const openAdminButton = document.getElementById('openAdminButton');
-        const closeAdminButton = document.getElementById('closeAdminButton');
-        const saveButton = document.getElementById('saveButton');
-        const adminTabsContainer = document.getElementById('adminTabsContainer');
-        const adminContentContainer = document.getElementById('adminContentContainer');
+<!-- PAGE 3: Main Admin Panel -->
+<div id="admin-page" class="page">
+    <div class="admin-container content">
+        <a href="#orders">&larr; Back to Orders Page</a>
+        <h1>Admin Panel</h1>
+        
+        <div class="form-section">
+            <h2>Extra Settings</h2>
+            <div class="input-wrapper">
+                <label for="extraImageUrl">Details Page Ad Image URL:</label>
+                <input type="url" id="extraImageUrl" name="extraImageUrl">
+                <span class="clear-input">&times;</span>
+            </div>
+            <button id="saveExtraSettingsBtn">Save Extra Settings</button>
+        </div>
 
-        function setContentPadding() {
-            const headerHeight = document.getElementById('header-img').offsetHeight;
-            const footerHeight = document.getElementById('footer-img').offsetHeight;
-            document.querySelector('.content').style.paddingTop = `${headerHeight}px`;
-            document.querySelector('.content').style.paddingBottom = `${footerHeight}px`;
+        <p>Add, edit, reorder, or remove items. All data is saved in your browser's local storage.</p>
+
+        <div class="form-section">
+            <h2 id="form-title">Add New Item</h2>
+            <form id="addItemForm">
+                <input type="hidden" id="editingItemId" name="editingItemId">
+                
+                <div class="input-wrapper">
+                    <label for="itemType">Item Type:</label>
+                    <select id="itemType" name="itemType" required>
+                        <option value="buyAgain">Buy Again</option>
+                        <option value="purchaseHistory">Purchase History</option>
+                    </select>
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="itemName">Product Name:</label>
+                    <input type="text" id="itemName" name="itemName" required>
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="itemImage">Image URL:</label>
+                    <input type="url" id="itemImage" name="itemImage" required>
+                    <span class="clear-input">&times;</span>
+                </div>
+                
+                <div class="input-wrapper">
+                    <label for="itemImagePageUrl">Image Page URL:</label>
+                    <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100px; height: auto; margin-top: 10px; margin-bottom: 15px; display: none; border-radius: 4px;">
+
+                <div class="input-wrapper">
+                    <label for="deliveryStatus">Delivery Status Text:</label>
+                    <select id="deliveryStatus" name="deliveryStatus">
+                        <option value="Delivered on">Delivered on</option>
+                        <option value="Delivered Today">Delivered Today</option>
+                        <option value="Arriving tomorrow">Arriving tomorrow</option>
+                        <option value="Arriving on">Arriving on</option>
+                        <option value="Arriving today">Arriving today</option>
+                    </select>
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="orderDate">Order Date:</label>
+                    <input type="date" id="orderDate" name="orderDate">
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="deliveryDate">Delivery Date (for Purchase History):</label>
+                    <input type="date" id="deliveryDate" name="deliveryDate">
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="eligibleDate">Replacement Eligible Date (for Purchase History):</label>
+                    <input type="date" id="eligibleDate" name="eligibleDate">
+                    <span class="clear-input">&times;</span>
+                </div>
+                
+                <div class="input-wrapper">
+                    <label for="shareLink">Share Link (Optional):</label>
+                    <input type="url" id="shareLink" name="shareLink">
+                    <span class="clear-input">&times;</span>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="shippingAddress">Shipping Address (Optional):</label>
+                    <textarea id="shippingAddress" name="shippingAddress" rows="3"></textarea>
+                </div>
+                
+                <button type="button" id="autofill-dates-btn" class="autofill-btn">Autofill Dates</button>
+
+                <button type="submit" id="form-submit-btn">Add Item</button>
+            </form>
+        </div>
+
+        <div class="current-items">
+            <div class="admin-list-header">
+                <h2>Current "Buy Again" Items</h2>
+                <button class="flip-btn" data-type="buyAgain">Flip Order</button>
+            </div>
+            <ul class="item-list" id="buy-again-admin-list" data-type="buyAgain"></ul>
+
+            <div class="admin-list-header">
+                <h2>Current "Purchase History" Items</h2>
+                <button class="flip-btn" data-type="purchaseHistory">Flip Order</button>
+            </div>
+            <ul class="item-list" id="purchase-history-admin-list" data-type="purchaseHistory"></ul>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 4: Full Image View Page -->
+<div id="image-page" class="page">
+    <div class="content" id="image-page-content"></div>
+</div>
+
+<!-- PAGE 5: Track Package Page -->
+<div id="track-page" class="page">
+    <div class="content" id="track-page-content"></div>
+</div>
+
+<!-- PAGE 6: Special Item Edit Page -->
+<div id="edit-item-page" class="page">
+    <div class="admin-container content" id="edit-item-content"></div>
+</div>
+
+<!-- PAGE 7: Order Summary Page -->
+<div id="order-summary-page" class="page">
+    <div class="content" id="order-summary-content"></div>
+</div>
+
+<!-- Admin Panel Overlay for Home Page -->
+<div class="admin-overlay" id="adminPanel">
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Manage Page Images</h1>
+            <p>Add or remove image URLs. Previews update automatically.</p>
+        </div>
+        <div class="admin-tabs" id="adminTabsContainer"></div>
+        <div class="admin-content" id="adminContentContainer"></div>
+        <div class="admin-footer">
+            <button id="closeAdminButton" class="admin-button secondary">Close</button>
+            <button id="saveButton" class="admin-button primary">Save & Close</button>
+        </div>
+    </div>
+</div>
+<div class="save-feedback" id="saveFeedback">Saved Successfully!</div>
+
+
+<!-- Fixed Footer - Visible on all pages -->
+<footer class="fixed-footer">
+    <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_01-17-05-266.jpg?updatedAt=1762631248379" alt="Footer Image" id="footer-img">
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const DB = {
+        get: (key) => JSON.parse(localStorage.getItem(key)) || [],
+        set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+        getValue: (key) => localStorage.getItem(key) || '',
+        setValue: (key, value) => localStorage.setItem(key, value),
+    };
+
+    const HEADER_URLS = {
+        home: 'https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938',
+        other: 'https://ik.imagekit.io/goldencodes/Picsart_25-11-15_11-12-35-748.jpg?updatedAt=1763233982084'
+    };
+
+    function initializeDefaultData() {
+        if (!localStorage.getItem('initialized')) {
+            const defaultBuyAgain = [
+                { id: 1, name: 'Writing Pad for Notes and Doodling', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L.jpg', orderDate: '2025-10-15' },
+                { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20' },
+            ];
+            const defaultPurchaseHistory = [
+                 { 
+                    id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display', 
+                    imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', 
+                    imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', 
+                    orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', 
+                    deliveryStatusText: 'Delivered on', 
+                    shareLink: 'https://www.amazon.in/dp/B0CKL65175', 
+                    shippingAddress: '1 Infinite Loop\nCupertino, CA 95014\nUnited States',
+                    progressStepImageUrl: 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861',
+                    shareTrackingLink: 'https://track.amazon.com/tracking/12345XYZ',
+                    trackingId: 'AMZ987654321',
+                    carouselToggle: true,
+                    orderNumber: "404-1234567-7654321",
+                    handedToResident: true,
+                    sellerInfo: "Appario Retail Private Ltd",
+                    price: "1799.00",
+                    itemSubtotal: "1799.00",
+                    shippingCost: "0.00",
+                    grandTotal: "1799.00"
+                 },
+                 { 
+                    id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
+                    imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', 
+                    imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', 
+                    orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', 
+                    deliveryStatusText: 'Delivered on', 
+                    shareLink: '', shippingAddress: '',
+                    progressStepImageUrl: '',
+                    shareTrackingLink: '',
+                    trackingId: '',
+                    carouselToggle: false,
+                    orderNumber: "D01-9876543-2109876",
+                    handedToResident: false,
+                    sellerInfo: "Amazon Pay",
+                    price: "299.00",
+                    itemSubtotal: "299.00",
+                    shippingCost: "0.00",
+                    grandTotal: "299.00"
+                 },
+            ];
+            DB.set('buyAgainItems', defaultBuyAgain);
+            DB.set('purchaseHistoryItems', defaultPurchaseHistory);
+            DB.setValue('extraImageUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251111_205647_Amazon.jpg?updatedAt=1762881134774');
+            DB.set('keepShopping', []); // Initialize home page sections
+            DB.set('yourLists', []);
+            localStorage.setItem('initialized', 'true');
+        }
+    }
+
+    const pages = document.querySelectorAll('.page');
+    
+    function showPage(pageId, params = null) {
+        const loader = document.getElementById('progress-bar-loader');
+        const currentlyActivePage = document.querySelector('.page.active .content');
+        const headerImg = document.getElementById('header-img');
+
+        // Update header image based on page
+        headerImg.src = (pageId === 'home-page') ? HEADER_URLS.home : HEADER_URLS.other;
+
+        if (currentlyActivePage) {
+            currentlyActivePage.classList.add('content-loading');
+        }
+        loader.classList.add('visible');
+
+        setTimeout(() => {
+            pages.forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                if (pageId === 'home-page') {
+                    renderHomePageContent();
+                } else if (pageId === 'orders-page') {
+                    renderAllOrdersPageContent();
+                } else if (pageId === 'details-page' && params) {
+                    renderOrderDetails(params.id);
+                } else if (pageId === 'image-page' && params) {
+                    renderImagePage(params);
+                } else if (pageId === 'track-page' && params) {
+                    renderTrackPage(params.id);
+                    adjustStickyHeaderTop();
+                } else if (pageId === 'edit-item-page' && params) {
+                    renderEditItemPage(params.id);
+                } else if (pageId === 'order-summary-page' && params) {
+                    renderOrderSummaryPage(params.id);
+                } else if (pageId === 'admin-page') {
+                    renderAdminPanel();
+                }
+                
+                targetPage.classList.add('active');
+                const newContent = targetPage.querySelector('.content');
+                if (newContent) {
+                    newContent.classList.remove('content-loading');
+                }
+                window.scrollTo(0, 0);
+            }
+            loader.classList.remove('visible');
+        }, 500);
+    }
+
+    function handleRouteChange() {
+        const hash = window.location.hash || '#home';
+        
+        if (hash.startsWith('#details-')) {
+            const id = parseInt(hash.split('-')[1]);
+            showPage('details-page', { id });
+        } else if (hash.startsWith('#image-')) {
+            const [, id, type] = hash.split('-');
+            showPage('image-page', { id: parseInt(id), type });
+        } else if (hash.startsWith('#track-')) {
+            const id = parseInt(hash.split('-')[1]);
+            showPage('track-page', { id });
+        } else if (hash.startsWith('#edit-item-')) {
+            const id = parseInt(hash.split('-')[2]);
+            showPage('edit-item-page', { id });
+        } else if (hash.startsWith('#order-summary-')) {
+            const id = parseInt(hash.split('-')[2]);
+            showPage('order-summary-page', { id });
+        } else if (hash === '#admin') {
+            showPage('admin-page');
+        } else if (hash === '#orders') {
+            showPage('orders-page');
+        } else {
+            showPage('home-page');
+        }
+    }
+    
+    function formatIndianCurrency(value) {
+        if (!value && value !== 0) return '';
+        let numStr = String(value).replace(/[^0-9.-]/g, '');
+        let number = parseFloat(numStr);
+        if (isNaN(number)) return '';
+        
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(number);
+    }
+
+    function truncateString(str, num) {
+        if (!str) return '';
+        if (str.length <= num) {
+            return str;
+        }
+        return str.slice(0, num) + '...';
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
+        return adjustedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    
+    // --- HOME PAGE RENDERING ---
+    function createCard(imageUrl) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<img src="${imageUrl}" alt="Product Image">`;
+        return card;
+    }
+    
+    function renderHomePageCardSection(sectionKey) {
+        const container = document.getElementById(`${sectionKey}-cards`);
+        if (!container) return;
+        
+        let items;
+        let placeholderText = 'Click "Edit" to add images.';
+        
+        if (sectionKey === 'yourOrders') {
+            items = DB.get('purchaseHistoryItems').map(item => item.imageUrl);
+            placeholderText = 'No recent orders.';
+        } else if (sectionKey === 'buyAgain') {
+             items = DB.get('buyAgainItems').map(item => item.imageUrl);
+             placeholderText = 'No items to buy again.';
+        } else {
+            items = DB.get(sectionKey);
         }
 
-        function createCard(imageUrl) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `<img src="${imageUrl}" alt="Product Image">`;
-            return card;
+        container.innerHTML = '';
+        if (items && items.length > 0 && items.some(url => url && url.trim())) {
+            items.forEach(url => { if (url && url.trim()) container.appendChild(createCard(url)); });
+        } else {
+            container.innerHTML = `<p class="placeholder-text">${placeholderText}</p>`;
         }
+    }
 
-        function loadCardSection(sectionKey) {
-            const container = document.getElementById(`${sectionKey}-cards`);
-            if (!container) return;
-            const images = JSON.parse(localStorage.getItem(sectionKey)) || [];
-            container.innerHTML = '';
-            if (images.length > 0 && images.some(url => url.trim())) {
-                images.forEach(url => { if (url.trim()) container.appendChild(createCard(url)); });
+    function loadListPreviews() {
+        const listImages = DB.get('yourLists');
+        const preview1 = document.getElementById('list-preview-1');
+        const preview2 = document.getElementById('list-preview-2');
+        const extraItems = document.getElementById('list-extra-items');
+        
+        if(preview1) preview1.style.backgroundImage = listImages[0] ? `url(${listImages[0]})` : 'none';
+        if(preview2) preview2.style.backgroundImage = listImages[1] ? `url(${listImages[1]})` : 'none';
+        if(extraItems) {
+            const extraCount = Math.max(0, listImages.length - 2);
+            extraItems.textContent = `+${extraCount}`;
+            extraItems.style.display = extraCount > 0 ? 'flex' : 'none';
+        }
+    }
+
+    function renderHomePageContent() {
+        renderHomePageCardSection('yourOrders');
+        renderHomePageCardSection('buyAgain');
+        renderHomePageCardSection('keepShopping');
+        loadListPreviews();
+    }
+
+    // --- ORDERS PAGE RENDERING ---
+    function renderBuyAgainItems() {
+        const items = DB.get('buyAgainItems');
+        const container = document.getElementById('buy-again-container');
+        container.innerHTML = '';
+        items.forEach(item => {
+            container.innerHTML += `
+                <div class="buy-again-card">
+                    <img src="${item.imageUrl}" alt="${item.name}">
+                    <p>${item.name}</p> 
+                </div>`;
+        });
+    }
+
+    function renderPurchaseHistory() {
+        const items = DB.get('purchaseHistoryItems');
+        const container = document.getElementById('purchase-history-container');
+        container.innerHTML = '';
+        items.forEach(item => {
+            const statusText = item.deliveryStatusText || 'Delivered on';
+            let statusDisplay = '';
+
+            if (['Delivered on', 'Arriving on'].includes(statusText)) {
+                statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
             } else {
-                container.innerHTML = '<p class="placeholder-text">Click "Edit" to add images.</p>';
+                statusDisplay = statusText;
+            }
+
+            container.innerHTML += `
+                <div class="purchase-item-card">
+                    <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
+                    <div class="item-info">
+                         <a href="#details-${item.id}" class="item-name">${item.name}</a>
+                        <p class="item-status">${statusDisplay}</p>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function renderAllOrdersPageContent() {
+        renderBuyAgainItems();
+        renderPurchaseHistory();
+    }
+
+    // --- OTHER PAGE RENDERING ---
+    function renderImagePage(params) {
+        const { id, type } = params;
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        const items = DB.get(key);
+        const item = items.find(i => i.id === id);
+        const container = document.getElementById('image-page-content');
+        
+        if (item && item.imagePageUrl) {
+            container.innerHTML = `<img src="${item.imagePageUrl}" alt="${item.name}">`;
+        } else {
+            container.innerHTML = '<p>Image not available.</p>';
+        }
+    }
+
+    function renderOrderDetails(itemId) {
+        const items = DB.get('purchaseHistoryItems');
+        const item = items.find(p => p.id === itemId);
+        const container = document.getElementById('order-details-content');
+        if (!item) {
+            container.innerHTML = '<p>Order not found.</p>';
+            return;
+        }
+        
+        const imageLinkStart = item.imagePageUrl ? `<a href="#image-${item.id}-purchaseHistory">` : '';
+        const imageLinkEnd = item.imagePageUrl ? `</a>` : '';
+        
+        const extraImageUrl = DB.getValue('extraImageUrl');
+        const extraImageHtml = extraImageUrl ? `<img src="${extraImageUrl}" alt="Advertisement" class="details-page-ad-image">` : '';
+        
+        const statusText = item.deliveryStatusText || 'Delivered on';
+        let statusDisplay = '';
+        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+        } else {
+            statusDisplay = statusText;
+        }
+
+        container.innerHTML = `
+            <div class="product-info-module">
+                ${imageLinkStart}
+                    <img src="${item.imageUrl}" alt="${item.name}" class="product-image">
+                ${imageLinkEnd}
+                <div class="product-details">
+                    <span class="product-name">${item.name}</span>
+                    <span class="share-item" data-product-name="${item.name}" data-share-link="${item.shareLink || ''}">Share this item</span>
+                </div>
+            </div>
+            <div class="delivery-status-module">
+                <div class="delivery-status">
+                    <div class="icon">&#10003;</div>
+                    <div>
+                        <div class="text-bold">${statusDisplay}</div>
+                        <div>Package was handed to resident</div>
+                    </div>
+                </div>
+                <div class="delivery-feedback">
+                    <div class="feedback-text">Your delivery feedback</div>
+                    <div class="stars">★★★★★</div>
+                </div>
+                <a href="#track-${item.id}" class="list-button"><span>Track package</span><span class="arrow">&gt;</span></a>
+            </div>
+            <hr class="separator">
+            <div class="module-with-buttons">
+                <h3>Need help with your item?</h3>
+                <a href="#edit-item-${item.id}" class="list-button"><span>Get product support</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button">
+                    <span class="button-text">
+                        Replace item
+                        <span class="sub-text">Eligible till ${formatDate(item.eligibleDate)}</span>
+                    </span>
+                    <span class="arrow">&gt;</span>
+                </a>
+            </div>
+            
+            <div class="module-with-buttons">
+                <a href="#" class="list-button"><span>Buy it again</span><span class="arrow">&gt;</span></a>
+            </div>
+
+            <hr class="separator">
+
+            <div class="module-with-buttons">
+                <h3>How's your item?</h3>
+                <a href="#" class="list-button"><span>Write a product review</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Create a video review</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Leave seller feedback</span><span class="arrow">&gt;</span></a>
+            </div>
+
+            <div class="module-with-buttons">
+                <h3>Order info</h3>
+                <a href="#order-summary-${item.id}" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Share gift receipt</span><span class="arrow">&gt;</span></a>
+                <a href="#" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
+            </div>
+
+            <hr class="separator">
+            <div class="details-page-footer">Ordered on ${formatDate(item.orderDate)}</div>
+            ${extraImageHtml}
+            `;
+    }
+
+    function renderTrackPage(itemId) {
+        const container = document.getElementById('track-page-content');
+        const items = DB.get('purchaseHistoryItems');
+        const item = items.find(p => p.id === itemId);
+
+        if (!item) {
+            container.innerHTML = '<p>Item not found.</p>';
+            return;
+        }
+
+        const statusText = item.deliveryStatusText || 'Delivered on';
+        let statusDisplay = '';
+        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+        } else {
+            statusDisplay = statusText;
+        }
+        
+        const defaultAddress = "Shipping address not set. Please add it in the Admin Panel.";
+        const address = item.shippingAddress || defaultAddress;
+
+        const defaultProgressImg = 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861';
+        const progressImg = item.progressStepImageUrl || defaultProgressImg;
+        
+        let carouselHtml = '';
+        if (item.carouselToggle) {
+            carouselHtml = `
+                <div class="button-carousel">
+                    <a href="#" class="action-button">Update delivery instructions</a>
+                    <a href="#" class="action-button share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">Share tracking</a>
+                    <a href="#" class="action-button">Request cancellation</a>
+                    <a href="#" class="action-button">Buy again</a>
+                </div>
+                <div class="shipped-with-info">
+                    <h3>Shipped with Amazon</h3>
+                    <p>Tracking ID: ${item.trackingId || 'N/A'}</p>
+                    <a href="#">see all updates</a>
+                </div>
+            `;
+        } else {
+            carouselHtml = `
+                <div class="button-carousel">
+                    <a href="#" class="action-button">Update delivery instructions</a>
+                    <a href="#" class="action-button">Request cancellation</a>
+                    <a href="#" class="action-button">Buy again</a>
+                </div>
+            `;
+        }
+
+        container.innerHTML = `
+            <div class="track-module sticky-track-header">
+                <div class="track-module-header">
+                    <h2>${statusDisplay}</h2>
+                    <a href="#orders" class="see-all-orders">see all orders</a>
+                </div>
+                <div class="track-product-image-container">
+                    <img src="${item.imageUrl}" alt="${item.name}" class="track-product-image">
+                </div>
+                <hr class="thin-separator">
+            </div>
+
+            <img src="${progressImg}" alt="Delivery Status Map" class="full-width-image">
+            
+            ${carouselHtml}
+
+            <div class="track-module">
+                <hr class="thick-separator">
+                <div class="shipping-address-section">
+                    <h3>Shipping Address</h3>
+                    <p>${address}</p>
+                </div>
+                <hr class="thick-separator">
+                <div class="order-info-section">
+                    <h2>Order Info</h2>
+                    <hr class="thick-separator-light">
+                    <a href="#order-summary-${itemId}" class="order-details-link">
+                        <span>View order details</span>
+                        <span class="arrow">&gt;</span>
+                    </a>
+                    <hr class="thick-separator-light">
+                </div>
+            </div>
+            <img src="https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624" alt="Order Details Summary" class="full-width-image">
+        `;
+    }
+
+    function renderOrderSummaryPage(itemId) {
+        const container = document.getElementById('order-summary-content');
+        const items = DB.get('purchaseHistoryItems');
+        const item = items.find(p => p.id === itemId);
+
+        if (!item) {
+            container.innerHTML = '<p>Item details not found.</p>';
+            return;
+        }
+
+        const deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
+        // MODIFICATION: Use eligibleDate for the return window text
+        const returnInfoText = item.eligibleDate ? `Return window closed on ${formatDate(item.eligibleDate)}` : '';
+
+        container.innerHTML = `
+            <div class="summary-top-bar">
+                <span id="summary-back-btn" class="back-arrow">&lt;</span>
+                <span class="title">Your Orders</span>
+            </div>
+            <div class="summary-page-background">
+                <div class="summary-card">
+                    <h2>Order Details</h2>
+                    <div class="summary-grid">
+                        <span class="label">Order date</span>
+                        <span class="value">${formatDate(item.orderDate)}</span>
+                    </div>
+                    <div class="summary-grid">
+                        <span class="label regular">Order number</span>
+                        <span class="value">${item.orderNumber || ''}</span>
+                    </div>
+                    <hr class="card-line">
+                    <div class="summary-nav-row">
+                        <span>Download Invoice</span>
+                        <span class="arrow">&gt;</span>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="product-card-delivery-status">
+                        <h2>${item.deliveryStatusText || 'Delivered on'} ${formatDate(item.deliveryDate)}</h2>
+                        <p>${deliveryStatusText}</p>
+                    </div>
+                    <hr class="card-line">
+                    <div class="product-card-info">
+                        <img src="${item.imageUrl}" alt="${item.name}">
+                        <div class="details">
+                            <p class="title">${item.name}</p>
+                            <p><span class="seller-label">Sold by : </span><a href="#" class="seller-name">${item.sellerInfo || ''}</a></p>
+                            <p>${returnInfoText}</p>
+                            <p class="price">${formatIndianCurrency(item.price)}</p>
+                        </div>
+                    </div>
+                    <div class="summary-button-group">
+                        <a href="#edit-item-${item.id}" class="summary-action-button">Get product support</a>
+                        <a href="#" class="summary-action-button">Buy it again</a>
+                        <a href="#track-${item.id}" class="summary-action-button">Track package</a>
+                        <button class="summary-action-button">Leave seller feedback</button>
+                        <button class="summary-action-button">Leave delivery feedback</button>
+                        <button class="summary-action-button">Write a product review</button>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h2>Payment method</h2>
+                    <hr class="card-line">
+                    <div class="payment-card">
+                        <p>American Express Credit Card</p>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h2>Ship to</h2>
+                    <hr class="card-line">
+                    <div class="address-card">
+                        <p>${item.shippingAddress || ''}</p>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <h2>Order Summary</h2>
+                    <hr class="card-line">
+                    <div class="summary-grid">
+                        <span class="label regular">Item(s) Subtotal:</span>
+                        <span class="value">${formatIndianCurrency(item.itemSubtotal)}</span>
+                    </div>
+                    <div class="summary-grid">
+                        <span class="label regular">Shipping:</span>
+                        <span class="value">${formatIndianCurrency(item.shippingCost)}</span>
+                    </div>
+                    <hr class="card-line">
+                    <div class="summary-grid">
+                        <span class="label">Grand Total:</span>
+                        <span class="value bold">${formatIndianCurrency(item.grandTotal)}</span>
+                    </div>
+                </div>
+                
+                <div class="summary-card">
+                    <h2>Recommended for you based on "${truncateString(item.name, 20)}"</h2>
+                    <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251115_121149_Chrome.jpg" alt="Recommended Products" style="width: 100%; height: auto; display: block;">
+                </div>
+
+                <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206" alt="Promotional Image" style="width: 100%; height: auto; display: block; padding: 0 8px 8px 8px; box-sizing: border-box;">
+            </div>
+        `;
+        
+        document.getElementById('summary-back-btn').addEventListener('click', () => {
+            window.history.back();
+        });
+    }
+
+    // --- ADMIN PANEL LOGIC (Orders Page) ---
+    function renderAdminList(type) {
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        const listId = type === 'buyAgain' ? 'buy-again-admin-list' : 'purchase-history-admin-list';
+        const items = DB.get(key);
+        const listElement = document.getElementById(listId);
+        listElement.innerHTML = '';
+        items.forEach(item => {
+            const li = document.createElement('li');
+            li.setAttribute('draggable', 'true');
+            li.setAttribute('data-id', item.id);
+            li.innerHTML = `
+                <span class="item-name-admin">${item.name}</span>
+                <div class="button-group">
+                    <button class="edit-btn" data-id="${item.id}" data-type="${type}">Edit</button>
+                    <button class="reorder-btn" data-id="${item.id}" data-type="${type}">Reorder</button>
+                    <button class="delete-btn" data-id="${item.id}" data-type="${type}">Delete</button>
+                </div>`;
+            listElement.appendChild(li);
+        });
+    }
+    
+    function renderAdminPanel() {
+        document.getElementById('extraImageUrl').value = DB.getValue('extraImageUrl');
+        renderAdminList('buyAgain');
+        renderAdminList('purchaseHistory');
+    }
+
+    const addItemForm = document.getElementById('addItemForm');
+    const formTitle = document.getElementById('form-title');
+    const formSubmitBtn = document.getElementById('form-submit-btn');
+    const imagePreview = document.getElementById('imagePreview');
+    const itemImageInput = document.getElementById('itemImage');
+
+    function resetFormState() {
+        formTitle.textContent = 'Add New Item';
+        formSubmitBtn.textContent = 'Add Item';
+        formSubmitBtn.classList.remove('update-mode');
+        addItemForm.reset();
+        document.getElementById('editingItemId').value = '';
+        imagePreview.style.display = 'none';
+        imagePreview.src = '';
+    }
+
+    addItemForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const editingId = parseInt(document.getElementById('editingItemId').value);
+        const type = e.target.itemType.value;
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        let items = DB.get(key);
+
+        const itemData = {
+            name: e.target.itemName.value,
+            imageUrl: e.target.itemImage.value,
+            imagePageUrl: e.target.itemImagePageUrl.value,
+            deliveryStatusText: e.target.deliveryStatus.value,
+            orderDate: e.target.orderDate.value,
+            deliveryDate: e.target.deliveryDate.value,
+            eligibleDate: e.target.eligibleDate.value,
+            shareLink: e.target.shareLink.value,
+            shippingAddress: e.target.shippingAddress.value,
+        };
+
+        if (editingId) {
+            const itemIndex = items.findIndex(item => item.id === editingId);
+            if (itemIndex > -1) {
+                items[itemIndex] = { ...items[itemIndex], ...itemData };
+            }
+        } else {
+            const newItem = { id: Date.now(), ...itemData };
+            items.push(newItem);
+        }
+
+        DB.set(key, items);
+        renderAdminPanel();
+        resetFormState();
+    });
+
+    document.getElementById('admin-page').addEventListener('click', (e) => {
+        const button = e.target;
+        
+        if (button.id === 'saveExtraSettingsBtn') {
+            const extraUrl = document.getElementById('extraImageUrl').value;
+            DB.setValue('extraImageUrl', extraUrl);
+            alert('Extra settings saved!');
+            return;
+        }
+
+        const id = parseInt(button.dataset.id);
+        const type = button.dataset.type;
+        if (!type) return;
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        let items = DB.get(key);
+
+        if (button.classList.contains('delete-btn')) {
+            items = items.filter(item => item.id !== id);
+            DB.set(key, items);
+        } else if (button.classList.contains('flip-btn')) {
+            items.reverse();
+            DB.set(key, items);
+        } else if (button.classList.contains('reorder-btn')) {
+            const itemToReorder = items.find(item => item.id === id);
+            if (itemToReorder) {
+                const newItem = { ...itemToReorder, id: Date.now() };
+                items.push(newItem);
+                DB.set(key, items);
+            }
+        } else if (button.classList.contains('edit-btn')) {
+            window.location.hash = `#edit-item-${id}`;
+            return;
+        }
+        renderAdminPanel();
+    });
+
+    itemImageInput.addEventListener('input', () => {
+        const url = itemImageInput.value;
+        if (url) {
+            imagePreview.src = url;
+            imagePreview.style.display = 'block';
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    });
+
+    addItemForm.addEventListener('click', (e) => {
+        if (e.target.classList.contains('clear-input')) {
+            const inputField = e.target.parentElement.querySelector('input, select, textarea');
+            if (inputField) {
+                inputField.value = '';
+                inputField.dispatchEvent(new Event('input'));
             }
         }
-
-        function loadListPreviews() {
-            const listImages = JSON.parse(localStorage.getItem('yourLists')) || [];
-            document.getElementById('list-preview-1').style.backgroundImage = listImages[0] ? `url(${listImages[0]})` : 'none';
-            document.getElementById('list-preview-2').style.backgroundImage = listImages[1] ? `url(${listImages[1]})` : 'none';
-        }
-        
-        function refreshAllDynamicContent() {
-            loadCardSection('yourOrders');
-            loadCardSection('buyAgain');
-            loadCardSection('keepShopping');
-            loadListPreviews();
-        }
-
-        // --- Admin Panel Logic ---
-        function createUrlInput(url = '') {
-            const group = document.createElement('div');
-            group.className = 'url-input-group';
-            group.innerHTML = `
-                <div class="url-preview"></div>
-                <input type="text" class="url-input" placeholder="https://..." value="">
-                <button class="remove-url-btn">&times;</button>
-            `;
-            const textInput = group.querySelector('.url-input');
-            const preview = group.querySelector('.url-preview');
-            textInput.value = url;
-            if (url) preview.style.backgroundImage = `url(${url})`;
-
-            textInput.addEventListener('input', () => {
-                preview.style.backgroundImage = textInput.value ? `url(${textInput.value})` : 'none';
-            });
-            group.querySelector('.remove-url-btn').addEventListener('click', () => group.remove());
-            return group;
-        }
-
-        function buildAdminPanel() {
-            SECTIONS.forEach((section, index) => {
-                adminTabsContainer.innerHTML += `<div class="admin-tab" data-tab="${section.key}">${section.title}</div>`;
-                const content = document.createElement('div');
-                content.className = 'admin-tab-content';
-                content.id = `${section.key}-content`;
-                content.innerHTML = `
-                    <p class="admin-note">${section.note}</p>
-                    <div id="${section.key}-urls"></div>
-                    <button class="add-url-btn" data-target="${section.key}-urls">+ Add New URL</button>
-                `;
-                adminContentContainer.appendChild(content);
-
-                if (index === 0) {
-                    adminTabsContainer.firstElementChild.classList.add('active');
-                    content.classList.add('active');
-                }
-            });
-
-            adminTabsContainer.addEventListener('click', e => {
-                if (e.target.matches('.admin-tab')) {
-                    const tabKey = e.target.dataset.tab;
-                    adminTabsContainer.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                    adminContentContainer.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-                    e.target.classList.add('active');
-                    document.getElementById(`${tabKey}-content`).classList.add('active');
-                }
-            });
-
-            adminContentContainer.addEventListener('click', e => {
-                if(e.target.matches('.add-url-btn')) {
-                    const targetId = e.target.dataset.target;
-                    document.getElementById(targetId).appendChild(createUrlInput());
-                }
-            });
-        }
-
-        function populateAdminPanel() {
-            SECTIONS.forEach(section => {
-                const urls = JSON.parse(localStorage.getItem(section.key)) || [];
-                const urlListContainer = document.getElementById(`${section.key}-urls`);
-                urlListContainer.innerHTML = '';
-                if (urls.length > 0) {
-                    urls.forEach(url => urlListContainer.appendChild(createUrlInput(url)));
-                } else {
-                    urlListContainer.appendChild(createUrlInput());
-                }
-            });
-        }
-        
-        function openAdmin() { populateAdminPanel(); adminPanel.classList.add('visible'); }
-        function closeAdmin() { adminPanel.classList.remove('visible'); }
-
-        function saveChanges() {
-            SECTIONS.forEach(section => {
-                const urlContainer = document.getElementById(`${section.key}-urls`);
-                const inputs = urlContainer.querySelectorAll('.url-input');
-                const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
-                localStorage.setItem(section.key, JSON.stringify(urls));
-            });
-            const feedback = document.getElementById('saveFeedback');
-            feedback.classList.add('visible');
-            setTimeout(() => feedback.classList.remove('visible'), 2000);
-            
-            refreshAllDynamicContent();
-            setTimeout(closeAdmin, 300);
-        }
-
-        // --- Event Listeners & Initial Calls ---
-        window.addEventListener('load', () => {
-            setContentPadding();
-            buildAdminPanel();
-            refreshAllDynamicContent();
-        });
-        window.addEventListener('resize', setContentPadding);
-        
-        openAdminButton.addEventListener('click', openAdmin);
-        closeAdminButton.addEventListener('click', closeAdmin);
-        saveButton.addEventListener('click', saveChanges);
-        adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdmin(); });
     });
-    </script>
+    
+    function formatDateForInput(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    document.getElementById('autofill-dates-btn').addEventListener('click', () => {
+        const today = new Date();
+        const delivery = new Date();
+        delivery.setDate(today.getDate() + 2);
+        const replacement = new Date();
+        replacement.setDate(today.getDate() + 7);
+
+        document.getElementById('orderDate').value = formatDateForInput(today);
+        document.getElementById('deliveryDate').value = formatDateForInput(delivery);
+        document.getElementById('eligibleDate').value = formatDateForInput(replacement);
+    });
+    
+    function renderEditItemPage(itemId) {
+        const container = document.getElementById('edit-item-content');
+        let items = DB.get('purchaseHistoryItems');
+        const item = items.find(i => i.id === itemId);
+
+        if (!item) {
+            container.innerHTML = `<a href="#details-${itemId}">&larr; Back</a><h1>Item not found</h1>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <a href="#details-${item.id}">&larr; Back to Order Details</a>
+            <h1>Edit Product Details</h1>
+            <div class="form-section">
+                <form id="editItemForm">
+                    <h3>Basic Info</h3>
+                    <div class="input-wrapper"><label for="editItemName">Product Name:</label><input type="text" id="editItemName" value="${item.name || ''}"></div>
+                    <div class="input-wrapper"><label for="editItemImage">Image URL:</label><input type="url" id="editItemImage" value="${item.imageUrl || ''}"></div>
+                    <div class="input-wrapper"><label for="editItemImagePageUrl">Image Page URL:</label><input type="url" id="editItemImagePageUrl" value="${item.imagePageUrl || ''}"></div>
+                    <div class="input-wrapper"><label for="editSellerInfo">Seller Info (Name only):</label><input type="text" id="editSellerInfo" value="${item.sellerInfo || ''}"></div>
+                    <div class="input-wrapper"><label for="editPrice">Price (e.g., 1799.00):</label><input type="text" id="editPrice" value="${item.price || ''}"></div>
+
+                    <h3 style="margin-top:20px;">Delivery Info</h3>
+                    <div class="input-wrapper"><label for="editDeliveryStatus">Delivery Status Text:</label><select id="editDeliveryStatus"></select></div>
+                    <div class="input-wrapper"><label for="editOrderDate">Order Date:</label><input type="date" id="editOrderDate" value="${item.orderDate || ''}"></div>
+                    <div class="input-wrapper"><label for="editDeliveryDate">Delivery Date:</label><input type="date" id="editDeliveryDate" value="${item.deliveryDate || ''}"></div>
+                    <div class="input-wrapper"><label for="editEligibleDate">Replacement Eligible Date:</label><input type="date" id="editEligibleDate" value="${item.eligibleDate || ''}"></div>
+                    <div class="input-wrapper"><label for="editShippingAddress">Shipping Address:</label><textarea id="editShippingAddress" rows="3">${item.shippingAddress || ''}</textarea></div>
+                    <div class="checkbox-wrapper"><label for="editHandedToResident">Package was handed to resident:</label><input type="checkbox" id="editHandedToResident" ${item.handedToResident ? 'checked' : ''}></div>
+                    
+                    <h3 style="margin-top:20px;">Order Summary Details</h3>
+                    <div class="input-wrapper"><label for="editOrderNumber">Order Number:</label><input type="text" id="editOrderNumber" value="${item.orderNumber || ''}"></div>
+                    <div class="input-wrapper"><label for="editItemSubtotal">Item(s) Subtotal:</label><input type="text" id="editItemSubtotal" value="${item.itemSubtotal || ''}"></div>
+                    <div class="input-wrapper"><label for="editShippingCost">Shipping Cost:</label><input type="text" id="editShippingCost" value="${item.shippingCost || ''}"></div>
+                    <div class="input-wrapper"><label for="editGrandTotal">Grand Total:</label><input type="text" id="editGrandTotal" value="${item.grandTotal || ''}"></div>
+
+                    <h3 style="margin-top:20px;">Tracking Page Settings</h3>
+                    <div class="input-wrapper"><label for="editProgressStepImageUrl">Progress-Step Image URL:</label><input type="url" id="editProgressStepImageUrl" value="${item.progressStepImageUrl || ''}"></div>
+                    <div class="input-wrapper"><label for="editShareTrackingLink">Share Tracking Link:</label><input type="url" id="editShareTrackingLink" value="${item.shareTrackingLink || ''}"></div>
+                    <div class="input-wrapper"><label for="editTrackingId">Tracking ID:</label><input type="text" id="editTrackingId" value="${item.trackingId || ''}"></div>
+                    <div class="checkbox-wrapper"><label for="editCarouselToggle">Carousel Toggle (On/Off):</label><input type="checkbox" id="editCarouselToggle" ${item.carouselToggle ? 'checked' : ''}></div>
+
+                    <h3 style="margin-top:20px;">Miscellaneous</h3>
+                    <div class="input-wrapper"><label for="editShareLink">General Share Link:</label><input type="url" id="editShareLink" value="${item.shareLink || ''}"></div>
+
+                    <button type="submit" id="save-item-changes-btn">Save Changes</button>
+                </form>
+            </div>
+        `;
+
+        const deliveryStatusSelect = document.getElementById('editDeliveryStatus');
+        const statuses = ['Delivered on', 'Delivered Today', 'Arriving tomorrow', 'Arriving on', 'Arriving today'];
+        statuses.forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status;
+            if (status === (item.deliveryStatusText || 'Delivered on')) {
+                option.selected = true;
+            }
+            deliveryStatusSelect.appendChild(option);
+        });
+
+        document.getElementById('editItemForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const itemIndex = items.findIndex(i => i.id === itemId);
+            if (itemIndex > -1) {
+                const updatedItem = {
+                    ...items[itemIndex],
+                    name: document.getElementById('editItemName').value,
+                    imageUrl: document.getElementById('editItemImage').value,
+                    imagePageUrl: document.getElementById('editItemImagePageUrl').value,
+                    sellerInfo: document.getElementById('editSellerInfo').value,
+                    price: document.getElementById('editPrice').value,
+                    deliveryStatusText: document.getElementById('editDeliveryStatus').value,
+                    orderDate: document.getElementById('editOrderDate').value,
+                    deliveryDate: document.getElementById('editDeliveryDate').value,
+                    eligibleDate: document.getElementById('editEligibleDate').value,
+                    shippingAddress: document.getElementById('editShippingAddress').value,
+                    handedToResident: document.getElementById('editHandedToResident').checked,
+                    orderNumber: document.getElementById('editOrderNumber').value,
+                    itemSubtotal: document.getElementById('editItemSubtotal').value,
+                    shippingCost: document.getElementById('editShippingCost').value,
+                    grandTotal: document.getElementById('editGrandTotal').value,
+                    progressStepImageUrl: document.getElementById('editProgressStepImageUrl').value,
+                    shareTrackingLink: document.getElementById('editShareTrackingLink').value,
+                    trackingId: document.getElementById('editTrackingId').value,
+                    carouselToggle: document.getElementById('editCarouselToggle').checked,
+                    shareLink: document.getElementById('editShareLink').value,
+                };
+                items[itemIndex] = updatedItem;
+                DB.set('purchaseHistoryItems', items);
+                alert('Changes saved!');
+                window.location.hash = `#details-${itemId}`;
+            }
+        });
+    }
+
+    // --- ADMIN PANEL LOGIC (Home Page Overlay) ---
+    const SECTIONS = [
+        { key: 'keepShopping', title: 'Keep Shopping', note: 'Add URLs for the square product cards.' },
+        { key: 'yourLists', title: 'Your Lists', note: 'Add image URLs for the list preview.' }
+    ];
+
+    const adminPanel = document.getElementById('adminPanel');
+    const openAdminButton = document.getElementById('openAdminButton');
+    const closeAdminButton = document.getElementById('closeAdminButton');
+    const saveButton = document.getElementById('saveButton');
+    const adminTabsContainer = document.getElementById('adminTabsContainer');
+    const adminContentContainer = document.getElementById('adminContentContainer');
+
+    function createUrlInput(url = '') {
+        const group = document.createElement('div');
+        group.className = 'url-input-group';
+        group.innerHTML = `
+            <div class="url-preview"></div>
+            <input type="text" class="url-input" placeholder="https://..." value="">
+            <button class="remove-url-btn">&times;</button>
+        `;
+        const textInput = group.querySelector('.url-input');
+        const preview = group.querySelector('.url-preview');
+        textInput.value = url;
+        if (url) preview.style.backgroundImage = `url(${url})`;
+
+        textInput.addEventListener('input', () => {
+            preview.style.backgroundImage = textInput.value ? `url(${textInput.value})` : 'none';
+        });
+        group.querySelector('.remove-url-btn').addEventListener('click', () => group.remove());
+        return group;
+    }
+
+    function buildAdminPanel() {
+        adminTabsContainer.innerHTML = '';
+        adminContentContainer.innerHTML = '';
+        SECTIONS.forEach((section, index) => {
+            adminTabsContainer.innerHTML += `<div class="admin-tab" data-tab="${section.key}">${section.title}</div>`;
+            const content = document.createElement('div');
+            content.className = 'admin-tab-content';
+            content.id = `${section.key}-content`;
+            content.innerHTML = `
+                <p class="admin-note">${section.note}</p>
+                <div id="${section.key}-urls"></div>
+                <button class="add-url-btn" data-target="${section.key}-urls">+ Add New URL</button>
+            `;
+            adminContentContainer.appendChild(content);
+
+            if (index === 0) {
+                adminTabsContainer.firstElementChild.classList.add('active');
+                content.classList.add('active');
+            }
+        });
+
+        adminTabsContainer.addEventListener('click', e => {
+            if (e.target.matches('.admin-tab')) {
+                const tabKey = e.target.dataset.tab;
+                adminTabsContainer.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                adminContentContainer.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                e.target.classList.add('active');
+                document.getElementById(`${tabKey}-content`).classList.add('active');
+            }
+        });
+
+        adminContentContainer.addEventListener('click', e => {
+            if(e.target.matches('.add-url-btn')) {
+                const targetId = e.target.dataset.target;
+                document.getElementById(targetId).appendChild(createUrlInput());
+            }
+        });
+    }
+
+    function populateAdminPanel() {
+        SECTIONS.forEach(section => {
+            const urls = DB.get(section.key);
+            const urlListContainer = document.getElementById(`${section.key}-urls`);
+            urlListContainer.innerHTML = '';
+            if (urls.length > 0) {
+                urls.forEach(url => urlListContainer.appendChild(createUrlInput(url)));
+            } else {
+                urlListContainer.appendChild(createUrlInput());
+            }
+        });
+    }
+    
+    function openAdmin() { populateAdminPanel(); adminPanel.classList.add('visible'); }
+    function closeAdmin() { adminPanel.classList.remove('visible'); }
+
+    function saveChanges() {
+        SECTIONS.forEach(section => {
+            const urlContainer = document.getElementById(`${section.key}-urls`);
+            const inputs = urlContainer.querySelectorAll('.url-input');
+            const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
+            DB.set(section.key, urls);
+        });
+        const feedback = document.getElementById('saveFeedback');
+        feedback.style.transform = 'translateX(-50%) translateY(0)';
+        feedback.style.opacity = '1';
+
+        setTimeout(() => {
+            feedback.style.transform = 'translateX(-50%) translateY(100px)';
+            feedback.style.opacity = '0';
+        }, 2000);
+        
+        renderHomePageContent(); // Refresh the home page content after saving
+        setTimeout(closeAdmin, 300);
+    }
+
+    // --- GLOBAL EVENT LISTENERS & INITIALIZATION ---
+    document.body.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('share-item')) {
+            const productName = e.target.dataset.productName;
+            const defaultShareUrl = 'https://www.amazon.in/';
+            const customShareUrl = e.target.dataset.shareLink;
+            const shareUrl = customShareUrl || defaultShareUrl;
+
+            const shareText = `Check out this product: ${productName}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Amazon Product', text: `${shareText}`, url: shareUrl });
+                } catch (err) { console.error('Error sharing:', err); }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                    alert('Link copied to clipboard!');
+                } catch (err) { alert('Failed to copy link.'); }
+            }
+        } else if (e.target.classList.contains('share-tracking-btn')) {
+            e.preventDefault();
+            const trackingLink = e.target.dataset.trackingLink;
+            const productName = e.target.dataset.productName;
+
+            if (!trackingLink) {
+                alert('No tracking link is available for this item.');
+                return;
+            }
+
+            const shareText = `Here is the tracking information for the order: ${productName}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Amazon Order Tracking', text: shareText, url: trackingLink });
+                } catch (err) { console.error('Error sharing tracking link:', err); }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(trackingLink);
+                    alert('Tracking link copied to clipboard!');
+                } catch (err) { alert('Failed to copy tracking link.'); }
+            }
+        }
+    });
+
+    const footer = document.querySelector('.fixed-footer');
+    footer.addEventListener('click', () => { window.location.hash = '#home'; });
+
+    document.getElementById('back-tap-area').addEventListener('click', () => {
+        window.history.back();
+    });
+
+    const header = document.querySelector('.fixed-header');
+    const loader = document.getElementById('progress-bar-loader');
+
+    function adjustStickyHeaderTop() {
+        const headerHeight = header.offsetHeight;
+        const stickyHeader = document.querySelector('.sticky-track-header');
+        if (stickyHeader) {
+            stickyHeader.style.top = `${headerHeight}px`;
+        }
+    }
+    
+    function setHomePageContentPadding() {
+        const headerHeight = document.getElementById('header-img').offsetHeight;
+        const footerHeight = document.getElementById('footer-img').offsetHeight;
+        const homePageContent = document.querySelector('#home-page .content');
+        if (homePageContent) {
+            homePageContent.style.paddingTop = `${headerHeight}px`;
+            homePageContent.style.paddingBottom = `${footerHeight}px`;
+        }
+    }
+
+    function adjustLayoutForAllPages() {
+        const headerImg = header.querySelector('img');
+        const performAdjustment = () => {
+            const headerHeight = header.offsetHeight;
+            loader.style.top = `${headerHeight}px`;
+            pages.forEach(page => {
+                if (page.id !== 'home-page') { // Home page has its own padding logic
+                    page.style.paddingTop = `${headerHeight}px`;
+                }
+            });
+            adjustStickyHeaderTop();
+            setHomePageContentPadding(); // Adjust home page padding too
+        };
+
+        if (headerImg.complete) {
+            performAdjustment();
+        } else {
+            headerImg.addEventListener('load', performAdjustment);
+        }
+        window.addEventListener('resize', performAdjustment);
+    }
+    
+    // --- Initial Setup Calls ---
+    openAdminButton.addEventListener('click', openAdmin);
+    closeAdminButton.addEventListener('click', closeAdmin);
+    saveButton.addEventListener('click', saveChanges);
+    adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdmin(); });
+
+    initializeDefaultData();
+    buildAdminPanel();
+    adjustLayoutForAllPages();
+    window.addEventListener('hashchange', handleRouteChange);
+    handleRouteChange(); 
+
+});
+</script>
+
 </body>
 </html>
