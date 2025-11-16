@@ -18,7 +18,19 @@
         body, html {
             margin: 0; padding: 0; width: 100%;
             background-color: white; font-family: sans-serif;
+            /* Below rule prevents the callout menu on long press in iOS Safari */
+            -webkit-touch-callout: none; 
         }
+
+        /* This universal selector disables text selection and the blue tap highlight */
+        * {
+            -webkit-user-select: none; /* Safari/Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* IE10+ */
+            user-select: none;         /* Standard */
+            -webkit-tap-highlight-color: transparent; /* Removes blue bar on tap */
+        }
+        
         img { width: 100%; display: block; height: auto; vertical-align: middle; }
         .hidden { display: none !important; }
 
@@ -140,7 +152,7 @@
         #admin-bundle-editor { border-top: 2px solid #ffd700; margin-top: 20px; padding-top: 20px; }
     </style>
 </head>
-<body>
+<body ondragstart="return false;" ondrop="return false;">
 
     <!-- AAPKA POORA PURANA HTML WAPAS DAAL DIYA GAYA HAI -->
     <div id="background-image"></div>
@@ -221,6 +233,24 @@
         // SABHI SCRIPTS KO EK HI JAGAH RAKH DIYA GAYA HAI
         document.addEventListener("DOMContentLoaded", function() {
             
+            // --- NAYA LOGIC COPYING AUR RIGHT-CLICK ROKNE KE LIYE ---
+            // Right-click context menu ko disable karna
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+
+            // Keyboard shortcuts (Ctrl+C, Ctrl+U, etc.) ko disable karna
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+C (Copy), Ctrl+X (Cut), Ctrl+U (View Source), Ctrl+S (Save)
+                if (e.ctrlKey && ['c', 'x', 'u', 's'].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
+                // F12 (Developer Tools)
+                if (e.key === 'F12') {
+                    e.preventDefault();
+                }
+            });
+
             // --- AAPKA POORA PURANA FEATURE WALA JAVASCRIPT ---
             const splashScreen = document.getElementById('splash-screen');
             if (sessionStorage.getItem('splashShown')) {
