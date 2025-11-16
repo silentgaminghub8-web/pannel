@@ -11,6 +11,10 @@
             --light-grey: #f0f2f2;
             --medium-grey: #ccc;
             --text-color: #0F1111;
+            --success-green: #28a745;
+            --danger-red: #dc3545;
+            --dark-grey: #343a40;
+            --light-blue: #e6f3ff;
         }
         /* COMMAND 1: Disable Text Selection & Tap Highlight */
         * {
@@ -752,173 +756,135 @@
         }
 
 
-        /* --- Admin Panel Styles (For Orders Page) --- */
-        #admin-page .admin-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-
-        #admin-page .admin-container h1, #admin-page .admin-container h2 {
-            text-align: center;
-        }
-
-        #admin-page .form-section {
-            background-color: #f7f7f7;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .form-section label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .form-section input[type="text"],
-        .form-section input[type="url"],
-        .form-section input[type="date"],
-        .form-section input[type="checkbox"],
-        .form-section select,
-        .form-section textarea {
-            width: 100%;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        .form-section .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .form-section input[type="checkbox"] {
-            width: auto;
-        }
-
-
-        .form-section .input-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        .form-section .input-wrapper input,
-        .form-section .input-wrapper select {
-            margin-bottom: 0;
-        }
-        .clear-input {
-            position: absolute;
-            right: 12px;
-            top: 36px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 22px;
-            color: #999;
-            font-weight: bold;
-            line-height: 1;
-            user-select: none;
-        }
-        .clear-input:hover {
-            color: #333;
-        }
-        .input-wrapper select + .clear-input {
-            right: 30px;
-        }
-
-
-        #admin-page .form-section button {
-            background-color: #007185;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-
-        #admin-page .form-section button:hover {
-            background-color: #005a6a;
-        }
-        
-        #admin-page .form-section button.update-mode {
-            background-color: #FFA41C;
-        }
-        #admin-page .form-section button.update-mode:hover {
-             background-color: #e69519;
-        }
-        #admin-page .form-section .autofill-btn {
-            background-color: #6c757d;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        #admin-page .form-section .autofill-btn:hover {
-            background-color: #5a6268;
-        }
-
-        .item-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .item-list li {
+        /* --- REDESIGNED ADMIN PANEL STYLES --- */
+        #admin-page .content { padding: 0; background-color: #f8f9fa; }
+        .admin-header-main {
             background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
         }
+        .admin-header-main h1 { margin: 0; font-size: 1.5rem; }
+        .admin-header-main a { color: var(--primary-blue); text-decoration: none; }
         
-        .item-list .item-name-admin {
-            flex-grow: 1;
-            margin-right: 10px;
+        .admin-tabs-container { display: flex; background-color: #f1f1f1; border-bottom: 1px solid #ddd; }
+        .admin-tab-button {
+            flex: 1; padding: 15px 10px; text-align: center; cursor: pointer;
+            background-color: transparent; color: #6c757d; border: none; border-bottom: 3px solid transparent;
+            font-size: 1rem; font-weight: 500; transition: all 0.2s ease-in-out;
         }
+        .admin-tab-button.active { border-bottom-color: var(--primary-blue); color: var(--primary-blue); background-color: #fff; }
+
+        .admin-tab-content { display: none; padding: 20px; }
+        .admin-tab-content.active { display: block; }
         
-        .item-list .button-group {
+        .admin-section-header {
             display: flex;
-            gap: 5px;
-        }
-
-        .item-list li.dragging {
-            opacity: 0.5;
-        }
-        
-        .item-list button {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: white;
-            font-size: 0.8rem;
-        }
-
-        .item-list .edit-btn { background-color: #007bff; }
-        .item-list .reorder-btn { background-color: #28a745; }
-        .item-list .delete-btn { background-color: #dc3545; }
-
-        .admin-list-header {
-            display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
         }
+        .admin-section-header h2 { margin: 0; font-size: 1.25rem; }
+        .admin-button {
+             background-color: var(--primary-blue); color: white; padding: 10px 15px;
+             border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+             text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .admin-button.secondary { background-color: var(--success-green); }
+        .admin-button:hover { opacity: 0.9; }
 
-        .flip-btn {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            cursor: pointer;
+        .item-list-admin { list-style: none; padding: 0; display: grid; gap: 15px; }
+        .item-list-admin-card {
+            background-color: #fff; border: 1px solid #ddd; border-radius: 8px;
+            padding: 15px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
         }
+        /* Drag and Drop Styles */
+        .item-list-admin-card.dragging { opacity: 0.5; background-color: var(--light-blue); }
+        .item-list-admin-card.drag-over-top::before, .item-list-admin-card.drag-over-bottom::after {
+            content: ''; position: absolute; left: 0; right: 0; height: 4px;
+            background-color: var(--primary-blue);
+        }
+        .item-list-admin-card.drag-over-top::before { top: -2px; }
+        .item-list-admin-card.drag-over-bottom::after { bottom: -2px; }
         
-        /* --- Admin Panel Overlay Styles (For Home Page) --- */
+        .item-list-admin-card .item-preview {
+            width: 50px; height: 50px; flex-shrink: 0;
+            background-color: #eee; border-radius: 4px;
+            background-size: contain; background-position: center; background-repeat: no-repeat;
+            cursor: grab;
+        }
+        .item-list-admin-card:active { cursor: grabbing; }
+        
+        .item-list-admin-card .item-info-admin { flex-grow: 1; }
+        .item-list-admin-card .item-info-admin p { margin: 0; font-weight: 600; }
+        .item-list-admin-card .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .item-list-admin-card .item-actions button {
+            padding: 8px 10px; border-radius: 5px; border: none; cursor: pointer;
+            font-size: 0.8rem; color: #fff;
+        }
+        .admin-edit-btn { background-color: var(--primary-blue); }
+        .admin-delete-btn { background-color: var(--danger-red); }
+        .admin-duplicate-btn { background-color: var(--success-green); }
+        
+        .admin-settings-form { background-color: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+        .admin-settings-form label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .admin-settings-form input[type="url"] {
+            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;
+        }
+        .admin-settings-form button { margin-top: 15px; }
+
+        /* Admin Modal Styles */
+        .admin-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .admin-modal-overlay.visible { display: flex; opacity: 1; }
+        .admin-modal {
+            background: #f8f9fa; width: 95%; max-width: 600px; border-radius: 12px;
+            max-height: 90vh; display: flex; flex-direction: column;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: scale(0.95); transition: transform 0.3s ease;
+        }
+        .admin-modal-overlay.visible .admin-modal { transform: scale(1); }
+        .modal-header {
+            padding: 15px 20px; border-bottom: 1px solid #ddd;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h2 { margin: 0; font-size: 1.2rem; }
+        .modal-close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #888; }
+        .modal-body { overflow-y: auto; padding: 20px; }
+        .modal-footer {
+            padding: 15px 20px; border-top: 1px solid #eee; background: #fff;
+            display: flex; justify-content: flex-end; gap: 10px;
+        }
+        .form-section-accordion { border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; background: #fff; }
+        .form-section-accordion summary {
+            padding: 15px; font-weight: 600; cursor: pointer;
+            list-style: none; display: flex; justify-content: space-between; align-items: center;
+        }
+        .form-section-accordion summary::-webkit-details-marker { display: none; }
+        .form-section-accordion summary:after { content: '▼'; font-size: 0.8em; }
+        .form-section-accordion[open] summary:after { content: '▲'; }
+        .form-section-accordion-content { padding: 0 15px 15px 15px; }
+        
+        .form-input-group { margin-bottom: 15px; }
+        .form-input-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
+        .form-input-group input, .form-input-group select, .form-input-group textarea {
+            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;
+            box-sizing: border-box; font-family: inherit; font-size: 1rem;
+        }
+        .form-checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .form-checkbox-group input { width: auto; }
+        
+        /* --- Old Admin Panel Overlay Styles (For Home Page) --- */
         .admin-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6); z-index: 100;
@@ -932,21 +898,21 @@
             display: flex; flex-direction: column; overflow: hidden; height: 90vh; max-height: 800px;
             padding: 0; /* Override default padding */
         }
-        .admin-header {
+        .admin-overlay .admin-header {
             padding: 20px; border-bottom: 1px solid #eee;
         }
-        .admin-header h1 { margin: 0 0 5px 0; font-size: 22px; text-align: left;}
-        .admin-header p { margin: 0; color: #666; }
-        .admin-tabs { display: flex; border-bottom: 1px solid #eee; }
-        .admin-tab {
+        .admin-overlay .admin-header h1 { margin: 0 0 5px 0; font-size: 22px; text-align: left;}
+        .admin-overlay .admin-header p { margin: 0; color: #666; }
+        .admin-overlay .admin-tabs { display: flex; border-bottom: 1px solid #eee; }
+        .admin-overlay .admin-tab {
             flex: 1; padding: 15px 10px; text-align: center; cursor: pointer;
             background-color: #f8f9fa; color: #6c757d; border-bottom: 3px solid transparent;
             transition: background-color 0.2s, border-color 0.2s; white-space: nowrap;
         }
-        .admin-tab.active { background-color: #fff; border-bottom-color: var(--primary-blue); color: #000; }
-        .admin-content { flex-grow: 1; overflow-y: auto; padding: 20px; }
-        .admin-tab-content { display: none; }
-        .admin-tab-content.active { display: block; }
+        .admin-overlay .admin-tab.active { background-color: #fff; border-bottom-color: var(--primary-blue); color: #000; }
+        .admin-overlay .admin-content { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .admin-overlay .admin-tab-content { display: none; }
+        .admin-overlay .admin-tab-content.active { display: block; }
         .admin-note { color: #555; font-size: 14px; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 15px; }
         .url-input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .url-preview {
@@ -961,7 +927,7 @@
             background: #e6e6e6; border: none; color: #555; font-weight: bold; width: 30px; height: 30px;
             border-radius: 50%; cursor: pointer; flex-shrink: 0;
         }
-        .remove-url-btn:hover { background-color: #dc3545; color: white; }
+        .remove-url-btn:hover { background-color: var(--danger-red); color: white; }
         .add-url-btn {
             display: block; width: 100%; padding: 12px; background-color: #f8f9fa;
             border: 1px dashed var(--medium-grey); border-radius: 4px; cursor: pointer; margin-top: 15px;
@@ -970,15 +936,15 @@
             padding: 15px 20px; border-top: 1px solid #eee; background-color: #fff;
             display: flex; gap: 10px;
         }
-        .admin-button {
+        .admin-button-overlay {
             flex: 1; padding: 12px; border: none; border-radius: 6px;
             font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none;
         }
-        .admin-button.primary { background-color: var(--primary-blue); color: white; }
-        .admin-button.secondary { background-color: #6c757d; color: white; }
+        .admin-button-overlay.primary { background-color: var(--primary-blue); color: white; }
+        .admin-button-overlay.secondary { background-color: #6c757d; color: white; }
         .save-feedback {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background-color: #28a745; color: white; padding: 10px 20px;
+            background-color: var(--success-green); color: white; padding: 10px 20px;
             border-radius: 6px; opacity: 0; transition: all 0.4s ease; z-index: 101;
         }
     </style>
@@ -1121,120 +1087,50 @@
     <div class="content" id="order-details-content"></div>
 </div>
 
-<!-- PAGE 3: Main Admin Panel -->
+<!-- PAGE 3: Main Admin Panel (REDESIGNED) -->
 <div id="admin-page" class="page">
-    <div class="admin-container content">
-        <a href="#orders">&larr; Back to Orders Page</a>
-        <h1>Admin Panel</h1>
-        
-        <div class="form-section">
-            <h2>Extra Settings</h2>
-            <div class="input-wrapper">
+    <div class="content">
+        <header class="admin-header-main">
+            <h1>Admin Panel</h1>
+            <a href="#orders">← Back to Orders</a>
+        </header>
+        <div class="admin-tabs-container">
+            <button class="admin-tab-button active" data-tab="manage-items-tab">Manage Items</button>
+            <button class="admin-tab-button" data-tab="global-settings-tab">Global Settings</button>
+        </div>
+
+        <!-- TAB 1: MANAGE ITEMS -->
+        <div id="manage-items-tab" class="admin-tab-content active">
+            <section id="purchase-history-section">
+                <div class="admin-section-header">
+                    <h2>Purchase History</h2>
+                    <button id="add-new-item-btn" class="admin-button">＋ Add New Item</button>
+                </div>
+                <ul id="purchase-history-admin-list" class="item-list-admin" data-type="purchaseHistory"></ul>
+            </section>
+            <hr class="separator" style="margin: 20px 0;">
+            <section id="buy-again-section">
+                <div class="admin-section-header">
+                    <h2>Buy Again</h2>
+                </div>
+                <ul id="buy-again-admin-list" class="item-list-admin" data-type="buyAgain"></ul>
+            </section>
+        </div>
+
+        <!-- TAB 2: GLOBAL SETTINGS -->
+        <div id="global-settings-tab" class="admin-tab-content">
+            <div class="admin-section-header">
+                <h2>Global Settings</h2>
+            </div>
+            <div class="admin-settings-form">
                 <label for="extraImageUrl">Details Page Ad Image URL:</label>
-                <input type="url" id="extraImageUrl" name="extraImageUrl">
-                <span class="clear-input">&times;</span>
+                <input type="url" id="extraImageUrl" name="extraImageUrl" placeholder="https://...">
+                <button id="saveExtraSettingsBtn" class="admin-button secondary">Save Settings</button>
             </div>
-            <button id="saveExtraSettingsBtn">Save Extra Settings</button>
-        </div>
-
-        <p>Add, edit, reorder, or remove items. All data is saved in your browser's local storage.</p>
-
-        <div class="form-section">
-            <h2 id="form-title">Add New Item</h2>
-            <form id="addItemForm">
-                <input type="hidden" id="editingItemId" name="editingItemId">
-                
-                <div class="input-wrapper">
-                    <label for="itemType">Item Type:</label>
-                    <select id="itemType" name="itemType" required>
-                        <option value="buyAgain">Buy Again</option>
-                        <option value="purchaseHistory">Purchase History</option>
-                    </select>
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <div class="input-wrapper">
-                    <label for="itemName">Product Name:</label>
-                    <input type="text" id="itemName" name="itemName" required>
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <div class="input-wrapper">
-                    <label for="itemImage">Image URL:</label>
-                    <input type="url" id="itemImage" name="itemImage" required>
-                    <span class="clear-input">&times;</span>
-                </div>
-                
-                <div class="input-wrapper">
-                    <label for="itemImagePageUrl">Image Page URL:</label>
-                    <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100px; height: auto; margin-top: 10px; margin-bottom: 15px; display: none; border-radius: 4px;">
-
-                <div class="input-wrapper">
-                    <label for="deliveryStatus">Delivery Status Text:</label>
-                    <select id="deliveryStatus" name="deliveryStatus">
-                        <option value="Delivered on">Delivered on</option>
-                        <option value="Delivered Today">Delivered Today</option>
-                        <option value="Arriving tomorrow">Arriving tomorrow</option>
-                        <option value="Arriving on">Arriving on</option>
-                        <option value="Arriving today">Arriving today</option>
-                    </select>
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <div class="input-wrapper">
-                    <label for="orderDate">Order Date:</label>
-                    <input type="date" id="orderDate" name="orderDate">
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <div class="input-wrapper">
-                    <label for="deliveryDate">Delivery Date (for Purchase History):</label>
-                    <input type="date" id="deliveryDate" name="deliveryDate">
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <div class="input-wrapper">
-                    <label for="eligibleDate">Replacement Eligible Date (for Purchase History):</label>
-                    <input type="date" id="eligibleDate" name="eligibleDate">
-                    <span class="clear-input">&times;</span>
-                </div>
-                
-                <div class="input-wrapper">
-                    <label for="shareLink">Share Link (Optional):</label>
-                    <input type="url" id="shareLink" name="shareLink">
-                    <span class="clear-input">&times;</span>
-                </div>
-
-                <div class="input-wrapper">
-                    <label for="shippingAddress">Shipping Address (Optional):</label>
-                    <textarea id="shippingAddress" name="shippingAddress" rows="3"></textarea>
-                </div>
-                
-                <button type="button" id="autofill-dates-btn" class="autofill-btn">Autofill Dates</button>
-
-                <button type="submit" id="form-submit-btn">Add Item</button>
-            </form>
-        </div>
-
-        <div class="current-items">
-            <div class="admin-list-header">
-                <h2>Current "Buy Again" Items</h2>
-                <button class="flip-btn" data-type="buyAgain">Flip Order</button>
-            </div>
-            <ul class="item-list" id="buy-again-admin-list" data-type="buyAgain"></ul>
-
-            <div class="admin-list-header">
-                <h2>Current "Purchase History" Items</h2>
-                <button class="flip-btn" data-type="purchaseHistory">Flip Order</button>
-            </div>
-            <ul class="item-list" id="purchase-history-admin-list" data-type="purchaseHistory"></ul>
         </div>
     </div>
 </div>
+
 
 <!-- PAGE 4: Full Image View Page -->
 <div id="image-page" class="page">
@@ -1246,10 +1142,7 @@
     <div class="content" id="track-page-content"></div>
 </div>
 
-<!-- PAGE 6: Special Item Edit Page -->
-<div id="edit-item-page" class="page">
-    <div class="admin-container content" id="edit-item-content"></div>
-</div>
+<!-- PAGE 6: Special Item Edit Page (REMOVED - Now handled by modal) -->
 
 <!-- PAGE 7: Order Summary Page -->
 <div id="order-summary-page" class="page">
@@ -1266,12 +1159,99 @@
         <div class="admin-tabs" id="adminTabsContainer"></div>
         <div class="admin-content" id="adminContentContainer"></div>
         <div class="admin-footer">
-            <button id="closeAdminButton" class="admin-button secondary">Close</button>
-            <button id="saveButton" class="admin-button primary">Save & Close</button>
+            <button id="closeAdminButton" class="admin-button-overlay secondary">Close</button>
+            <button id="saveButton" class="admin-button-overlay primary">Save & Close</button>
         </div>
     </div>
 </div>
 <div class="save-feedback" id="saveFeedback">Saved Successfully!</div>
+
+<!-- REDESIGNED Admin Modal for Add/Edit Item -->
+<div class="admin-modal-overlay" id="item-modal">
+    <div class="admin-modal">
+        <header class="modal-header">
+            <h2 id="modal-title">Add New Item</h2>
+            <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+        </header>
+        <form class="modal-body" id="item-form">
+            <input type="hidden" id="editingItemId" name="editingItemId">
+            
+            <details class="form-section-accordion" open>
+                <summary>Basic Info</summary>
+                <div class="form-section-accordion-content">
+                    <div class="form-input-group">
+                        <label for="itemType">Item Type</label>
+                        <select id="itemType" name="itemType"><option value="purchaseHistory">Purchase History</option><option value="buyAgain">Buy Again</option></select>
+                    </div>
+                    <div class="form-input-group">
+                        <label for="itemName">Product Name</label>
+                        <input type="text" id="itemName" name="itemName" required>
+                    </div>
+                    <div class="form-input-group">
+                        <label for="itemImage">Image URL</label>
+                        <input type="url" id="itemImage" name="itemImage" required>
+                    </div>
+                    <div class="form-input-group">
+                        <label for="itemImagePageUrl">Image Page URL (for fullscreen view)</label>
+                        <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
+                    </div>
+                </div>
+            </details>
+
+            <details class="form-section-accordion">
+                <summary>Delivery & Dates</summary>
+                <div class="form-section-accordion-content">
+                    <div class="form-input-group">
+                        <label for="deliveryStatus">Delivery Status Text</label>
+                        <select id="deliveryStatus" name="deliveryStatus"><option>Delivered on</option><option>Delivered Today</option><option>Arriving tomorrow</option><option>Arriving on</option><option>Arriving today</option></select>
+                    </div>
+                    <div class="form-input-group"><label for="orderDate">Order Date</label><input type="date" id="orderDate" name="orderDate"></div>
+                    <div class="form-input-group"><label for="deliveryDate">Delivery Date</label><input type="date" id="deliveryDate" name="deliveryDate"></div>
+                    <div class="form-input-group"><label for="eligibleDate">Replacement Eligible Until</label><input type="date" id="eligibleDate" name="eligibleDate"></div>
+                </div>
+            </details>
+
+            <details class="form-section-accordion">
+                <summary>Tracking Details</summary>
+                <div class="form-section-accordion-content">
+                    <div class="form-input-group"><label for="shippingAddress">Shipping Address</label><textarea id="shippingAddress" name="shippingAddress" rows="3"></textarea></div>
+                    <div class="form-input-group"><label for="progressStepImageUrl">Progress/Map Image URL</label><input type="url" id="progressStepImageUrl" name="progressStepImageUrl"></div>
+                    <div class="form-input-group"><label for="shareTrackingLink">Share Tracking Link</label><input type="url" id="shareTrackingLink" name="shareTrackingLink"></div>
+                    <div class="form-input-group"><label for="trackingId">Tracking ID</label><input type="text" id="trackingId" name="trackingId"></div>
+                    <div class="form-checkbox-group"><input type="checkbox" id="carouselToggle"><label for="carouselToggle">Show extended carousel (with Share Tracking)</label></div>
+                </div>
+            </details>
+            
+            <details class="form-section-accordion">
+                <summary>Order Summary Info</summary>
+                <div class="form-section-accordion-content">
+                    <div class="form-input-group"><label for="orderNumber">Order Number</label><input type="text" id="orderNumber" name="orderNumber"></div>
+                    <div class="form-input-group"><label for="sellerInfo">Seller Info</label><input type="text" id="sellerInfo" name="sellerInfo"></div>
+                    <div class="form-input-group"><label for="price">Price (e.g. 1799.00)</label><input type="text" id="price" name="price"></div>
+                    <div class="form-input-group"><label for="itemSubtotal">Item(s) Subtotal</label><input type="text" id="itemSubtotal" name="itemSubtotal"></div>
+                    <div class="form-input-group"><label for="shippingCost">Shipping Cost</label><input type="text" id="shippingCost" name="shippingCost"></div>
+                    <div class="form-input-group"><label for="grandTotal">Grand Total</label><input type="text" id="grandTotal" name="grandTotal"></div>
+                    <div class="form-checkbox-group"><input type="checkbox" id="handedToResident"><label for="handedToResident">Package was handed to resident</label></div>
+                </div>
+            </details>
+            
+            <details class="form-section-accordion">
+                <summary>Miscellaneous</summary>
+                <div class="form-section-accordion-content">
+                    <div class="form-input-group">
+                        <label for="shareLink">General Share Link</label>
+                        <input type="url" id="shareLink" name="shareLink">
+                    </div>
+                </div>
+            </details>
+
+        </form>
+        <footer class="modal-footer">
+            <button class="admin-button" style="background-color: #6c757d;" id="modal-cancel-btn">Cancel</button>
+            <button class="admin-button secondary" id="modal-save-btn">Save Changes</button>
+        </footer>
+    </div>
+</div>
 
 
 <!-- Fixed Footer - Visible on all pages -->
@@ -1380,8 +1360,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (pageId === 'track-page' && params) {
                     renderTrackPage(params.id);
                     adjustStickyHeaderTop();
-                } else if (pageId === 'edit-item-page' && params) {
-                    renderEditItemPage(params.id);
                 } else if (pageId === 'order-summary-page' && params) {
                     renderOrderSummaryPage(params.id);
                 } else if (pageId === 'admin-page') {
@@ -1411,9 +1389,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#track-')) {
             const id = parseInt(hash.split('-')[1]);
             showPage('track-page', { id });
-        } else if (hash.startsWith('#edit-item-')) {
-            const id = parseInt(hash.split('-')[2]);
-            showPage('edit-item-page', { id });
         } else if (hash.startsWith('#order-summary-')) {
             const id = parseInt(hash.split('-')[2]);
             showPage('order-summary-page', { id });
@@ -1515,6 +1490,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderBuyAgainItems() {
         const items = DB.get('buyAgainItems');
         const container = document.getElementById('buy-again-container');
+        if(!container) return;
         container.innerHTML = '';
         items.forEach(item => {
             container.innerHTML += `
@@ -1528,6 +1504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPurchaseHistory() {
         const items = DB.get('purchaseHistoryItems');
         const container = document.getElementById('purchase-history-container');
+        if(!container) return;
         container.innerHTML = '';
         items.forEach(item => {
             const statusText = item.deliveryStatusText || 'Delivered on';
@@ -1620,7 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <hr class="separator">
             <div class="module-with-buttons">
                 <h3>Need help with your item?</h3>
-                <a href="#edit-item-${item.id}" class="list-button"><span>Get product support</span><span class="arrow">&gt;</span></a>
+                <a href="#admin" class="list-button admin-edit-trigger" data-id="${item.id}" data-type="purchaseHistory"><span>Get product support / Edit</span><span class="arrow">&gt;</span></a>
                 <a href="#" class="list-button">
                     <span class="button-text">
                         Replace item
@@ -1753,7 +1730,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
-        // MODIFICATION: Use eligibleDate for the return window text
         const returnInfoText = item.eligibleDate ? `Return window closed on ${formatDate(item.eligibleDate)}` : '';
 
         container.innerHTML = `
@@ -1795,7 +1771,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="summary-button-group">
-                        <a href="#edit-item-${item.id}" class="summary-action-button">Get product support</a>
+                        <a href="#admin" class="summary-action-button admin-edit-trigger" data-id="${item.id}" data-type="purchaseHistory">Get product support</a>
                         <a href="#" class="summary-action-button">Buy it again</a>
                         <a href="#track-${item.id}" class="summary-action-button">Track package</a>
                         <button class="summary-action-button">Leave seller feedback</button>
@@ -1847,260 +1823,273 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         
-        document.getElementById('summary-back-btn').addEventListener('click', () => {
-            window.history.back();
-        });
+        document.getElementById('summary-back-btn').addEventListener('click', () => { window.history.back(); });
     }
 
-    // --- ADMIN PANEL LOGIC (Orders Page) ---
+    // --- REDESIGNED ADMIN PANEL LOGIC ---
     function renderAdminList(type) {
         const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
         const listId = type === 'buyAgain' ? 'buy-again-admin-list' : 'purchase-history-admin-list';
         const items = DB.get(key);
         const listElement = document.getElementById(listId);
+        if (!listElement) return;
+
         listElement.innerHTML = '';
+        if(items.length === 0) {
+            listElement.innerHTML = `<p style="padding-left: 5px; color: #666;">No items in this category yet.</p>`;
+            return;
+        }
+
         items.forEach(item => {
-            const li = document.createElement('li');
-            li.setAttribute('draggable', 'true');
-            li.setAttribute('data-id', item.id);
-            li.innerHTML = `
-                <span class="item-name-admin">${item.name}</span>
-                <div class="button-group">
-                    <button class="edit-btn" data-id="${item.id}" data-type="${type}">Edit</button>
-                    <button class="reorder-btn" data-id="${item.id}" data-type="${type}">Reorder</button>
-                    <button class="delete-btn" data-id="${item.id}" data-type="${type}">Delete</button>
+            const card = document.createElement('li');
+            card.className = 'item-list-admin-card';
+            card.setAttribute('draggable', 'true');
+            card.dataset.id = item.id;
+            card.innerHTML = `
+                <div class="item-preview" style="background-image: url('${item.imageUrl || ''}')"></div>
+                <div class="item-info-admin"><p>${item.name || 'Unnamed Item'}</p></div>
+                <div class="item-actions">
+                    <button class="admin-duplicate-btn" data-id="${item.id}" data-type="${type}">Duplicate</button>
+                    <button class="admin-edit-btn" data-id="${item.id}" data-type="${type}">Edit</button>
+                    <button class="admin-delete-btn" data-id="${item.id}" data-type="${type}">Delete</button>
                 </div>`;
-            listElement.appendChild(li);
+            listElement.appendChild(card);
         });
     }
-    
+
     function renderAdminPanel() {
         document.getElementById('extraImageUrl').value = DB.getValue('extraImageUrl');
-        renderAdminList('buyAgain');
+        document.getElementById('saveExtraSettingsBtn').addEventListener('click', () => {
+             DB.setValue('extraImageUrl', document.getElementById('extraImageUrl').value);
+             alert('Settings Saved!');
+        });
         renderAdminList('purchaseHistory');
+        renderAdminList('buyAgain');
     }
 
-    const addItemForm = document.getElementById('addItemForm');
-    const formTitle = document.getElementById('form-title');
-    const formSubmitBtn = document.getElementById('form-submit-btn');
-    const imagePreview = document.getElementById('imagePreview');
-    const itemImageInput = document.getElementById('itemImage');
+    const itemModal = document.getElementById('item-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const itemForm = document.getElementById('item-form');
+    
+    function openModalForEdit(itemId, type) {
+        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        const items = DB.get(key);
+        const item = items.find(i => i.id === itemId);
+        if (!item) return;
 
-    function resetFormState() {
-        formTitle.textContent = 'Add New Item';
-        formSubmitBtn.textContent = 'Add Item';
-        formSubmitBtn.classList.remove('update-mode');
-        addItemForm.reset();
-        document.getElementById('editingItemId').value = '';
-        imagePreview.style.display = 'none';
-        imagePreview.src = '';
+        modalTitle.textContent = 'Edit Item';
+        document.getElementById('modal-save-btn').textContent = 'Update Changes';
+        
+        itemForm.editingItemId.value = item.id;
+        itemForm.itemType.value = type;
+        itemForm.itemName.value = item.name || '';
+        itemForm.itemImage.value = item.imageUrl || '';
+        itemForm.itemImagePageUrl.value = item.imagePageUrl || '';
+        itemForm.deliveryStatus.value = item.deliveryStatusText || 'Delivered on';
+        itemForm.orderDate.value = item.orderDate || '';
+        itemForm.deliveryDate.value = item.deliveryDate || '';
+        itemForm.eligibleDate.value = item.eligibleDate || '';
+        itemForm.shippingAddress.value = item.shippingAddress || '';
+        itemForm.progressStepImageUrl.value = item.progressStepImageUrl || '';
+        itemForm.shareTrackingLink.value = item.shareTrackingLink || '';
+        itemForm.trackingId.value = item.trackingId || '';
+        itemForm.carouselToggle.checked = !!item.carouselToggle;
+        itemForm.orderNumber.value = item.orderNumber || '';
+        itemForm.sellerInfo.value = item.sellerInfo || '';
+        itemForm.price.value = item.price || '';
+        itemForm.itemSubtotal.value = item.itemSubtotal || '';
+        itemForm.shippingCost.value = item.shippingCost || '';
+        itemForm.grandTotal.value = item.grandTotal || '';
+        itemForm.handedToResident.checked = !!item.handedToResident;
+        itemForm.shareLink.value = item.shareLink || '';
+
+        itemModal.classList.add('visible');
     }
 
-    addItemForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const editingId = parseInt(document.getElementById('editingItemId').value);
-        const type = e.target.itemType.value;
+    function openModalForNew() {
+        modalTitle.textContent = 'Add New Item';
+        document.getElementById('modal-save-btn').textContent = 'Save Changes';
+        itemForm.reset();
+        itemForm.editingItemId.value = '';
+        itemModal.classList.add('visible');
+    }
+
+    function closeModal() {
+        itemModal.classList.remove('visible');
+    }
+    
+    document.getElementById('add-new-item-btn').addEventListener('click', openModalForNew);
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
+
+    document.getElementById('modal-save-btn').addEventListener('click', () => {
+        const editingId = parseInt(itemForm.editingItemId.value);
+        const type = itemForm.itemType.value;
         const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
         let items = DB.get(key);
 
         const itemData = {
-            name: e.target.itemName.value,
-            imageUrl: e.target.itemImage.value,
-            imagePageUrl: e.target.itemImagePageUrl.value,
-            deliveryStatusText: e.target.deliveryStatus.value,
-            orderDate: e.target.orderDate.value,
-            deliveryDate: e.target.deliveryDate.value,
-            eligibleDate: e.target.eligibleDate.value,
-            shareLink: e.target.shareLink.value,
-            shippingAddress: e.target.shippingAddress.value,
+            name: itemForm.itemName.value, imageUrl: itemForm.itemImage.value,
+            imagePageUrl: itemForm.itemImagePageUrl.value, deliveryStatusText: itemForm.deliveryStatus.value,
+            orderDate: itemForm.orderDate.value, deliveryDate: itemForm.deliveryDate.value,
+            eligibleDate: itemForm.eligibleDate.value, shippingAddress: itemForm.shippingAddress.value,
+            progressStepImageUrl: itemForm.progressStepImageUrl.value, shareTrackingLink: itemForm.shareTrackingLink.value,
+            trackingId: itemForm.trackingId.value, carouselToggle: itemForm.carouselToggle.checked,
+            orderNumber: itemForm.orderNumber.value, sellerInfo: itemForm.sellerInfo.value,
+            price: itemForm.price.value, itemSubtotal: itemForm.itemSubtotal.value,
+            shippingCost: itemForm.shippingCost.value, grandTotal: itemForm.grandTotal.value,
+            handedToResident: itemForm.handedToResident.checked, shareLink: itemForm.shareLink.value
         };
 
         if (editingId) {
             const itemIndex = items.findIndex(item => item.id === editingId);
-            if (itemIndex > -1) {
-                items[itemIndex] = { ...items[itemIndex], ...itemData };
-            }
+            if (itemIndex > -1) items[itemIndex] = { ...items[itemIndex], ...itemData };
         } else {
-            const newItem = { id: Date.now(), ...itemData };
-            items.push(newItem);
+            items.unshift({ id: Date.now(), ...itemData }); // Use unshift to add to the top
         }
 
         DB.set(key, items);
         renderAdminPanel();
-        resetFormState();
+        closeModal();
     });
 
     document.getElementById('admin-page').addEventListener('click', (e) => {
-        const button = e.target;
+        const target = e.target.closest('button');
+        if (!target) return;
         
-        if (button.id === 'saveExtraSettingsBtn') {
-            const extraUrl = document.getElementById('extraImageUrl').value;
-            DB.setValue('extraImageUrl', extraUrl);
-            alert('Extra settings saved!');
-            return;
-        }
+        const id = parseInt(target.dataset.id);
+        const type = target.dataset.type;
 
-        const id = parseInt(button.dataset.id);
-        const type = button.dataset.type;
-        if (!type) return;
-        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
-        let items = DB.get(key);
-
-        if (button.classList.contains('delete-btn')) {
-            items = items.filter(item => item.id !== id);
-            DB.set(key, items);
-        } else if (button.classList.contains('flip-btn')) {
-            items.reverse();
-            DB.set(key, items);
-        } else if (button.classList.contains('reorder-btn')) {
-            const itemToReorder = items.find(item => item.id === id);
-            if (itemToReorder) {
-                const newItem = { ...itemToReorder, id: Date.now() };
-                items.push(newItem);
+        if (target.classList.contains('admin-edit-btn')) {
+            openModalForEdit(id, type);
+        } else if (target.classList.contains('admin-delete-btn')) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+                let items = DB.get(key);
+                items = items.filter(item => item.id !== id);
                 DB.set(key, items);
+                renderAdminPanel();
             }
-        } else if (button.classList.contains('edit-btn')) {
-            window.location.hash = `#edit-item-${id}`;
-            return;
-        }
-        renderAdminPanel();
-    });
+        } else if (target.classList.contains('admin-duplicate-btn')) {
+            if (confirm('Are you sure you want to duplicate this item? A copy will be added to the top of the list.')) {
+                const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+                let items = DB.get(key);
+                const originalItem = items.find(item => item.id === id);
 
-    itemImageInput.addEventListener('input', () => {
-        const url = itemImageInput.value;
-        if (url) {
-            imagePreview.src = url;
-            imagePreview.style.display = 'block';
-        } else {
-            imagePreview.style.display = 'none';
-        }
-    });
-
-    addItemForm.addEventListener('click', (e) => {
-        if (e.target.classList.contains('clear-input')) {
-            const inputField = e.target.parentElement.querySelector('input, select, textarea');
-            if (inputField) {
-                inputField.value = '';
-                inputField.dispatchEvent(new Event('input'));
+                if (originalItem) {
+                    const newItem = JSON.parse(JSON.stringify(originalItem)); // Deep copy
+                    newItem.id = Date.now();
+                    newItem.name = `${originalItem.name} (Copy)`;
+                    items.unshift(newItem);
+                    DB.set(key, items);
+                    renderAdminPanel();
+                }
             }
         }
     });
-    
-    function formatDateForInput(date) {
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const dd = String(date.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
-    }
 
-    document.getElementById('autofill-dates-btn').addEventListener('click', () => {
-        const today = new Date();
-        const delivery = new Date();
-        delivery.setDate(today.getDate() + 2);
-        const replacement = new Date();
-        replacement.setDate(today.getDate() + 7);
-
-        document.getElementById('orderDate').value = formatDateForInput(today);
-        document.getElementById('deliveryDate').value = formatDateForInput(delivery);
-        document.getElementById('eligibleDate').value = formatDateForInput(replacement);
-    });
-    
-    function renderEditItemPage(itemId) {
-        const container = document.getElementById('edit-item-content');
-        let items = DB.get('purchaseHistoryItems');
-        const item = items.find(i => i.id === itemId);
-
-        if (!item) {
-            container.innerHTML = `<a href="#details-${itemId}">&larr; Back</a><h1>Item not found</h1>`;
-            return;
-        }
-
-        container.innerHTML = `
-            <a href="#details-${item.id}">&larr; Back to Order Details</a>
-            <h1>Edit Product Details</h1>
-            <div class="form-section">
-                <form id="editItemForm">
-                    <h3>Basic Info</h3>
-                    <div class="input-wrapper"><label for="editItemName">Product Name:</label><input type="text" id="editItemName" value="${item.name || ''}"></div>
-                    <div class="input-wrapper"><label for="editItemImage">Image URL:</label><input type="url" id="editItemImage" value="${item.imageUrl || ''}"></div>
-                    <div class="input-wrapper"><label for="editItemImagePageUrl">Image Page URL:</label><input type="url" id="editItemImagePageUrl" value="${item.imagePageUrl || ''}"></div>
-                    <div class="input-wrapper"><label for="editSellerInfo">Seller Info (Name only):</label><input type="text" id="editSellerInfo" value="${item.sellerInfo || ''}"></div>
-                    <div class="input-wrapper"><label for="editPrice">Price (e.g., 1799.00):</label><input type="text" id="editPrice" value="${item.price || ''}"></div>
-
-                    <h3 style="margin-top:20px;">Delivery Info</h3>
-                    <div class="input-wrapper"><label for="editDeliveryStatus">Delivery Status Text:</label><select id="editDeliveryStatus"></select></div>
-                    <div class="input-wrapper"><label for="editOrderDate">Order Date:</label><input type="date" id="editOrderDate" value="${item.orderDate || ''}"></div>
-                    <div class="input-wrapper"><label for="editDeliveryDate">Delivery Date:</label><input type="date" id="editDeliveryDate" value="${item.deliveryDate || ''}"></div>
-                    <div class="input-wrapper"><label for="editEligibleDate">Replacement Eligible Date:</label><input type="date" id="editEligibleDate" value="${item.eligibleDate || ''}"></div>
-                    <div class="input-wrapper"><label for="editShippingAddress">Shipping Address:</label><textarea id="editShippingAddress" rows="3">${item.shippingAddress || ''}</textarea></div>
-                    <div class="checkbox-wrapper"><label for="editHandedToResident">Package was handed to resident:</label><input type="checkbox" id="editHandedToResident" ${item.handedToResident ? 'checked' : ''}></div>
-                    
-                    <h3 style="margin-top:20px;">Order Summary Details</h3>
-                    <div class="input-wrapper"><label for="editOrderNumber">Order Number:</label><input type="text" id="editOrderNumber" value="${item.orderNumber || ''}"></div>
-                    <div class="input-wrapper"><label for="editItemSubtotal">Item(s) Subtotal:</label><input type="text" id="editItemSubtotal" value="${item.itemSubtotal || ''}"></div>
-                    <div class="input-wrapper"><label for="editShippingCost">Shipping Cost:</label><input type="text" id="editShippingCost" value="${item.shippingCost || ''}"></div>
-                    <div class="input-wrapper"><label for="editGrandTotal">Grand Total:</label><input type="text" id="editGrandTotal" value="${item.grandTotal || ''}"></div>
-
-                    <h3 style="margin-top:20px;">Tracking Page Settings</h3>
-                    <div class="input-wrapper"><label for="editProgressStepImageUrl">Progress-Step Image URL:</label><input type="url" id="editProgressStepImageUrl" value="${item.progressStepImageUrl || ''}"></div>
-                    <div class="input-wrapper"><label for="editShareTrackingLink">Share Tracking Link:</label><input type="url" id="editShareTrackingLink" value="${item.shareTrackingLink || ''}"></div>
-                    <div class="input-wrapper"><label for="editTrackingId">Tracking ID:</label><input type="text" id="editTrackingId" value="${item.trackingId || ''}"></div>
-                    <div class="checkbox-wrapper"><label for="editCarouselToggle">Carousel Toggle (On/Off):</label><input type="checkbox" id="editCarouselToggle" ${item.carouselToggle ? 'checked' : ''}></div>
-
-                    <h3 style="margin-top:20px;">Miscellaneous</h3>
-                    <div class="input-wrapper"><label for="editShareLink">General Share Link:</label><input type="url" id="editShareLink" value="${item.shareLink || ''}"></div>
-
-                    <button type="submit" id="save-item-changes-btn">Save Changes</button>
-                </form>
-            </div>
-        `;
-
-        const deliveryStatusSelect = document.getElementById('editDeliveryStatus');
-        const statuses = ['Delivered on', 'Delivered Today', 'Arriving tomorrow', 'Arriving on', 'Arriving today'];
-        statuses.forEach(status => {
-            const option = document.createElement('option');
-            option.value = status;
-            option.textContent = status;
-            if (status === (item.deliveryStatusText || 'Delivered on')) {
-                option.selected = true;
-            }
-            deliveryStatusSelect.appendChild(option);
-        });
-
-        document.getElementById('editItemForm').addEventListener('submit', (e) => {
+    document.body.addEventListener('click', (e) => {
+        if(e.target.closest('.admin-edit-trigger')) {
             e.preventDefault();
-            const itemIndex = items.findIndex(i => i.id === itemId);
-            if (itemIndex > -1) {
-                const updatedItem = {
-                    ...items[itemIndex],
-                    name: document.getElementById('editItemName').value,
-                    imageUrl: document.getElementById('editItemImage').value,
-                    imagePageUrl: document.getElementById('editItemImagePageUrl').value,
-                    sellerInfo: document.getElementById('editSellerInfo').value,
-                    price: document.getElementById('editPrice').value,
-                    deliveryStatusText: document.getElementById('editDeliveryStatus').value,
-                    orderDate: document.getElementById('editOrderDate').value,
-                    deliveryDate: document.getElementById('editDeliveryDate').value,
-                    eligibleDate: document.getElementById('editEligibleDate').value,
-                    shippingAddress: document.getElementById('editShippingAddress').value,
-                    handedToResident: document.getElementById('editHandedToResident').checked,
-                    orderNumber: document.getElementById('editOrderNumber').value,
-                    itemSubtotal: document.getElementById('editItemSubtotal').value,
-                    shippingCost: document.getElementById('editShippingCost').value,
-                    grandTotal: document.getElementById('editGrandTotal').value,
-                    progressStepImageUrl: document.getElementById('editProgressStepImageUrl').value,
-                    shareTrackingLink: document.getElementById('editShareTrackingLink').value,
-                    trackingId: document.getElementById('editTrackingId').value,
-                    carouselToggle: document.getElementById('editCarouselToggle').checked,
-                    shareLink: document.getElementById('editShareLink').value,
-                };
-                items[itemIndex] = updatedItem;
-                DB.set('purchaseHistoryItems', items);
-                alert('Changes saved!');
-                window.location.hash = `#details-${itemId}`;
-            }
+            const trigger = e.target.closest('.admin-edit-trigger');
+            const id = parseInt(trigger.dataset.id);
+            const type = trigger.dataset.type;
+            showPage('admin-page');
+            setTimeout(() => openModalForEdit(id, type), 50);
+        }
+    });
+    
+    const adminTabs = document.querySelectorAll('.admin-tab-button');
+    const adminTabContents = document.querySelectorAll('.admin-tab-content');
+    adminTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            adminTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            adminTabContents.forEach(c => c.classList.remove('active'));
+            document.getElementById(tab.dataset.tab).classList.add('active');
         });
+    });
+
+    // --- DRAG AND DROP REORDERING LOGIC ---
+    let draggedItem = null;
+    const adminPage = document.getElementById('admin-page');
+
+    adminPage.addEventListener('dragstart', e => {
+        draggedItem = e.target.closest('.item-list-admin-card');
+        if (!draggedItem) return;
+        setTimeout(() => draggedItem.classList.add('dragging'), 0);
+    });
+
+    adminPage.addEventListener('dragend', e => {
+        if (!draggedItem) return;
+        draggedItem.classList.remove('dragging');
+        draggedItem = null;
+        document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
+            el.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+    });
+    
+    adminPage.addEventListener('dragover', e => {
+        e.preventDefault();
+        const list = e.target.closest('.item-list-admin');
+        if (!list || !draggedItem) return;
+
+        const afterElement = getDragAfterElement(list, e.clientY);
+        
+        list.querySelectorAll('.item-list-admin-card').forEach(el => {
+             el.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+
+        if (afterElement) {
+            afterElement.classList.add('drag-over-top');
+        } else {
+            const lastChild = list.querySelector('.item-list-admin-card:not(.dragging):last-child');
+            if(lastChild) lastChild.classList.add('drag-over-bottom');
+        }
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.item-list-admin-card:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
+    
+    adminPage.addEventListener('drop', e => {
+        e.preventDefault();
+        const list = e.target.closest('.item-list-admin');
+        if (!list || !draggedItem) return;
+
+        const listType = list.dataset.type;
+        const key = listType === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+        let items = DB.get(key);
+        
+        const draggedId = parseInt(draggedItem.dataset.id);
+        const draggedIndex = items.findIndex(item => item.id === draggedId);
+        if (draggedIndex === -1) return;
+
+        const [removed] = items.splice(draggedIndex, 1);
+        
+        const afterElement = getDragAfterElement(list, e.clientY);
+        if (afterElement) {
+            const afterId = parseInt(afterElement.dataset.id);
+            const newIndex = items.findIndex(item => item.id === afterId);
+            items.splice(newIndex, 0, removed);
+        } else {
+            items.push(removed);
+        }
+
+        DB.set(key, items);
+        renderAdminList(listType);
+    });
+
+
 
     // --- ADMIN PANEL LOGIC (Home Page Overlay) ---
     const SECTIONS = [
@@ -2136,6 +2125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buildAdminPanel() {
+        if (!adminTabsContainer) return;
         adminTabsContainer.innerHTML = '';
         adminContentContainer.innerHTML = '';
         SECTIONS.forEach((section, index) => {
@@ -2178,6 +2168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         SECTIONS.forEach(section => {
             const urls = DB.get(section.key);
             const urlListContainer = document.getElementById(`${section.key}-urls`);
+            if(!urlListContainer) return;
             urlListContainer.innerHTML = '';
             if (urls.length > 0) {
                 urls.forEach(url => urlListContainer.appendChild(createUrlInput(url)));
@@ -2206,7 +2197,7 @@ document.addEventListener('DOMContentLoaded', () => {
             feedback.style.opacity = '0';
         }, 2000);
         
-        renderHomePageContent(); // Refresh the home page content after saving
+        renderHomePageContent();
         setTimeout(closeAdmin, 300);
     }
 
@@ -2217,40 +2208,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const defaultShareUrl = 'https://www.amazon.in/';
             const customShareUrl = e.target.dataset.shareLink;
             const shareUrl = customShareUrl || defaultShareUrl;
-
             const shareText = `Check out this product: ${productName}`;
-
             if (navigator.share) {
-                try {
-                    await navigator.share({ title: 'Amazon Product', text: `${shareText}`, url: shareUrl });
-                } catch (err) { console.error('Error sharing:', err); }
+                try { await navigator.share({ title: 'Amazon Product', text: `${shareText}`, url: shareUrl }); }
+                catch (err) { console.error('Error sharing:', err); }
             } else {
-                try {
-                    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-                    alert('Link copied to clipboard!');
-                } catch (err) { alert('Failed to copy link.'); }
+                try { await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`); alert('Link copied to clipboard!'); }
+                catch (err) { alert('Failed to copy link.'); }
             }
         } else if (e.target.classList.contains('share-tracking-btn')) {
             e.preventDefault();
             const trackingLink = e.target.dataset.trackingLink;
             const productName = e.target.dataset.productName;
-
-            if (!trackingLink) {
-                alert('No tracking link is available for this item.');
-                return;
-            }
-
+            if (!trackingLink) { alert('No tracking link is available for this item.'); return; }
             const shareText = `Here is the tracking information for the order: ${productName}`;
-
             if (navigator.share) {
-                try {
-                    await navigator.share({ title: 'Amazon Order Tracking', text: shareText, url: trackingLink });
-                } catch (err) { console.error('Error sharing tracking link:', err); }
+                try { await navigator.share({ title: 'Amazon Order Tracking', text: shareText, url: trackingLink }); }
+                catch (err) { console.error('Error sharing tracking link:', err); }
             } else {
-                try {
-                    await navigator.clipboard.writeText(trackingLink);
-                    alert('Tracking link copied to clipboard!');
-                } catch (err) { alert('Failed to copy tracking link.'); }
+                try { await navigator.clipboard.writeText(trackingLink); alert('Tracking link copied to clipboard!'); }
+                catch (err) { alert('Failed to copy tracking link.'); }
             }
         }
     });
@@ -2258,9 +2235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const footer = document.querySelector('.fixed-footer');
     footer.addEventListener('click', () => { window.location.hash = '#home'; });
 
-    document.getElementById('back-tap-area').addEventListener('click', () => {
-        window.history.back();
-    });
+    document.getElementById('back-tap-area').addEventListener('click', () => { window.history.back(); });
 
     const header = document.querySelector('.fixed-header');
     const loader = document.getElementById('progress-bar-loader');
@@ -2268,9 +2243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function adjustStickyHeaderTop() {
         const headerHeight = header.offsetHeight;
         const stickyHeader = document.querySelector('.sticky-track-header');
-        if (stickyHeader) {
-            stickyHeader.style.top = `${headerHeight}px`;
-        }
+        if (stickyHeader) { stickyHeader.style.top = `${headerHeight}px`; }
     }
     
     function setHomePageContentPadding() {
@@ -2289,27 +2262,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerHeight = header.offsetHeight;
             loader.style.top = `${headerHeight}px`;
             pages.forEach(page => {
-                if (page.id !== 'home-page') { // Home page has its own padding logic
-                    page.style.paddingTop = `${headerHeight}px`;
-                }
+                if (page.id !== 'home-page') { page.style.paddingTop = `${headerHeight}px`; }
             });
             adjustStickyHeaderTop();
-            setHomePageContentPadding(); // Adjust home page padding too
+            setHomePageContentPadding();
         };
-
-        if (headerImg.complete) {
-            performAdjustment();
-        } else {
-            headerImg.addEventListener('load', performAdjustment);
-        }
+        if (headerImg.complete) { performAdjustment(); }
+        else { headerImg.addEventListener('load', performAdjustment); }
         window.addEventListener('resize', performAdjustment);
     }
     
     // --- Initial Setup Calls ---
-    openAdminButton.addEventListener('click', openAdmin);
-    closeAdminButton.addEventListener('click', closeAdmin);
-    saveButton.addEventListener('click', saveChanges);
-    adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdmin(); });
+    if(openAdminButton) openAdminButton.addEventListener('click', openAdmin);
+    if(closeAdminButton) closeAdminButton.addEventListener('click', closeAdmin);
+    if(saveButton) saveButton.addEventListener('click', saveChanges);
+    if(adminPanel) adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdmin(); });
 
     initializeDefaultData();
     buildAdminPanel();
