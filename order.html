@@ -835,7 +835,7 @@
         .admin-settings-form { background-color: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
         .admin-settings-form label { display: block; margin-bottom: 5px; font-weight: bold; }
         .admin-settings-form input[type="url"] {
-            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box;
+            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 10px;
         }
         .admin-settings-form button { margin-top: 15px; }
 
@@ -1123,8 +1123,24 @@
                 <h2>Global Settings</h2>
             </div>
             <div class="admin-settings-form">
+                <div class="form-checkbox-group" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                    <input type="checkbox" id="navToggle" checked>
+                    <label for="navToggle">Standard Navigation (Go to Order Details)<br><span style="font-weight:normal; font-size:0.9rem; color:#666;">If OFF, tapping an order goes directly to "Track Package".</span></label>
+                </div>
+
+                <div class="form-input-group">
+                    <label for="trackBottomImg">Track Package Bottom Image URL:</label>
+                    <input type="url" id="trackBottomImg" name="trackBottomImg">
+                </div>
+                
+                <div class="form-input-group">
+                    <label for="summaryBottomImg">View Order Detail (Summary Page) Bottom Image URL:</label>
+                    <input type="url" id="summaryBottomImg" name="summaryBottomImg">
+                </div>
+
                 <label for="extraImageUrl">Details Page Ad Image URL:</label>
                 <input type="url" id="extraImageUrl" name="extraImageUrl" placeholder="https://...">
+                
                 <button id="saveExtraSettingsBtn" class="admin-button secondary">Save Settings</button>
             </div>
         </div>
@@ -1326,6 +1342,12 @@ document.addEventListener('DOMContentLoaded', () => {
             DB.setValue('extraImageUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251111_205647_Amazon.jpg?updatedAt=1762881134774');
             DB.set('keepShopping', []); // Initialize home page sections
             DB.set('yourLists', []);
+            
+            // New Default Settings
+            DB.setValue('navBehaviorToggle', 'true'); // Default ON
+            DB.setValue('trackPageBottomImgUrl', 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624');
+            DB.setValue('orderSummaryBottomImgUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206');
+            
             localStorage.setItem('initialized', 'true');
         }
     }
@@ -1505,6 +1527,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = DB.get('purchaseHistoryItems');
         const container = document.getElementById('purchase-history-container');
         if(!container) return;
+        
+        // CHECK TOGGLE STATE
+        const navBehaviorToggle = DB.getValue('navBehaviorToggle') === 'true';
+
         container.innerHTML = '';
         items.forEach(item => {
             const statusText = item.deliveryStatusText || 'Delivered on';
@@ -1515,12 +1541,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 statusDisplay = statusText;
             }
+            
+            // Apply Logic: If Toggle ON (true) -> Details, If OFF (false) -> Track
+            const linkHref = navBehaviorToggle ? `#details-${item.id}` : `#track-${item.id}`;
 
             container.innerHTML += `
                 <div class="purchase-item-card">
                     <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
                     <div class="item-info">
-                         <a href="#details-${item.id}" class="item-name">${item.name}</a>
+                         <a href="${linkHref}" class="item-name">${item.name}</a>
                         <p class="item-status">${statusDisplay}</p>
                     </div>
                 </div>`;
@@ -1657,6 +1686,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const defaultProgressImg = 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861';
         const progressImg = item.progressStepImageUrl || defaultProgressImg;
         
+        // GET GLOBAL SETTING IMAGE FOR BOTTOM
+        const bottomImg = DB.getValue('trackPageBottomImgUrl') || 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624';
+        
         let carouselHtml = '';
         if (item.carouselToggle) {
             carouselHtml = `
@@ -1715,7 +1747,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <hr class="thick-separator-light">
                 </div>
             </div>
-            <img src="https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624" alt="Order Details Summary" class="full-width-image">
+            <img src="${bottomImg}" alt="Order Details Summary" class="full-width-image">
         `;
     }
 
@@ -1728,6 +1760,9 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = '<p>Item details not found.</p>';
             return;
         }
+        
+        // GET GLOBAL SETTING IMAGE FOR BOTTOM (VIEW ORDER DETAIL)
+        const bottomImg = DB.getValue('orderSummaryBottomImgUrl') || 'https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206';
 
         const deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
         const returnInfoText = item.eligibleDate ? `Return window closed on ${formatDate(item.eligibleDate)}` : '';
@@ -1819,7 +1854,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251115_121149_Chrome.jpg" alt="Recommended Products" style="width: 100%; height: auto; display: block;">
                 </div>
 
-                <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206" alt="Promotional Image" style="width: 100%; height: auto; display: block; padding: 0 8px 8px 8px; box-sizing: border-box;">
+                <img src="${bottomImg}" alt="Promotional Image" style="width: 100%; height: auto; display: block; padding: 0 8px 8px 8px; box-sizing: border-box;">
             </div>
         `;
         
@@ -1858,9 +1893,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderAdminPanel() {
+        // Load Global Settings
         document.getElementById('extraImageUrl').value = DB.getValue('extraImageUrl');
+        document.getElementById('navToggle').checked = DB.getValue('navBehaviorToggle') === 'true';
+        document.getElementById('trackBottomImg').value = DB.getValue('trackPageBottomImgUrl');
+        document.getElementById('summaryBottomImg').value = DB.getValue('orderSummaryBottomImgUrl');
+
         document.getElementById('saveExtraSettingsBtn').addEventListener('click', () => {
              DB.setValue('extraImageUrl', document.getElementById('extraImageUrl').value);
+             DB.setValue('navBehaviorToggle', document.getElementById('navToggle').checked ? 'true' : 'false');
+             DB.setValue('trackPageBottomImgUrl', document.getElementById('trackBottomImg').value);
+             DB.setValue('orderSummaryBottomImgUrl', document.getElementById('summaryBottomImg').value);
              alert('Settings Saved!');
         });
         renderAdminList('purchaseHistory');
