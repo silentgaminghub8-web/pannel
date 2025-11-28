@@ -1247,6 +1247,7 @@
                     <div class="form-input-group"><label for="itemSubtotal">Item(s) Subtotal</label><input type="text" id="itemSubtotal" name="itemSubtotal"></div>
                     <div class="form-input-group"><label for="shippingCost">Shipping Cost</label><input type="text" id="shippingCost" name="shippingCost"></div>
                     <div class="form-input-group"><label for="grandTotal">Grand Total</label><input type="text" id="grandTotal" name="grandTotal"></div>
+                    <div class="form-input-group"><label for="paymentMethod">Payment Method Info</label><input type="text" id="paymentMethod" name="paymentMethod" placeholder="e.g. American Express xx-xxxx-1234 Credit Card"></div>
                     <div class="form-checkbox-group"><input type="checkbox" id="handedToResident"><label for="handedToResident">Package was handed to resident</label></div>
                 </div>
             </details>
@@ -1272,7 +1273,7 @@
 
 <!-- Fixed Footer - Visible on all pages -->
 <footer class="fixed-footer">
-    <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-09_01-17-05-266.jpg?updatedAt=1762631248379" alt="Footer Image" id="footer-img">
+    <img src="https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-28_09-08-31-792.jpg" alt="Footer Image" id="footer-img">
 </footer>
 
 <script>
@@ -1315,7 +1316,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     price: "1799.00",
                     itemSubtotal: "1799.00",
                     shippingCost: "0.00",
-                    grandTotal: "1799.00"
+                    grandTotal: "1799.00",
+                    paymentMethod: "American Express xx-xxxx-8970 Credit Card"
                  },
                  { 
                     id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
@@ -1334,7 +1336,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     price: "299.00",
                     itemSubtotal: "299.00",
                     shippingCost: "0.00",
-                    grandTotal: "299.00"
+                    grandTotal: "299.00",
+                    paymentMethod: "Amazon Pay Balance"
                  },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
@@ -1766,6 +1769,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
         const returnInfoText = item.eligibleDate ? `Return window closed on ${formatDate(item.eligibleDate)}` : '';
+        
+        // Dynamic Payment Method
+        const paymentMethodText = item.paymentMethod || 'American Express Credit Card';
 
         container.innerHTML = `
             <div class="summary-top-bar">
@@ -1819,7 +1825,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h2>Payment method</h2>
                     <hr class="card-line">
                     <div class="payment-card">
-                        <p>American Express Credit Card</p>
+                        <p>${paymentMethodText}</p>
                     </div>
                 </div>
 
@@ -1943,6 +1949,7 @@ document.addEventListener('DOMContentLoaded', () => {
         itemForm.itemSubtotal.value = item.itemSubtotal || '';
         itemForm.shippingCost.value = item.shippingCost || '';
         itemForm.grandTotal.value = item.grandTotal || '';
+        itemForm.paymentMethod.value = item.paymentMethod || '';
         itemForm.handedToResident.checked = !!item.handedToResident;
         itemForm.shareLink.value = item.shareLink || '';
 
@@ -1981,6 +1988,7 @@ document.addEventListener('DOMContentLoaded', () => {
             orderNumber: itemForm.orderNumber.value, sellerInfo: itemForm.sellerInfo.value,
             price: itemForm.price.value, itemSubtotal: itemForm.itemSubtotal.value,
             shippingCost: itemForm.shippingCost.value, grandTotal: itemForm.grandTotal.value,
+            paymentMethod: itemForm.paymentMethod.value,
             handedToResident: itemForm.handedToResident.checked, shareLink: itemForm.shareLink.value
         };
 
