@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mobile Page - Final</title>
+    <title>Mobile Page - OG Footer</title>
     <link rel="manifest" href="manifest.json">
 
     <!-- Fix for iPhone Fullscreen -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- COMMAND ANALYSIS: Reverted theme color to white to match your original setup -->
     <meta name="theme-color" content="#ffffff">
 
-    <!-- AAPKA POORA PURANA CSS WAPAS DAAL DIYA GAYA HAI -->
     <style>
         /* General Setup */
         :root { --loader-time: 2s; }
         body, html {
             margin: 0; padding: 0; width: 100%;
             background-color: white; font-family: sans-serif;
-            /* Below rule prevents the callout menu on long press in iOS Safari */
             -webkit-touch-callout: none; 
         }
 
-        /* This universal selector disables text selection and the blue tap highlight */
+        /* Disable text selection and highlight */
         * {
-            -webkit-user-select: none; /* Safari/Chrome */
-            -moz-user-select: none;    /* Firefox */
-            -ms-user-select: none;     /* IE10+ */
-            user-select: none;         /* Standard */
-            -webkit-tap-highlight-color: transparent; /* Removes blue bar on tap */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         img { width: 100%; display: block; height: auto; vertical-align: middle; }
@@ -36,77 +36,58 @@
 
         /* --- Full Screen Background --- */
         #background-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Puts it behind all other content */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
             background-image: url('https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-40-24-348.jpg?updatedAt=1762470754371');
-            background-size: cover;
-            background-position: center;
+            background-size: cover; background-position: center;
         }
 
         /* --- Splash Screen --- */
         #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999; /* Highest z-index to be on top */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999;
             background-image: url('https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-28-11-055.jpg?updatedAt=1762441127768');
-            background-size: cover;
-            background-position: center;
-            background-color: #ffffff; /* Fallback color */
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* For fade out */
+            background-size: cover; background-position: center;
+            background-color: #ffffff;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
         }
-        #splash-screen.splash-hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
+        #splash-screen.splash-hidden { opacity: 0; visibility: hidden; }
 
         /* --- Header & Sub-Header --- */
         .sticky-header {
             position: sticky; top: 0; z-index: 1000;
             background-color: white;
-            padding-top: env(safe-area-inset-top); /* This ensures content isn't hidden by the notch */
+            padding-top: env(safe-area-inset-top);
         }
         .sub-header {
             transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 200px;
-            overflow: hidden;
-            will-change: max-height;
+            max-height: 200px; overflow: hidden; will-change: max-height;
         }
-        .sub-header-hidden {
-            max-height: 0;
-        }
+        .sub-header-hidden { max-height: 0; }
 
-        /* --- Main Content & Loading Animation --- */
+        /* --- Main Content & Loader --- */
         #main-page-content-wrapper, #cart-page-content-wrapper { position: relative; }
         main {
-           background-color: transparent; /* Changed to see background */
-           padding-bottom: 120px;
+           background-color: transparent;
+           padding-bottom: 120px; /* Space for the footer */
            min-height: 300px;
         }
         main.loading { opacity: 0; transition: opacity 0.3s ease-out; }
         .loader {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 4px; background: linear-gradient(90deg, #ffd700, #ffa500);
-            transform: translateY(-100%);
-            transition: transform 0.4s ease-in-out;
+            transform: translateY(-100%); transition: transform 0.4s ease-in-out;
             z-index: 999; overflow: hidden;
         }
         .loader::after {
-            content: ''; position: absolute; top: 0; left: -100%;
-            width: 100%; height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             animation: loader-inner var(--loader-time) linear infinite;
         }
         .loader.active { transform: translateY(0); }
         @keyframes loader-inner { 0% { left: -100%; } 100% { left: 100%; } }
 
-        /* --- Universal Footer & Pop-ups --- */
+        /* --- COMMAND ANALYSIS: RESTORED ORIGINAL FOOTER CSS --- */
         .footer-grid-container { position: relative; }
         .footer-grid {
             position: absolute; top: 0; left: 0;
@@ -122,25 +103,22 @@
             will-change: transform;
         }
         .footer-hidden { transform: translateY(100%); }
+
+        /* --- Pop-ups --- */
         .popup-container {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
             z-index: 1001; display: flex; align-items: flex-end;
         }
-        .page-wrapper.blur > *:not(.sticky-header, .popup-container) {
-            filter: blur(5px);
-        }
+        .page-wrapper.blur > *:not(.sticky-header, .popup-container) { filter: blur(5px); }
         .popup-content { width: 100%; }
 
         /* --- Admin Panel --- */
         .admin-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0,0,0,0.95); z-index: 2000;
-            color: white; padding: 20px; overflow-y: auto;
-            box-sizing: border-box;
+            color: white; padding: 20px; overflow-y: auto; box-sizing: border-box;
         }
         .admin-panel h2, .admin-panel h3 { margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 5px;}
         .admin-panel input { width: calc(100% - 12px); padding: 5px; margin-bottom: 10px; background: #333; color: white; border: 1px solid #555; }
@@ -154,7 +132,6 @@
 </head>
 <body ondragstart="return false;" ondrop="return false;">
 
-    <!-- AAPKA POORA PURANA HTML WAPAS DAAL DIYA GAYA HAI -->
     <div id="background-image"></div>
     <div id="splash-screen"></div>
 
@@ -171,13 +148,18 @@
             <div class="loader"></div>
             <main id="main-page-content"></main>
         </div>
+        
+        <!-- COMMAND ANALYSIS: RESTORED ORIGINAL IMAGE FOOTER -->
         <footer class="sliding-footer">
             <div class="footer-grid-container">
                 <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_20-38-33-559.jpg?updatedAt=1762441866973" alt="Footer">
                 <div class="footer-grid">
-                    <a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a>
-                    <div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div>
-                    <div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div>
+                    <div class="footer-link home-trigger"></div>
+                    <a href="order.html" class="footer-link"></a>
+                    <div class="footer-link popup-trigger-1"></div>
+                    <div class="footer-link cart-trigger"></div>
+                    <div class="footer-link popup-trigger-2"></div>
+                    <div class="footer-link popup-trigger-3"></div>
                 </div>
             </div>
         </footer>
@@ -198,21 +180,27 @@
                 <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-06_23-59-32-684.jpg?updatedAt=1762453796056" alt="Cart Image">
             </main>
         </div>
+        
+        <!-- RESTORED CART FOOTER -->
         <footer class="sliding-footer">
             <div class="footer-grid-container">
                 <img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_00-48-14-627.jpg?updatedAt=1762456721818" alt="Cart Footer">
                 <div class="footer-grid">
-                    <a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a>
-                    <div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div>
-                    <div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div>
+                    <div class="footer-link home-trigger"></div>
+                    <a href="order.html" class="footer-link"></a>
+                    <div class="footer-link popup-trigger-1"></div>
+                    <div class="footer-link cart-trigger"></div>
+                    <div class="footer-link popup-trigger-2"></div>
+                    <div class="footer-link popup-trigger-3"></div>
                 </div>
             </div>
         </footer>
     </div>
 
-    <div id="popup-1" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-46-828.png?updatedAt=1762460531235" alt="Special Popup"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
-    <div id="popup-2" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_02-08-55-599.jpg?updatedAt=1762461555587" alt="Special Popup 2"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
-    <div id="popup-3" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-16-726.png?updatedAt=1762460530551" alt="Special Popup 3"><div class="footer-grid"><a href="#" class="footer-link home-trigger"></a><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <!-- Popups with Original Grid Structure -->
+    <div id="popup-1" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-46-828.png?updatedAt=1762460531235" alt="Special Popup"><div class="footer-grid"><div class="footer-link home-trigger"></div><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <div id="popup-2" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_02-08-55-599.jpg?updatedAt=1762461555587" alt="Special Popup 2"><div class="footer-grid"><div class="footer-link home-trigger"></div><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
+    <div id="popup-3" class="popup-container hidden"><div class="popup-content footer-grid-container"><img src="https://ik.imagekit.io/goldencodes/Picsart_25-11-07_01-50-16-726.png?updatedAt=1762460530551" alt="Special Popup 3"><div class="footer-grid"><div class="footer-link home-trigger"></div><a href="order.html" class="footer-link"></a><div class="footer-link popup-trigger-1"></div><div class="footer-link cart-trigger"></div><div class="footer-link popup-trigger-2"></div><div class="footer-link popup-trigger-3"></div></div></div></div>
     
     <div id="admin-panel" class="admin-panel hidden">
         <div id="admin-bundle-list-view">
@@ -230,44 +218,32 @@
     </div>
 
     <script>
-        // SABHI SCRIPTS KO EK HI JAGAH RAKH DIYA GAYA HAI
         document.addEventListener("DOMContentLoaded", function() {
             
-            // --- NAYA LOGIC COPYING AUR RIGHT-CLICK ROKNE KE LIYE ---
-            // Right-click context menu ko disable karna
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-            });
-
-            // Keyboard shortcuts (Ctrl+C, Ctrl+U, etc.) ko disable karna
+            // Security / Restriction Logic
+            document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
             document.addEventListener('keydown', function(e) {
-                // Ctrl+C (Copy), Ctrl+X (Cut), Ctrl+U (View Source), Ctrl+S (Save)
-                if (e.ctrlKey && ['c', 'x', 'u', 's'].includes(e.key.toLowerCase())) {
-                    e.preventDefault();
-                }
-                // F12 (Developer Tools)
-                if (e.key === 'F12') {
-                    e.preventDefault();
-                }
+                if (e.ctrlKey && ['c', 'x', 'u', 's'].includes(e.key.toLowerCase())) { e.preventDefault(); }
+                if (e.key === 'F12') { e.preventDefault(); }
             });
 
-            // --- AAPKA POORA PURANA FEATURE WALA JAVASCRIPT ---
             const splashScreen = document.getElementById('splash-screen');
             if (sessionStorage.getItem('splashShown')) {
                 splashScreen.style.display = 'none';
             } else {
                 sessionStorage.setItem('splashShown', 'true');
-                setTimeout(() => {
-                    splashScreen.classList.add('splash-hidden');
-                }, 2500);
+                setTimeout(() => { splashScreen.classList.add('splash-hidden'); }, 2500);
             }
 
             const mainPage = document.getElementById('main-page');
             const cartPage = document.getElementById('cart-page');
             const popups = [document.getElementById('popup-1'), document.getElementById('popup-2'), document.getElementById('popup-3')];
             const mainSubHeader = document.querySelector('#main-page .sub-header');
+            
+            /* COMMAND ANALYSIS: REVERTED TO SLIDING FOOTER SELECTORS */
             const mainFooter = document.querySelector('#main-page .sliding-footer');
             const cartFooter = document.querySelector('#cart-page .sliding-footer');
+            
             const adminPanel = document.getElementById('admin-panel');
             const headerClickableArea = document.getElementById('header-clickable-area');
             const bundleListView = document.getElementById('admin-bundle-list-view');
@@ -295,6 +271,7 @@
                     else mainSubHeader.classList.remove('sub-header-hidden');
                 }
                 const activeFooter = onCartPage ? cartFooter : mainFooter;
+                /* Restored Scroll Hiding Logic for the sliding footer */
                 if (st > lastScrollTop && st > 50) activeFooter.classList.add('footer-hidden');
                 else activeFooter.classList.remove('footer-hidden');
                 lastScrollTop = st <= 0 ? 0 : st;
@@ -412,7 +389,11 @@
                 contentArea.innerHTML = contentToRender.map(url => `<img src="${url}" alt="Main Content">`).join('');
             });
 
-            document.querySelectorAll('.home-trigger').forEach(el => el.addEventListener('click', (e) => { e.preventDefault(); if (mainPage.classList.contains('hidden')) { showHomePage(); } else { window.location.reload(); } }));
+            document.querySelectorAll('.home-trigger').forEach(el => el.addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                if (mainPage.classList.contains('hidden')) { showHomePage(); } else { window.location.reload(); } 
+            }));
+            
             document.querySelectorAll('.cart-trigger').forEach(el => el.addEventListener('click', showCartPage));
             document.querySelectorAll('.popup-trigger-1').forEach(el => el.addEventListener('click', () => showPopup(popups[0])));
             document.querySelectorAll('.popup-trigger-2').forEach(el => el.addEventListener('click', () => showPopup(popups[1])));
@@ -421,19 +402,12 @@
             window.addEventListener('scroll', handleScroll, false);
             popups.forEach(p => p.addEventListener('click', (e) => { if (e.target === p) closeAllPopups(); }));
 
-
-            // --- PWA INSTALL AUR SERVICE WORKER KA GUARANTEED WORKING LOGIC ---
-            // (Ise aapke feature waale code ke baad rakha gaya hai taaki koi conflict na ho)
+            // PWA Install Logic
             let deferredPrompt;
-            // Note: Hum is baar koi naya install button nahi bana rahe, browser ke default pop-up par nirbhar rahenge.
-            // Agar aapko button chahiye, to pichle code se add kar sakte hain.
-
             window.addEventListener('beforeinstallprompt', (e) => {
                 console.log('beforeinstallprompt event fired!');
                 e.preventDefault();
                 deferredPrompt = e;
-                // Yahan aap install button ko dikha sakte hain agar aapne banaya ho
-                // For example: document.getElementById('my-install-button').style.display = 'block';
             });
 
             window.addEventListener('appinstalled', () => {
@@ -442,7 +416,6 @@
             });
 
             if ('serviceWorker' in navigator) {
-                // Pehle se 'load' event ke andar hai, dobara add karne ki zaroorat nahi
                 navigator.serviceWorker.register('/pannel/sw.js')
                     .then(registration => console.log('ServiceWorker registered successfully with scope: ', registration.scope))
                     .catch(err => console.log('ServiceWorker registration failed: ', err));
