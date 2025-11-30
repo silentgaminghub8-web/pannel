@@ -1137,11 +1137,6 @@
                     <label for="summaryBottomImg">View Order Detail (Summary Page) Bottom Image URL:</label>
                     <input type="url" id="summaryBottomImg" name="summaryBottomImg">
                 </div>
-                
-                <div class="form-input-group">
-                    <label for="globalPaymentMethod">Global Default Payment Method:</label>
-                    <input type="text" id="globalPaymentMethod" name="globalPaymentMethod" placeholder="Default Payment Method for all orders">
-                </div>
 
                 <label for="extraImageUrl">Details Page Ad Image URL:</label>
                 <input type="url" id="extraImageUrl" name="extraImageUrl" placeholder="https://...">
@@ -1556,7 +1551,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Apply Logic: If Toggle ON (true) -> Details, If OFF (false) -> Track
             const linkHref = navBehaviorToggle ? `#details-${item.id}` : `#track-${item.id}`;
 
-            container.innerHTML += `
+            // CHECK IF STATUS IS ARRIVING (Logic for Green Text & Hiding Name)
+            // User requested: "arriving on, Arriving today, Arriving tomorrow"
+            const isGreenStatus = ['Arriving on', 'Arriving today', 'Arriving tomorrow'].some(s => statusText.startsWith(s));
+
+            if (isGreenStatus) {
+                // Layout for Arriving Items:
+                // 1. Hide Product Name.
+                // 2. Status Display takes place of name (same font style) with color #3E8277.
+                // 3. Remove duplicate status below.
+                container.innerHTML += `
+                <div class="purchase-item-card">
+                    <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
+                    <div class="item-info">
+                         <a href="${linkHref}" class="item-name" style="color: #3E8277; font-weight: bold; text-decoration: none;">${statusDisplay}</a>
+                    </div>
+                </div>`;
+            } else {
+                // Standard Layout for other statuses
+                container.innerHTML += `
                 <div class="purchase-item-card">
                     <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
                     <div class="item-info">
@@ -1564,6 +1577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p class="item-status">${statusDisplay}</p>
                     </div>
                 </div>`;
+            }
         });
     }
 
