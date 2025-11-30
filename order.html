@@ -1137,6 +1137,11 @@
                     <label for="summaryBottomImg">View Order Detail (Summary Page) Bottom Image URL:</label>
                     <input type="url" id="summaryBottomImg" name="summaryBottomImg">
                 </div>
+                
+                <div class="form-input-group">
+                    <label for="globalPaymentMethod">Global Default Payment Method:</label>
+                    <input type="text" id="globalPaymentMethod" name="globalPaymentMethod" placeholder="Default Payment Method for all orders">
+                </div>
 
                 <label for="extraImageUrl">Details Page Ad Image URL:</label>
                 <input type="url" id="extraImageUrl" name="extraImageUrl" placeholder="https://...">
@@ -1249,6 +1254,7 @@
                     <div class="form-input-group"><label for="grandTotal">Grand Total</label><input type="text" id="grandTotal" name="grandTotal"></div>
                     <div class="form-input-group"><label for="paymentMethod">Payment Method Info</label><input type="text" id="paymentMethod" name="paymentMethod" placeholder="e.g. American Express xx-xxxx-1234 Credit Card"></div>
                     <div class="form-checkbox-group"><input type="checkbox" id="handedToResident"><label for="handedToResident">Package was handed to resident</label></div>
+                    <div class="form-checkbox-group"><input type="checkbox" id="orderCancelled"><label for="orderCancelled">Order is Cancelled/Not Shipped (Modifies Buttons)</label></div>
                 </div>
             </details>
             
@@ -1317,7 +1323,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     itemSubtotal: "1799.00",
                     shippingCost: "0.00",
                     grandTotal: "1799.00",
-                    paymentMethod: "American Express xx-xxxx-8970 Credit Card"
+                    paymentMethod: "American Express xx-xxxx-8970 Credit Card",
+                    orderCancelled: false
                  },
                  { 
                     id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
@@ -1337,7 +1344,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     itemSubtotal: "299.00",
                     shippingCost: "0.00",
                     grandTotal: "299.00",
-                    paymentMethod: "Amazon Pay Balance"
+                    paymentMethod: "Amazon Pay Balance",
+                    orderCancelled: false
                  },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
@@ -1767,11 +1775,38 @@ document.addEventListener('DOMContentLoaded', () => {
         // GET GLOBAL SETTING IMAGE FOR BOTTOM (VIEW ORDER DETAIL)
         const bottomImg = DB.getValue('orderSummaryBottomImgUrl') || 'https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206';
 
-        const deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
+        // LOGIC CHANGE: Only show text if Delivery Status Text is exactly "Delivered on"
+        let deliveryStatusText = '';
+        if (item.deliveryStatusText === 'Delivered on') {
+            deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
+        }
+
         const returnInfoText = item.eligibleDate ? `Return window closed on ${formatDate(item.eligibleDate)}` : '';
         
-        // Dynamic Payment Method
-        const paymentMethodText = item.paymentMethod || 'American Express Credit Card';
+        // Dynamic Payment Method: Item Specific -> Global Default -> Fallback
+        const globalPayment = DB.getValue('globalPaymentMethod');
+        const paymentMethodText = item.paymentMethod || globalPayment || 'American Express Credit Card';
+
+        // Logic for BUTTONS based on "Order is Cancelled" Toggle
+        let buttonGroupHtml = '';
+        if (item.orderCancelled) {
+            // Cancelled State: Show Cancel, Track, Review. Hide Support, Buy Again, Feedback.
+            buttonGroupHtml = `
+                <a href="#track-${item.id}" class="summary-action-button">Track package</a>
+                <button class="summary-action-button">Cancel items</button>
+                <button class="summary-action-button">Write a product review</button>
+            `;
+        } else {
+            // Normal State
+            buttonGroupHtml = `
+                <a href="#admin" class="summary-action-button admin-edit-trigger" data-id="${item.id}" data-type="purchaseHistory">Get product support</a>
+                <a href="#" class="summary-action-button">Buy it again</a>
+                <a href="#track-${item.id}" class="summary-action-button">Track package</a>
+                <button class="summary-action-button">Leave seller feedback</button>
+                <button class="summary-action-button">Leave delivery feedback</button>
+                <button class="summary-action-button">Write a product review</button>
+            `;
+        }
 
         container.innerHTML = `
             <div class="summary-top-bar">
@@ -1812,12 +1847,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="summary-button-group">
-                        <a href="#admin" class="summary-action-button admin-edit-trigger" data-id="${item.id}" data-type="purchaseHistory">Get product support</a>
-                        <a href="#" class="summary-action-button">Buy it again</a>
-                        <a href="#track-${item.id}" class="summary-action-button">Track package</a>
-                        <button class="summary-action-button">Leave seller feedback</button>
-                        <button class="summary-action-button">Leave delivery feedback</button>
-                        <button class="summary-action-button">Write a product review</button>
+                        ${buttonGroupHtml}
                     </div>
                 </div>
 
@@ -1904,12 +1934,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('navToggle').checked = DB.getValue('navBehaviorToggle') === 'true';
         document.getElementById('trackBottomImg').value = DB.getValue('trackPageBottomImgUrl');
         document.getElementById('summaryBottomImg').value = DB.getValue('orderSummaryBottomImgUrl');
+        document.getElementById('globalPaymentMethod').value = DB.getValue('globalPaymentMethod');
 
         document.getElementById('saveExtraSettingsBtn').addEventListener('click', () => {
              DB.setValue('extraImageUrl', document.getElementById('extraImageUrl').value);
              DB.setValue('navBehaviorToggle', document.getElementById('navToggle').checked ? 'true' : 'false');
              DB.setValue('trackPageBottomImgUrl', document.getElementById('trackBottomImg').value);
              DB.setValue('orderSummaryBottomImgUrl', document.getElementById('summaryBottomImg').value);
+             DB.setValue('globalPaymentMethod', document.getElementById('globalPaymentMethod').value);
              alert('Settings Saved!');
         });
         renderAdminList('purchaseHistory');
@@ -1951,6 +1983,7 @@ document.addEventListener('DOMContentLoaded', () => {
         itemForm.grandTotal.value = item.grandTotal || '';
         itemForm.paymentMethod.value = item.paymentMethod || '';
         itemForm.handedToResident.checked = !!item.handedToResident;
+        itemForm.orderCancelled.checked = !!item.orderCancelled;
         itemForm.shareLink.value = item.shareLink || '';
 
         itemModal.classList.add('visible');
@@ -1989,7 +2022,9 @@ document.addEventListener('DOMContentLoaded', () => {
             price: itemForm.price.value, itemSubtotal: itemForm.itemSubtotal.value,
             shippingCost: itemForm.shippingCost.value, grandTotal: itemForm.grandTotal.value,
             paymentMethod: itemForm.paymentMethod.value,
-            handedToResident: itemForm.handedToResident.checked, shareLink: itemForm.shareLink.value
+            handedToResident: itemForm.handedToResident.checked, 
+            orderCancelled: itemForm.orderCancelled.checked,
+            shareLink: itemForm.shareLink.value
         };
 
         if (editingId) {
@@ -2340,3 +2375,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+```
