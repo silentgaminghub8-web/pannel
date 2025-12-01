@@ -531,6 +531,45 @@
             background-color: var(--success-green); color: white; padding: 10px 20px;
             border-radius: 6px; opacity: 0; transition: all 0.4s ease; z-index: 101;
         }
+
+        /* --- INVOICE PAGE STYLES (Specific Request) --- */
+        .invoice-card {
+            width: 900px;
+            min-width: 900px;
+            background-color: #ffffff;
+            margin: 20px auto;
+            border: 1px solid #d5d9d9;
+            padding: 18px 20px;
+            box-sizing: border-box;
+            font-family: "Arial", sans-serif;
+            color: #333333;
+        }
+        .invoice-card h2, .invoice-card p, .invoice-card h5 {
+            margin-top: 0; margin-bottom: 0;
+        }
+        .invoice-header { margin-bottom: 10px; }
+        .invoice-header h2 { text-align: left; margin-bottom: 10px; }
+        .invoice-meta-line { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 14px; }
+        .invoice-divider { border: 0; border-top: 1px solid #e7e7e7; margin: 10px 0; }
+        .invoice-grid { display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: 20px; font-size: 13px; margin-bottom: 20px; }
+        .invoice-col-label { font-weight: bold; font-size: 13px; margin-bottom: 5px; display: block; }
+        .invoice-summary-table { width: 100%; border-collapse: collapse; }
+        .invoice-summary-table td { padding: 2px 0; }
+        .invoice-summary-table .price-col { text-align: right; }
+        .invoice-product-section { border-top: 1px solid #e7e7e7; padding-top: 10px; }
+        .invoice-arrival-text { color: #007600; font-weight: bold; font-size: 17px; margin-bottom: 10px; display: block; }
+        .invoice-product-row { display: flex; align-items: flex-start; }
+        .invoice-img-container { position: relative; margin-right: 15px; }
+        .invoice-img-container img { width: 80px; height: 80px; object-fit: contain; }
+        .invoice-badge {
+            position: absolute; bottom: 0; right: 0; background: #fff; border: 1px solid #ccc;
+            border-radius: 4px; font-size: 11px; padding: 2px 5px; color: #333;
+        }
+        .invoice-product-details { display: flex; flex-direction: column; }
+        .invoice-product-link { color: #007185; text-decoration: none; font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+        .invoice-product-link:hover { text-decoration: underline; }
+        .invoice-seller-text { color: #565959; font-size: 11px; margin-bottom: 2px; }
+        .invoice-price-text { color: #B12704; font-weight: bold; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -752,6 +791,11 @@
 <!-- PAGE 7: Order Summary Page -->
 <div id="order-summary-page" class="page">
     <div class="content" id="order-summary-content"></div>
+</div>
+
+<!-- PAGE 8: Invoice Page (NEW) -->
+<div id="invoice-page" class="page" style="overflow-x: auto; background-color: #eaeded;">
+    <div class="content" id="invoice-page-content" style="padding: 0; min-height: 100vh;"></div>
 </div>
 
 <!-- Admin Panel Overlay for Home Page -->
@@ -976,6 +1020,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     adjustStickyHeaderTop();
                 } else if (pageId === 'order-summary-page' && params) {
                     renderOrderSummaryPage(params.id);
+                } else if (pageId === 'invoice-page' && params) {
+                    renderInvoicePage(params.id);
                 } else if (pageId === 'admin-page') {
                     renderAdminPanel();
                 }
@@ -1006,6 +1052,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#order-summary-')) {
             const id = parseInt(hash.split('-')[2]);
             showPage('order-summary-page', { id });
+        } else if (hash.startsWith('#invoice-')) {
+            const id = parseInt(hash.split('-')[1]);
+            showPage('invoice-page', { id });
         } else if (hash === '#admin') {
             showPage('admin-page');
         } else if (hash === '#orders') {
@@ -1243,7 +1292,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>Order info</h3>
                 <a href="#order-summary-${item.id}" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
                 <a href="#" class="list-button"><span>Share gift receipt</span><span class="arrow">&gt;</span></a>
-                <a href="#" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
+                <a href="#invoice-${item.id}" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
             </div>
             <hr class="separator">
             <div class="details-page-footer">Ordered on ${formatDate(item.orderDate)}</div>
@@ -1388,7 +1437,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="value">${item.orderNumber || ''}</span>
                     </div>
                     <hr class="card-line">
-                    <div class="summary-nav-row">
+                    <div class="summary-nav-row" onclick="location.hash='#invoice-${item.id}'">
                         <span>Download Invoice</span>
                         <span class="arrow">&gt;</span>
                     </div>
@@ -1438,6 +1487,93 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         document.getElementById('summary-back-btn').addEventListener('click', () => { window.history.back(); });
+    }
+
+    function renderInvoicePage(itemId) {
+        const container = document.getElementById('invoice-page-content');
+        const items = DB.get('purchaseHistoryItems');
+        const item = items.find(p => p.id === itemId);
+
+        if (!item) {
+            container.innerHTML = '<p>Order not found.</p>';
+            return;
+        }
+
+        const formattedOrderDate = formatDate(item.orderDate);
+        const formattedArrivalDate = item.deliveryStatusText + " " + formatDate(item.deliveryDate);
+        // Assuming customer name is the first line of address or generic
+        const addressLines = (item.shippingAddress || '').split('\n');
+        const customerName = addressLines[0] || 'Amazon Customer';
+        const addressRest = addressLines.slice(1).join('<br>');
+        
+        const globalPayment = DB.getValue('globalPaymentMethod');
+        const paymentText = item.paymentMethod || globalPayment || 'Credit Card';
+
+        container.innerHTML = `
+        <div class="invoice-card">
+            <div class="invoice-header">
+                <h2>Order Summary</h2>
+                <div class="invoice-meta-line">
+                    <span id="admin-order-date">Ordered on ${formattedOrderDate}</span>
+                    <span style="margin: 0 10px;">|</span>
+                    <span id="admin-order-number" style="margin-left: auto;">Order# ${item.orderNumber}</span>
+                </div>
+                <hr class="invoice-divider">
+            </div>
+
+            <div class="invoice-grid">
+                <div>
+                    <span class="invoice-col-label">Ship to</span>
+                    <div id="admin-shipping-address">
+                        ${customerName}<br>
+                        ${addressRest}
+                    </div>
+                </div>
+                <div>
+                    <span class="invoice-col-label">Payment method</span>
+                    <div id="admin-payment-method">
+                        ${paymentText}
+                    </div>
+                </div>
+                <div>
+                    <span class="invoice-col-label">Order Summary</span>
+                    <table class="invoice-summary-table">
+                        <tr>
+                            <td>Item(s) Subtotal:</td>
+                            <td class="price-col" id="admin-subtotal">${formatIndianCurrency(item.itemSubtotal)}</td>
+                        </tr>
+                        <tr>
+                            <td>Shipping:</td>
+                            <td class="price-col" id="admin-shipping">${formatIndianCurrency(item.shippingCost)}</td>
+                        </tr>
+                        <tr>
+                            <td>Total:</td>
+                            <td class="price-col" id="admin-total">${formatIndianCurrency(item.grandTotal)}</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; color: #333;">Grand Total:</td>
+                            <td class="price-col" style="font-weight: bold; color: #333;" id="admin-grand-total">${formatIndianCurrency(item.grandTotal)}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="invoice-product-section">
+                <span id="admin-arrival-text" class="invoice-arrival-text">${formattedArrivalDate}</span>
+                <div class="invoice-product-row">
+                    <div class="invoice-img-container">
+                        <img id="admin-product-img" src="${item.imageUrl}" alt="Product">
+                        <div class="invoice-badge">1</div>
+                    </div>
+                    <div class="invoice-product-details">
+                        <a href="#" id="admin-product-link" class="invoice-product-link">${item.name}</a>
+                        <span id="admin-seller-text" class="invoice-seller-text">Sold by: ${item.sellerInfo || 'Seller'}</span>
+                        <span id="admin-product-price" class="invoice-price-text">${formatIndianCurrency(item.price)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
     }
 
     function renderAdminList(type) {
