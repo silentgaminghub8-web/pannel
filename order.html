@@ -15,27 +15,31 @@
             --danger-red: #dc3545;
             --dark-grey: #343a40;
             --light-blue: #e6f3ff;
-            --amazon-green: #3E8277; /* New Green Color */
+            --amazon-green: #3E8277;
         }
-        /* COMMAND 1: Disable Text Selection & Tap Highlight */
+        
         * {
             -webkit-tap-highlight-color: transparent; 
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            box-sizing: border-box;
         }
         input, textarea, select {
             -webkit-user-select: auto;
             user-select: auto;
         }
 
-        /* General Body and Page Setup */
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: "Amazon Ember", Arial, sans-serif;
             background-color: #ffffff;
             color: #0F1111;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
+
+        a { text-decoration: none; color: inherit; }
 
         .page {
             display: none;
@@ -55,6 +59,7 @@
              padding-bottom: 100px;
         }
 
+        /* --- Loader Styles --- */
         #progress-bar-loader {
             position: fixed; left: 0; width: 100%; height: 3px;
             background-color: transparent; z-index: 9998;
@@ -76,8 +81,33 @@
             0% { background-position: 0% 0; }
             100% { background-position: -100% 0; }
         }
-        .content-loading {
-            visibility: hidden; min-height: 500px;
+
+        /* --- Skeleton Loading Styles --- */
+        .skeleton {
+            background: #e1e4e8;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton::after {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0,
+                rgba(255, 255, 255, 0.2) 20%,
+                rgba(255, 255, 255, 0.5) 60%,
+                rgba(255, 255, 255, 0)
+            );
+            animation: shimmer 2s infinite;
+            content: '';
+        }
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+        .skeleton-card {
+            flex: 0 0 140px; width: 140px; height: 140px;
+            border-radius: 8px; margin-right: 10px;
         }
 
         /* Header and Footer */
@@ -126,6 +156,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-right: 10px; display: flex; align-items: center;
             justify-content: center; padding: 10px; box-sizing: border-box;
+            text-decoration: none; color: inherit;
         }
         .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .placeholder-text { color: #666; font-size: 14px; padding-left: 5px; }
@@ -236,7 +267,7 @@
             font-size: 0.9rem; color: #565959; margin: 0;
         }
 
-        /* --- Order Details Page Styles --- */
+        /* --- Standard Order Details Page Styles --- */
         .product-info-module {
             display: flex; padding: 16px; gap: 16px; align-items: flex-start;
         }
@@ -282,7 +313,14 @@
             font-size: 1.2rem; font-weight: bold; margin-top: 16px; margin-bottom: 8px;
         }
         .details-page-footer { padding: 16px; color: #565959; font-size: 0.9rem; }
-        .details-page-ad-image { width: 100%; display: block; height: auto; }
+        
+        /* Full width image for Detail page (Ad Image) */
+        .details-page-ad-image { 
+            width: calc(100% + 32px) !important; 
+            margin: 0 -16px; 
+            display: block; 
+            height: auto; 
+        }
 
         /* --- Track Page Styles --- */
         .track-module { padding: 16px; }
@@ -294,7 +332,10 @@
             font-size: 0.9rem; color: #007185; text-decoration: none; white-space: nowrap;
         }
         .thin-separator { border: none; border-top: 1px solid #ddd; margin: 0 -16px; }
-        .track-module .full-width-image { margin: 0 -16px; width: calc(100% + 32px); }
+        
+        /* Track Page Full Width */
+        .track-module .full-width-image { margin: 0 -16px; width: calc(100% + 32px); display: block; }
+        
         .thick-separator { border: none; border-top: 8px solid #EAEDED; margin: 0 -16px 16px -16px; }
         .shipping-address-section h3 { font-size: 1.2rem; margin: 0 0 8px 0; }
         .shipping-address-section p { margin: 0; font-size: 1rem; line-height: 1.4; white-space: pre-wrap; }
@@ -310,57 +351,193 @@
         .track-product-image-container { padding: 16px 0; text-align: left; }
         .track-product-image { max-width: 80px; max-height: 80px; object-fit: contain; }
         
-        .button-carousel {
-            display: flex; overflow-x: auto; padding: 16px; scrollbar-width: none;
+        /* NEW TRACK BUTTON STYLES */
+        .amz-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 4px 15px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
         }
-        .button-carousel::-webkit-scrollbar { display: none; }
-        .action-button {
-            padding: 10px 16px; margin-right: 12px; flex-shrink: 0; max-width: 180px;
-            background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 16px;
-            color: #222; font-size: 14px; font-weight: 500; text-align: center;
-            line-height: 1.4; cursor: pointer; text-decoration: none;
+        .amz-scroll-container::-webkit-scrollbar {
+            display: none;
         }
-        .action-button:hover { background-color: #f0f0f0; }
+
+        .amz-btn {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 44px;
+            padding: 0 16px;
+            background-color: #fafafa; 
+            border: 1px solid #d5d9d9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px 0 rgba(213,217,217,0.5);
+            color: #0f1111;
+            text-decoration: none;
+            font-size: 13px;
+            line-height: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.1s ease;
+        }
+
+        .amz-btn:active {
+            background-color: #ebf8fa !important; 
+            border-color: #008296 !important;     
+            box-shadow: none !important;
+            color: #0f1111;
+        }
+
         .shipped-with-info { padding: 0 16px 16px 16px; }
         .shipped-with-info h3 { font-size: 1.2rem; font-weight: bold; margin: 0 0 8px 0; }
         .shipped-with-info p, .shipped-with-info a { font-size: 1rem; margin: 0 0 4px 0; color: #007185; text-decoration: none; }
         
-        /* --- Order Summary Page Styles --- */
-        #order-summary-page .content { background-color: #EAEDED; }
-        .summary-top-bar {
-            background-color: #f0f2f2; padding: 12px 16px; display: flex; align-items: center; border-bottom: 1px solid #ddd;
-        }
-        .summary-top-bar .back-arrow { font-size: 1.5rem; font-weight: bold; margin-right: 16px; cursor: pointer; }
-        .summary-top-bar .title { font-size: 1.2rem; font-weight: bold; }
-        .summary-card { background-color: #ffffff; margin-bottom: 8px; padding: 16px; }
-        .summary-card h2 { font-size: 1.2rem; font-weight: bold; margin: 0 0 12px 0; }
-        .summary-card .card-line { border: none; border-top: 1px solid #ddd; margin-top: 12px; margin-bottom: 12px; }
-        .summary-grid { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .summary-grid .label { font-weight: bold; }
-        .summary-grid .label.regular { font-weight: normal; }
-        .summary-grid .value { text-align: right; }
-        .summary-nav-row { display: flex; justify-content: space-between; align-items: center; color: #007185; cursor: pointer; }
-        .summary-nav-row .arrow { font-weight: bold; }
+        /* --- NEW LAYOUT FOR "ORDER SUMMARY" PAGE (Scoped with .os-) --- */
+        #order-summary-page .content { background-color: #ffffff; padding: 0 !important; }
         
-        .product-card-delivery-status h2 { margin-bottom: 2px; }
-        .product-card-delivery-status p { margin: 0 0 12px 0; font-size: 0.9rem; color: #565959; }
-        .product-card-info { display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: flex-start; }
-        .product-card-info img { width: 80px; height: 80px; object-fit: contain; }
-        .product-card-info .details p { margin: 0 0 6px 0; font-size: 1rem; line-height: 1.4; }
-        .product-card-info .details p.title { font-weight: bold; }
-        .product-card-info .details p.price { font-weight: bold; font-size: 1.1rem; }
-        .product-card-info .details p .seller-label { color: grey; }
-        .product-card-info .details p .seller-name { color: #007185; text-decoration: none; }
+        /* REMOVED .os-nav-header as per request */
 
-        .summary-button-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-        .summary-action-button {
-            background-color: #fff; border: 1px solid #ccc; border-radius: 8px;
-            padding: 10px 14px; font-size: 0.9rem; cursor: pointer; text-decoration: none;
-            color: #0F1111; display: inline-block;
+        .os-sub-nav-bar {
+            background-color: #eaeded;
+            padding: 12px 15px;
+            border-bottom: 1px solid #d5d9d9;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
         }
-        .payment-card p { margin: 0 0 4px 0; font-size: 1rem; }
-        .address-card p { margin: 0; font-size: 1rem; line-height: 1.5; white-space: pre-wrap; }
-        .summary-card .summary-grid .value.bold { font-weight: bold; }
+        
+        .os-content-container {
+            padding: 15px 15px 40px 15px;
+        }
+
+        .os-section-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+        .os-section-title.first { margin-top: 0; }
+
+        .os-amz-card {
+            border: 1px solid #d5d9d9;
+            border-radius: 8px;
+            background-color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .os-od-padding { padding: 14px 15px; }
+        
+        .os-od-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            line-height: 20px;
+            margin-bottom: 2px;
+        }
+        
+        .os-label-grey { color: #565959; }
+        .os-val-black { color: #0f1111; }
+
+        .os-invoice-row {
+            border-top: 1px solid #d5d9d9;
+            padding: 14px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-radius: 0 0 8px 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .os-chevron {
+            width: 8px; height: 8px;
+            border-right: 2px solid #111;
+            border-top: 2px solid #111;
+            transform: rotate(45deg);
+        }
+
+        .os-arriving-text {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .os-product-flex {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .os-img-box {
+            position: relative;
+            width: 70px;
+            flex-shrink: 0;
+        }
+        .os-img-box img { width: 100%; height: auto; object-fit: contain; }
+        
+        /* REMOVED QUANTITY CIRCLE */
+        .os-qty-circle { display: none !important; }
+        
+        .os-prod-info { font-size: 14px; line-height: 1.35; }
+        .os-prod-name { font-weight: 700; margin-bottom: 4px; display: block; text-decoration: none; color: inherit; }
+        .os-sold-line { font-size: 12px; color: #565959; margin-bottom: 4px;}
+        .os-blue-link { color: #007185; text-decoration: none; }
+        .os-price-text { font-weight: 700; font-size: 14px; }
+
+        .os-button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .os-amz-action-btn {
+            flex: 1 0 auto;
+            background: #ffffff;
+            border: 1px solid #d5d9d9;
+            border-radius: 100px;
+            height: 38px;
+            padding: 0 16px;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center;
+            font-size: 13px; color: #0f1111;
+            box-shadow: 0 2px 5px 0 rgba(213,217,217,0.5);
+            white-space: nowrap;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .os-info-box {
+            padding: 15px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        .os-summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .os-grand-total {
+            font-weight: 700;
+            font-size: 15px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Full Width Image for Order Summary - 100% Width */
+        .os-full-width-image {
+            width: calc(100% + 30px); /* Compensate for content-container padding */
+            margin: 20px -15px 0 -15px;
+            display: block;
+            height: auto;
+        }
 
         /* --- REDESIGNED ADMIN PANEL STYLES --- */
         #admin-page .content { padding: 0; background-color: #f8f9fa; }
@@ -561,10 +738,8 @@
         .invoice-product-row { display: flex; align-items: flex-start; }
         .invoice-img-container { position: relative; margin-right: 15px; }
         .invoice-img-container img { width: 80px; height: 80px; object-fit: contain; }
-        .invoice-badge {
-            position: absolute; bottom: 0; right: 0; background: #fff; border: 1px solid #ccc;
-            border-radius: 4px; font-size: 11px; padding: 2px 5px; color: #333;
-        }
+        /* Removed Badge */
+        .invoice-badge { display: none !important; }
         .invoice-product-details { display: flex; flex-direction: column; }
         .invoice-product-link { color: #007185; text-decoration: none; font-size: 13px; font-weight: bold; margin-bottom: 2px; }
         .invoice-product-link:hover { text-decoration: underline; }
@@ -746,11 +921,6 @@
                 <h2>Global Settings</h2>
             </div>
             <div class="admin-settings-form">
-                <div class="form-checkbox-group" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-                    <input type="checkbox" id="navToggle" checked>
-                    <label for="navToggle">Standard Navigation (Go to Order Details)<br><span style="font-weight:normal; font-size:0.9rem; color:#666;">If OFF, tapping an order goes directly to "Track Package".</span></label>
-                </div>
-
                 <div class="form-input-group">
                     <label for="trackBottomImg">Track Package Bottom Image URL:</label>
                     <input type="url" id="trackBottomImg" name="trackBottomImg">
@@ -830,7 +1000,7 @@
                 <div class="form-section-accordion-content">
                     <div class="form-input-group">
                         <label for="itemType">Item Type</label>
-                        <select id="itemType" name="itemType"><option value="purchaseHistory">Purchase History</option><option value="buyAgain">Buy Again</option></select>
+                        <select id="itemType" name="itemType"><option value="purchaseHistory">Purchase History</option><option value="buyAgain">BuyAgain</option></select>
                     </div>
                     <div class="form-input-group">
                         <label for="itemName">Product Name</label>
@@ -844,6 +1014,10 @@
                         <label for="itemImagePageUrl">Image Page URL (for fullscreen view)</label>
                         <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
                     </div>
+                    <div class="form-checkbox-group">
+                         <input type="checkbox" id="itemStandardNav" checked>
+                         <label for="itemStandardNav">Standard Navigation (Go to Order Details)<br><span style="font-weight:normal; font-size:0.85rem; color:#666;">Uncheck to go directly to Track Package.</span></label>
+                    </div>
                 </div>
             </details>
 
@@ -852,11 +1026,12 @@
                 <div class="form-section-accordion-content">
                     <div class="form-input-group">
                         <label for="deliveryStatus">Delivery Status Text</label>
-                        <select id="deliveryStatus" name="deliveryStatus"><option>Delivered on</option><option>Delivered Today</option><option>Arriving tomorrow</option><option>Arriving on</option><option>Arriving today</option></select>
+                        <select id="deliveryStatus" name="deliveryStatus"><option>Delivered on</option><option>Delivered Today</option><option>Arriving tomorrow</option><option>Arriving on</option><option>Arriving today</option><option>Arriving</option></select>
                     </div>
                     <div class="form-input-group"><label for="orderDate">Order Date</label><input type="date" id="orderDate" name="orderDate"></div>
                     <div class="form-input-group"><label for="deliveryDate">Delivery Date</label><input type="date" id="deliveryDate" name="deliveryDate"></div>
                     <div class="form-input-group"><label for="eligibleDate">Replacement Eligible Until</label><input type="date" id="eligibleDate" name="eligibleDate"></div>
+                    <div class="form-input-group"><label for="weekName">Week Name (e.g. Wednesday)</label><input type="text" id="weekName" name="weekName"></div>
                 </div>
             </details>
 
@@ -924,6 +1099,9 @@ document.addEventListener('DOMContentLoaded', () => {
         home: 'https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938',
         other: 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251129_112415_Amazon.jpg?updatedAt=1764395709738'
     };
+    
+    // Flag for Skeleton Loading
+    let isFirstLoad = !sessionStorage.getItem('appLoaded');
 
     function initializeDefaultData() {
         if (!localStorage.getItem('initialized')) {
@@ -952,7 +1130,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     shippingCost: "0.00",
                     grandTotal: "1799.00",
                     paymentMethod: "American Express xx-xxxx-8970 Credit Card",
-                    orderCancelled: false
+                    orderCancelled: false,
+                    standardNav: true
                  },
                  { 
                     id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
@@ -973,7 +1152,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     shippingCost: "0.00",
                     grandTotal: "299.00",
                     paymentMethod: "Amazon Pay Balance",
-                    orderCancelled: false
+                    orderCancelled: false,
+                    standardNav: true
                  },
             ];
             DB.set('buyAgainItems', defaultBuyAgain);
@@ -981,7 +1161,6 @@ document.addEventListener('DOMContentLoaded', () => {
             DB.setValue('extraImageUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251111_205647_Amazon.jpg?updatedAt=1762881134774');
             DB.set('keepShopping', []); 
             DB.set('yourLists', []);
-            DB.setValue('navBehaviorToggle', 'true'); 
             DB.setValue('trackPageBottomImgUrl', 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624');
             DB.setValue('orderSummaryBottomImgUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206');
             
@@ -995,8 +1174,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const loader = document.getElementById('progress-bar-loader');
         const currentlyActivePage = document.querySelector('.page.active .content');
         const headerImg = document.getElementById('header-img');
+        const header = document.querySelector('.fixed-header');
 
-        headerImg.src = (pageId === 'home-page') ? HEADER_URLS.home : HEADER_URLS.other;
+        // Restore global header for all pages
+        header.style.display = 'block';
+
+        if (pageId === 'home-page') {
+             headerImg.src = HEADER_URLS.home;
+        } else {
+             headerImg.src = HEADER_URLS.other;
+        }
 
         if (currentlyActivePage) {
             currentlyActivePage.classList.add('content-loading');
@@ -1034,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.scrollTo(0, 0);
             }
             loader.classList.remove('visible');
-        }, 500);
+        }, 500); 
     }
 
     function handleRouteChange() {
@@ -1090,9 +1277,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- RENDER FUNCTIONS ---
-    function createCard(imageUrl) {
-        const card = document.createElement('div');
+    function createCard(imageUrl, link = null) {
+        const card = document.createElement(link ? 'a' : 'div');
         card.className = 'card';
+        if (link) card.href = link;
         card.innerHTML = `<img src="${imageUrl}" alt="Product Image">`;
         return card;
     }
@@ -1101,24 +1289,52 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById(`${sectionKey}-cards`);
         if (!container) return;
         
+        // Skeleton Loading Logic
+        if (sectionKey === 'yourOrders' && isFirstLoad) {
+            container.innerHTML = `
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            `;
+            setTimeout(() => {
+                isFirstLoad = false;
+                sessionStorage.setItem('appLoaded', 'true');
+                renderHomePageCardSection(sectionKey); // Re-render actual content
+            }, 1500);
+            return;
+        }
+
         let items;
         let placeholderText = 'Click "Edit" to add images.';
         
+        container.innerHTML = '';
+
         if (sectionKey === 'yourOrders') {
-            items = DB.get('purchaseHistoryItems').map(item => item.imageUrl);
-            placeholderText = 'No recent orders.';
+            // YOUR ORDERS: Link to Track Package
+            const orders = DB.get('purchaseHistoryItems');
+            if (orders && orders.length > 0) {
+                orders.forEach(item => {
+                    const useStandardNav = item.standardNav !== false; // Default true
+                    const linkHref = `#track-${item.id}`; // Requirement 2: tap on image redirects to Track Package
+                    container.appendChild(createCard(item.imageUrl, linkHref));
+                });
+            } else {
+                container.innerHTML = `<p class="placeholder-text">No recent orders.</p>`;
+            }
         } else if (sectionKey === 'buyAgain') {
-             items = DB.get('buyAgainItems').map(item => item.imageUrl);
-             placeholderText = 'No items to buy again.';
+             items = DB.get('buyAgainItems');
+             if (items && items.length > 0) {
+                 items.forEach(item => container.appendChild(createCard(item.imageUrl)));
+             } else {
+                 container.innerHTML = `<p class="placeholder-text">No items to buy again.</p>`;
+             }
         } else {
             items = DB.get(sectionKey);
-        }
-
-        container.innerHTML = '';
-        if (items && items.length > 0 && items.some(url => url && url.trim())) {
-            items.forEach(url => { if (url && url.trim()) container.appendChild(createCard(url)); });
-        } else {
-            container.innerHTML = `<p class="placeholder-text">${placeholderText}</p>`;
+            if (items && items.length > 0) {
+                items.forEach(url => { if (url && url.trim()) container.appendChild(createCard(url)); });
+            } else {
+                container.innerHTML = `<p class="placeholder-text">${placeholderText}</p>`;
+            }
         }
     }
 
@@ -1145,7 +1361,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderAllOrdersPageContent() {
-        // Buy Again
+        const items = DB.get('purchaseHistoryItems');
+        const container = document.getElementById('purchase-history-container');
+        if(!container) return;
+        
+        container.innerHTML = '';
+        items.forEach(item => {
+            const statusText = item.deliveryStatusText || 'Delivered on';
+            let statusDisplay = '';
+
+            if (['Delivered on', 'Arriving on'].includes(statusText)) {
+                statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+            } else if (statusText === 'Arriving' && item.weekName) {
+                statusDisplay = `Arriving ${item.weekName}`;
+            } else {
+                statusDisplay = statusText;
+            }
+            
+            // Per-product navigation setting
+            const useStandardNav = item.standardNav !== false; // Default true
+            const linkHref = useStandardNav ? `#details-${item.id}` : `#track-${item.id}`;
+
+            const greenStatuses = ['Arriving on', 'Arriving today', 'Arriving tomorrow', 'Arriving'];
+            const isGreen = greenStatuses.some(s => statusText.startsWith(s));
+
+            if (isGreen) {
+                container.innerHTML += `
+                <div class="purchase-item-card">
+                    <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
+                    <div class="item-info">
+                         <a href="${linkHref}" class="item-name" style="color: #3E8277; font-weight: bold; text-decoration: none;">${statusDisplay}</a>
+                    </div>
+                </div>`;
+            } else {
+                container.innerHTML += `
+                <div class="purchase-item-card">
+                    <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
+                    <div class="item-info">
+                         <a href="${linkHref}" class="item-name">${item.name}</a>
+                        <p class="item-status">${statusDisplay}</p>
+                    </div>
+                </div>`;
+            }
+        });
+        
         const buyItems = DB.get('buyAgainItems');
         const buyContainer = document.getElementById('buy-again-container');
         if(buyContainer) {
@@ -1158,52 +1417,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`;
             });
         }
-
-        // Purchase History
-        const items = DB.get('purchaseHistoryItems');
-        const container = document.getElementById('purchase-history-container');
-        if(!container) return;
-        
-        const navBehaviorToggle = DB.getValue('navBehaviorToggle') === 'true';
-
-        container.innerHTML = '';
-        items.forEach(item => {
-            const statusText = item.deliveryStatusText || 'Delivered on';
-            let statusDisplay = '';
-
-            if (['Delivered on', 'Arriving on'].includes(statusText)) {
-                statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
-            } else {
-                statusDisplay = statusText;
-            }
-            
-            const linkHref = navBehaviorToggle ? `#details-${item.id}` : `#track-${item.id}`;
-
-            // SPECIAL LOGIC FOR ARRIVING STATUS
-            const greenStatuses = ['Arriving on', 'Arriving today', 'Arriving tomorrow'];
-            const isGreen = greenStatuses.some(s => statusText.startsWith(s));
-
-            if (isGreen) {
-                // Layout 2: Hidden Name, Green Status as Link
-                container.innerHTML += `
-                <div class="purchase-item-card">
-                    <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
-                    <div class="item-info">
-                         <a href="${linkHref}" class="item-name" style="color: #3E8277; font-weight: bold; text-decoration: none;">${statusDisplay}</a>
-                    </div>
-                </div>`;
-            } else {
-                // Layout 1: Normal
-                container.innerHTML += `
-                <div class="purchase-item-card">
-                    <div class="item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>
-                    <div class="item-info">
-                         <a href="${linkHref}" class="item-name">${item.name}</a>
-                        <p class="item-status">${statusDisplay}</p>
-                    </div>
-                </div>`;
-            }
-        });
     }
 
     function renderImagePage(params) {
@@ -1238,6 +1451,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let statusDisplay = '';
         if (['Delivered on', 'Arriving on'].includes(statusText)) {
             statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+        } else if (statusText === 'Arriving' && item.weekName) {
+            statusDisplay = `Arriving ${item.weekName}`;
         } else {
             statusDisplay = statusText;
         }
@@ -1314,6 +1529,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let statusDisplay = '';
         if (['Delivered on', 'Arriving on'].includes(statusText)) {
             statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+        } else if (statusText === 'Arriving' && item.weekName) {
+            statusDisplay = `Arriving ${item.weekName}`;
         } else {
             statusDisplay = statusText;
         }
@@ -1323,29 +1540,56 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressImg = item.progressStepImageUrl || 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861';
         const bottomImg = DB.getValue('trackPageBottomImgUrl') || 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624';
         
-        let carouselHtml = '';
+        let buttonsHtml = '';
+
+        if (item.orderCancelled) {
+             buttonsHtml = `
+                <a href="#" class="amz-btn">
+                  Cancel order
+                </a>
+                <a href="https://www.amazon.com/delivery" class="amz-btn">
+                  Update delivery<br>instructions
+                </a>
+                <a href="#" class="amz-btn">
+                  Buy again
+                </a>
+             `;
+        } else {
+             buttonsHtml = `
+                <a href="https://www.amazon.com/delivery" class="amz-btn">
+                  Update delivery<br>instructions
+                </a>
+            
+                <a href="#" class="amz-btn share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">
+                  Share tracking
+                </a>
+            
+                <a href="#" class="amz-btn">
+                  Request cancellation
+                </a>
+            
+                <a href="#" class="amz-btn">
+                  Buy again
+                </a>
+             `;
+        }
+
+        const carouselHtml = `
+            <div class="amz-scroll-container">
+                ${buttonsHtml}
+            </div>
+        `;
+        
+        let shippedWithHtml = '';
         if (item.carouselToggle) {
-            carouselHtml = `
-                <div class="button-carousel">
-                    <a href="#" class="action-button">Update delivery instructions</a>
-                    <a href="#" class="action-button share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">Share tracking</a>
-                    <a href="#" class="action-button">Request cancellation</a>
-                    <a href="#" class="action-button">Buy again</a>
-                </div>
+             shippedWithHtml = `
+                <div style="border-top: 1px solid #d5d9d9; margin: 8px 16px 16px 16px;"></div>
                 <div class="shipped-with-info">
                     <h3>Shipped with Amazon</h3>
                     <p>Tracking ID: ${item.trackingId || 'N/A'}</p>
                     <a href="#">see all updates</a>
                 </div>
-            `;
-        } else {
-            carouselHtml = `
-                <div class="button-carousel">
-                    <a href="#" class="action-button">Update delivery instructions</a>
-                    <a href="#" class="action-button">Request cancellation</a>
-                    <a href="#" class="action-button">Buy again</a>
-                </div>
-            `;
+             `;
         }
 
         container.innerHTML = `
@@ -1361,6 +1605,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <img src="${progressImg}" alt="Delivery Status Map" class="full-width-image">
             ${carouselHtml}
+            ${shippedWithHtml}
             <div class="track-module">
                 <hr class="thick-separator">
                 <div class="shipping-address-section">
@@ -1392,99 +1637,124 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const bottomImg = DB.getValue('orderSummaryBottomImgUrl') || 'https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206';
-        let deliveryStatusText = '';
-        if (item.deliveryStatusText === 'Delivered on') {
-            deliveryStatusText = item.handedToResident ? 'Package was handed to resident' : 'Package was left at door';
-        }
-        const returnInfoText = item.eligibleDate ? `Return window closed on ${formatDate(item.eligibleDate)}` : '';
         const globalPayment = DB.getValue('globalPaymentMethod');
         const paymentMethodText = item.paymentMethod || globalPayment || 'American Express Credit Card';
-
-        // LOGIC FOR BUTTONS (CANCELLED VS NORMAL)
-        let buttonGroupHtml = '';
-        if (item.orderCancelled) {
-            buttonGroupHtml = `
-                <a href="#track-${item.id}" class="summary-action-button">Track package</a>
-                <button class="summary-action-button">Cancel items</button>
-                <button class="summary-action-button">Write a product review</button>
-            `;
+        const formattedDate = formatDate(item.orderDate);
+        const bottomImg = DB.getValue('orderSummaryBottomImgUrl');
+        
+        let statusDisplay = '';
+        const statusText = item.deliveryStatusText || 'Delivered on';
+        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+        } else if (statusText === 'Arriving' && item.weekName) {
+            statusDisplay = `Arriving ${item.weekName}`;
         } else {
-            buttonGroupHtml = `
-                <a href="#admin" class="summary-action-button admin-edit-trigger" data-id="${item.id}" data-type="purchaseHistory">Get product support</a>
-                <a href="#" class="summary-action-button">Buy it again</a>
-                <a href="#track-${item.id}" class="summary-action-button">Track package</a>
-                <button class="summary-action-button">Leave seller feedback</button>
-                <button class="summary-action-button">Leave delivery feedback</button>
-                <button class="summary-action-button">Write a product review</button>
-            `;
+            statusDisplay = statusText;
         }
 
+        // Logic for Buttons
+        let buttonsHtml = '';
+        if (item.orderCancelled) {
+            buttonsHtml = `
+                <a href="#track-${item.id}" class="os-amz-action-btn">Track package</a>
+                <a href="#" class="os-amz-action-btn">Cancel order</a>
+                <a href="#" class="os-amz-action-btn">Buy it again</a>
+            `;
+        } else {
+            buttonsHtml = `
+                <a href="#track-${item.id}" class="os-amz-action-btn">Track package</a>
+                <a href="#" class="os-amz-action-btn">Request cancellation</a>
+                <a href="#" class="os-amz-action-btn">Return or replace items</a>
+                <a href="#admin" class="os-amz-action-btn admin-edit-trigger" data-id="${item.id}" data-type="purchaseHistory">Write a product review</a>
+            `;
+        }
+        
+        const imageLink = item.imagePageUrl ? `<a href="#image-${item.id}-purchaseHistory">` : '';
+        const imageLinkEnd = item.imagePageUrl ? `</a>` : '';
+
+        // Address Formatting (Simple replacement for break lines)
+        const formattedAddress = (item.shippingAddress || '').replace(/\n/g, '<br>');
+
         container.innerHTML = `
-            <div class="summary-top-bar">
-                <span id="summary-back-btn" class="back-arrow">&lt;</span>
-                <span class="title">Your Orders</span>
+          <div class="os-sub-nav-bar" id="summary-back-btn">
+            &lt; Your Orders
+          </div>
+
+          <div class="os-content-container">
+
+            <div class="os-section-title first">Order Details</div>
+            <div class="os-amz-card">
+              <div class="os-od-padding">
+                <div class="os-od-row">
+                  <span class="os-label-grey">Order placed</span>
+                  <span class="os-val-black">${formattedDate}</span>
+                </div>
+                <div class="os-od-row">
+                  <span class="os-label-grey">Order number</span>
+                  <span class="os-val-black">${item.orderNumber || ''}</span>
+                </div>
+              </div>
+              <div class="os-invoice-row" onclick="location.hash='#invoice-${item.id}'">
+                <span>Download Invoice</span>
+                <span class="os-chevron"></span>
+              </div>
             </div>
-            <div class="summary-page-background">
-                <div class="summary-card">
-                    <h2>Order Details</h2>
-                    <div class="summary-grid">
-                        <span class="label">Order date</span>
-                        <span class="value">${formatDate(item.orderDate)}</span>
-                    </div>
-                    <div class="summary-grid">
-                        <span class="label regular">Order number</span>
-                        <span class="value">${item.orderNumber || ''}</span>
-                    </div>
-                    <hr class="card-line">
-                    <div class="summary-nav-row" onclick="location.hash='#invoice-${item.id}'">
-                        <span>Download Invoice</span>
-                        <span class="arrow">&gt;</span>
-                    </div>
+
+            <div class="os-amz-card" style="margin-top: 20px;">
+              <div class="os-od-padding">
+                <div class="os-arriving-text">${statusDisplay}</div>
+                
+                <div class="os-product-flex">
+                  <div class="os-img-box">
+                     ${imageLink}<img src="${item.imageUrl}" alt="${item.name}">${imageLinkEnd}
+                     <div class="os-qty-circle">1</div>
+                  </div>
+                  <div class="os-prod-info">
+                    <a href="#" class="os-prod-name">${item.name}</a>
+                    <div class="os-sold-line">Sold by: <a href="#" class="os-blue-link">${item.sellerInfo || ''}</a></div>
+                    <div class="os-price-text">${formatIndianCurrency(item.price)}</div>
+                  </div>
                 </div>
-                <div class="summary-card">
-                    <div class="product-card-delivery-status">
-                        <h2>${item.deliveryStatusText || 'Delivered on'} ${formatDate(item.deliveryDate)}</h2>
-                        <p>${deliveryStatusText}</p>
-                    </div>
-                    <hr class="card-line">
-                    <div class="product-card-info">
-                        <img src="${item.imageUrl}" alt="${item.name}">
-                        <div class="details">
-                            <p class="title">${item.name}</p>
-                            <p><span class="seller-label">Sold by : </span><a href="#" class="seller-name">${item.sellerInfo || ''}</a></p>
-                            <p>${returnInfoText}</p>
-                            <p class="price">${formatIndianCurrency(item.price)}</p>
-                        </div>
-                    </div>
-                    <div class="summary-button-group">
-                        ${buttonGroupHtml}
-                    </div>
+
+                <div class="os-button-container">
+                  ${buttonsHtml}
                 </div>
-                <div class="summary-card">
-                    <h2>Payment method</h2>
-                    <hr class="card-line">
-                    <div class="payment-card"><p>${paymentMethodText}</p></div>
-                </div>
-                <div class="summary-card">
-                    <h2>Ship to</h2>
-                    <hr class="card-line">
-                    <div class="address-card"><p>${item.shippingAddress || ''}</p></div>
-                </div>
-                <div class="summary-card">
-                    <h2>Order Summary</h2>
-                    <hr class="card-line">
-                    <div class="summary-grid"><span class="label regular">Item(s) Subtotal:</span><span class="value">${formatIndianCurrency(item.itemSubtotal)}</span></div>
-                    <div class="summary-grid"><span class="label regular">Shipping:</span><span class="value">${formatIndianCurrency(item.shippingCost)}</span></div>
-                    <hr class="card-line">
-                    <div class="summary-grid"><span class="label">Grand Total:</span><span class="value bold">${formatIndianCurrency(item.grandTotal)}</span></div>
-                </div>
-                <div class="summary-card">
-                    <h2>Recommended for you based on "${truncateString(item.name, 20)}"</h2>
-                    <img src="https://ik.imagekit.io/goldencodes/Screenshot_20251115_121149_Chrome.jpg" alt="Recommended Products" style="width: 100%; height: auto; display: block;">
-                </div>
-                <img src="${bottomImg}" alt="Promotional Image" style="width: 100%; height: auto; display: block; padding: 0 8px 8px 8px; box-sizing: border-box;">
+              </div>
             </div>
+
+            <div class="os-section-title">Payment method</div>
+            <div class="os-amz-card os-info-box">
+              ${paymentMethodText}
+            </div>
+
+            <div class="os-section-title">Ship to</div>
+            <div class="os-amz-card os-info-box">
+              ${formattedAddress}
+            </div>
+
+            <div class="os-section-title">Order Summary</div>
+            <div class="os-amz-card os-info-box">
+              <div class="os-summary-line">
+                <span>Item(s) Subtotal:</span>
+                <span>${formatIndianCurrency(item.itemSubtotal)}</span>
+              </div>
+              <div class="os-summary-line">
+                <span>Shipping:</span>
+                <span>${formatIndianCurrency(item.shippingCost)}</span>
+              </div>
+              <div class="os-summary-line">
+                <span>Total:</span>
+                <span>${formatIndianCurrency(item.grandTotal)}</span>
+              </div>
+              <div class="os-grand-total">
+                <span>Grand Total:</span>
+                <span>${formatIndianCurrency(item.grandTotal)}</span>
+              </div>
+            </div>
+            
+            <img src="${bottomImg}" class="os-full-width-image">
+
+          </div>
         `;
         document.getElementById('summary-back-btn').addEventListener('click', () => { window.history.back(); });
     }
@@ -1563,7 +1833,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="invoice-product-row">
                     <div class="invoice-img-container">
                         <img id="admin-product-img" src="${item.imageUrl}" alt="Product">
-                        <div class="invoice-badge">1</div>
                     </div>
                     <div class="invoice-product-details">
                         <a href="#" id="admin-product-link" class="invoice-product-link">${item.name}</a>
@@ -1609,7 +1878,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAdminPanel() {
         // Load Global Settings
         document.getElementById('extraImageUrl').value = DB.getValue('extraImageUrl');
-        document.getElementById('navToggle').checked = DB.getValue('navBehaviorToggle') === 'true';
         document.getElementById('trackBottomImg').value = DB.getValue('trackPageBottomImgUrl');
         document.getElementById('summaryBottomImg').value = DB.getValue('orderSummaryBottomImgUrl');
         document.getElementById('globalPaymentMethod').value = DB.getValue('globalPaymentMethod');
@@ -1640,6 +1908,7 @@ document.addEventListener('DOMContentLoaded', () => {
         itemForm.orderDate.value = item.orderDate || '';
         itemForm.deliveryDate.value = item.deliveryDate || '';
         itemForm.eligibleDate.value = item.eligibleDate || '';
+        itemForm.weekName.value = item.weekName || ''; 
         itemForm.shippingAddress.value = item.shippingAddress || '';
         itemForm.progressStepImageUrl.value = item.progressStepImageUrl || '';
         itemForm.shareTrackingLink.value = item.shareTrackingLink || '';
@@ -1655,6 +1924,7 @@ document.addEventListener('DOMContentLoaded', () => {
         itemForm.handedToResident.checked = !!item.handedToResident;
         itemForm.orderCancelled.checked = !!item.orderCancelled;
         itemForm.shareLink.value = item.shareLink || '';
+        itemForm.itemStandardNav.checked = item.standardNav !== false; // Default true if undefined
 
         itemModal.classList.add('visible');
     }
@@ -1664,6 +1934,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-save-btn').textContent = 'Save Changes';
         itemForm.reset();
         itemForm.editingItemId.value = '';
+        itemForm.itemStandardNav.checked = true; // Default to true
         itemModal.classList.add('visible');
     }
 
@@ -1678,7 +1949,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('saveExtraSettingsBtn').addEventListener('click', () => {
          DB.setValue('extraImageUrl', document.getElementById('extraImageUrl').value);
-         DB.setValue('navBehaviorToggle', document.getElementById('navToggle').checked ? 'true' : 'false');
          DB.setValue('trackPageBottomImgUrl', document.getElementById('trackBottomImg').value);
          DB.setValue('orderSummaryBottomImgUrl', document.getElementById('summaryBottomImg').value);
          DB.setValue('globalPaymentMethod', document.getElementById('globalPaymentMethod').value);
@@ -1695,7 +1965,9 @@ document.addEventListener('DOMContentLoaded', () => {
             name: itemForm.itemName.value, imageUrl: itemForm.itemImage.value,
             imagePageUrl: itemForm.itemImagePageUrl.value, deliveryStatusText: itemForm.deliveryStatus.value,
             orderDate: itemForm.orderDate.value, deliveryDate: itemForm.deliveryDate.value,
-            eligibleDate: itemForm.eligibleDate.value, shippingAddress: itemForm.shippingAddress.value,
+            eligibleDate: itemForm.eligibleDate.value, 
+            weekName: itemForm.weekName.value,
+            shippingAddress: itemForm.shippingAddress.value,
             progressStepImageUrl: itemForm.progressStepImageUrl.value, shareTrackingLink: itemForm.shareTrackingLink.value,
             trackingId: itemForm.trackingId.value, carouselToggle: itemForm.carouselToggle.checked,
             orderNumber: itemForm.orderNumber.value, sellerInfo: itemForm.sellerInfo.value,
@@ -1704,7 +1976,8 @@ document.addEventListener('DOMContentLoaded', () => {
             paymentMethod: itemForm.paymentMethod.value,
             handedToResident: itemForm.handedToResident.checked, 
             orderCancelled: itemForm.orderCancelled.checked,
-            shareLink: itemForm.shareLink.value
+            shareLink: itemForm.shareLink.value,
+            standardNav: itemForm.itemStandardNav.checked
         };
 
         if (editingId) {
@@ -2027,7 +2300,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerHeight = header.offsetHeight;
             loader.style.top = `${headerHeight}px`;
             pages.forEach(page => {
-                if (page.id !== 'home-page') { page.style.paddingTop = `${headerHeight}px`; }
+                if (page.id !== 'home-page' && page.id !== 'order-summary-page') { 
+                    page.style.paddingTop = `${headerHeight}px`; 
+                } else if (page.id === 'order-summary-page') {
+                    // Summary page has its own header structure, remove top padding
+                    page.style.paddingTop = `${headerHeight}px`;
+                }
             });
             adjustStickyHeaderTop();
             setHomePageContentPadding();
