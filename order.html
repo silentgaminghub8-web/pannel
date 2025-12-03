@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1000,7 +1001,7 @@
                 <div class="form-section-accordion-content">
                     <div class="form-input-group">
                         <label for="itemType">Item Type</label>
-                        <select id="itemType" name="itemType"><option value="purchaseHistory">Purchase History</option><option value="buyAgain">BuyAgain</option></select>
+                        <select id="itemType" name="itemType"><option value="purchaseHistory">Purchase History</option><option value="buyAgain">Buy Again</option></select>
                     </div>
                     <div class="form-input-group">
                         <label for="itemName">Product Name</label>
@@ -1031,7 +1032,19 @@
                     <div class="form-input-group"><label for="orderDate">Order Date</label><input type="date" id="orderDate" name="orderDate"></div>
                     <div class="form-input-group"><label for="deliveryDate">Delivery Date</label><input type="date" id="deliveryDate" name="deliveryDate"></div>
                     <div class="form-input-group"><label for="eligibleDate">Replacement Eligible Until</label><input type="date" id="eligibleDate" name="eligibleDate"></div>
-                    <div class="form-input-group"><label for="weekName">Week Name (e.g. Wednesday)</label><input type="text" id="weekName" name="weekName"></div>
+                    <div class="form-input-group">
+                        <label for="weekName">Week Name</label>
+                        <select id="weekName" name="weekName">
+                            <option value="">-- Select Day --</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                        </select>
+                    </div>
                 </div>
             </details>
 
@@ -1370,10 +1383,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusText = item.deliveryStatusText || 'Delivered on';
             let statusDisplay = '';
 
-            if (['Delivered on', 'Arriving on'].includes(statusText)) {
+            if (item.weekName && item.weekName.trim() !== "") {
+                 statusDisplay = `${statusText} ${item.weekName}`;
+            } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
                 statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
-            } else if (statusText === 'Arriving' && item.weekName) {
-                statusDisplay = `Arriving ${item.weekName}`;
             } else {
                 statusDisplay = statusText;
             }
@@ -1449,10 +1462,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const statusText = item.deliveryStatusText || 'Delivered on';
         let statusDisplay = '';
-        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+        if (item.weekName && item.weekName.trim() !== "") {
+             statusDisplay = `${statusText} ${item.weekName}`;
+        } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
             statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
-        } else if (statusText === 'Arriving' && item.weekName) {
-            statusDisplay = `Arriving ${item.weekName}`;
         } else {
             statusDisplay = statusText;
         }
@@ -1527,10 +1540,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const statusText = item.deliveryStatusText || 'Delivered on';
         let statusDisplay = '';
-        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+        if (item.weekName && item.weekName.trim() !== "") {
+             statusDisplay = `${statusText} ${item.weekName}`;
+        } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
             statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
-        } else if (statusText === 'Arriving' && item.weekName) {
-            statusDisplay = `Arriving ${item.weekName}`;
         } else {
             statusDisplay = statusText;
         }
@@ -1644,10 +1657,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let statusDisplay = '';
         const statusText = item.deliveryStatusText || 'Delivered on';
-        if (['Delivered on', 'Arriving on'].includes(statusText)) {
+        if (item.weekName && item.weekName.trim() !== "") {
+             statusDisplay = `${statusText} ${item.weekName}`;
+        } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
             statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
-        } else if (statusText === 'Arriving' && item.weekName) {
-            statusDisplay = `Arriving ${item.weekName}`;
         } else {
             statusDisplay = statusText;
         }
@@ -2304,7 +2317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     page.style.paddingTop = `${headerHeight}px`; 
                 } else if (page.id === 'order-summary-page') {
                     // Summary page has its own header structure, remove top padding
-                    page.style.paddingTop = `${headerHeight}px`;
+                    page.style.paddingTop = '0';
                 }
             });
             adjustStickyHeaderTop();
