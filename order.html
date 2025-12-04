@@ -112,10 +112,12 @@
 
         /* Header and Footer */
         .fixed-header, .fixed-footer {
-            position: fixed; left: 0; right: 0; width: 100%; z-index: 1000;
+            position: fixed; left: 0; right: 0; width: 100%; 
+            /* MODIFICATION: Z-index increased to be above the overlay (which is 2000) */
+            z-index: 2002; 
         }
         .fixed-header { top: 0; background-color: #ffffff; }
-        .fixed-footer { bottom: 0; cursor: pointer; }
+        .fixed-footer { bottom: 0; cursor: pointer; z-index: 1000; }
         .fixed-header img, .fixed-footer img, img.full-width-image, .full-width-image img {
             width: 100%; height: auto; display: block;
         }
@@ -415,12 +417,14 @@
 
         .updates-sheet {
             position: absolute; bottom: 0; left: 0; width: 100%;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1);
-            background-color: #fff;
+            /* MODIFICATION 3: Slower animation (0.8s) */
+            transform: translateY(100%); transition: transform 0.8s cubic-bezier(0.1, 0.7, 0.1, 1);
+            /* MODIFICATION 1: Transparent background for PNGs */
+            background-color: transparent;
             max-height: 90vh;
             border-radius: 12px 12px 0 0;
             overflow: hidden;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            /* box-shadow: 0 -2px 10px rgba(0,0,0,0.1); Optional: Remove shadow if transparency causes issues, but usually fine */
         }
         .updates-overlay-container.visible .updates-sheet { transform: translateY(0); }
 
@@ -2414,3 +2418,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+```
