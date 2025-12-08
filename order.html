@@ -16,6 +16,7 @@
             --dark-grey: #343a40;
             --light-blue: #e6f3ff;
             --amazon-green: #3E8277;
+            --amazon-teal: #007185;
         }
         
         * {
@@ -41,10 +42,10 @@
 
         a { text-decoration: none; color: inherit; }
 
+        /* --- INSTANT PAGE SWITCHING --- */
         .page {
             display: none;
             padding-bottom: 100px;
-            /* Top padding injected via JS */
         }
 
         .page.active {
@@ -58,31 +59,75 @@
         #home-page .content {
              padding-bottom: 100px;
         }
+        
+        /* --- IMAGE PAGE STYLES --- */
+        #image-page .content {
+            display: block;
+            background-color: #fff;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        #image-page img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: none;
+        }
 
         /* --- Loader Styles --- */
         #progress-bar-loader {
-            position: fixed; left: 0; width: 100%; height: 3px;
+            position: fixed; left: 0; width: 100%; height: 4px;
             background-color: transparent; z-index: 9998;
             opacity: 0; visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+            transition: opacity 0.1s ease;
             overflow: hidden;
         }
         #progress-bar-loader.visible {
             opacity: 1; visibility: visible;
-            transition: opacity 0.1s ease, visibility 0s;
         }
         #progress-bar-loader::before {
             content: ''; display: block; height: 100%; width: 100%;
             background-image: linear-gradient(to right, #FFA41C, #FFD814, #FFA41C);
             background-size: 200% auto;
-            animation: progressBarFlow 1.2s linear infinite;
+            animation: progressBarFlow 1s linear infinite;
         }
         @keyframes progressBarFlow {
             0% { background-position: 0% 0; }
             100% { background-position: -100% 0; }
         }
 
-        /* --- Skeleton Loading Styles --- */
+        /* --- INVOICE LOADER --- */
+        #invoice-loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 11000;
+            display: none;
+            justify-content: center; align-items: center;
+            background-color: transparent; 
+            pointer-events: all; 
+        }
+        
+        .invoice-box {
+            width: 100px;
+            height: 100px;
+            background-color: rgba(0, 0, 0, 0.75); 
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .invoice-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3); 
+            border-top: 3px solid #ffffff; 
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* --- SKELETON LOADING --- */
         .skeleton {
             background: #e1e4e8;
             position: relative;
@@ -95,11 +140,10 @@
             background-image: linear-gradient(
                 90deg,
                 rgba(255, 255, 255, 0) 0,
-                rgba(255, 255, 255, 0.2) 20%,
-                rgba(255, 255, 255, 0.5) 60%,
-                rgba(255, 255, 255, 0)
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%
             );
-            animation: shimmer 2s infinite;
+            animation: shimmer 1.5s infinite;
             content: '';
         }
         @keyframes shimmer {
@@ -108,12 +152,19 @@
         .skeleton-card {
             flex: 0 0 140px; width: 140px; height: 140px;
             border-radius: 8px; margin-right: 10px;
+            background-color: #fff;
+            border: 1px solid #eee;
+        }
+        .skeleton-inner {
+            width: 80%; height: 80%;
+            background-color: #f0f2f2;
+            margin: 10% auto;
+            border-radius: 4px;
         }
 
         /* Header and Footer */
         .fixed-header, .fixed-footer {
             position: fixed; left: 0; right: 0; width: 100%; 
-            /* MODIFICATION: Z-index increased to be above the overlay (which is 2000) */
             z-index: 2002; 
         }
         .fixed-header { top: 0; background-color: #ffffff; }
@@ -122,6 +173,13 @@
             width: 100%; height: auto; display: block;
         }
         .full-width-image.no-gap { margin-top: -1px; }
+        
+        img {
+            -webkit-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
+            backface-visibility: hidden;
+        }
+
         #back-tap-area {
             position: absolute; top: 0; left: 0; width: 25%; height: 100%; z-index: 1001;
         }
@@ -134,8 +192,9 @@
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
         }
         #home-page .module-title { font-weight: bold; font-size: 18px; }
+        
         .see-all, .edit-button {
-            text-decoration: none; color: var(--primary-blue); font-size: 14px;
+            text-decoration: none; color: var(--amazon-teal); font-size: 14px;
             background: none; border: none; cursor: pointer; padding: 0;
         }
         .edit-button { margin-right: 5px; }
@@ -215,21 +274,39 @@
             font-size: 1.2rem; font-weight: bold; margin: 0;
         }
         #orders-page .module-header .see-more {
-            font-size: 0.9rem; color: #007185; text-decoration: none; cursor: pointer;
+            font-size: 0.9rem; color: var(--amazon-teal); text-decoration: none; cursor: pointer;
         }
 
         .buy-again-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+            display: flex; 
+            overflow-x: auto; 
+            padding-bottom: 15px;
+            gap: 12px;
+            scrollbar-width: none;
         }
+        .buy-again-grid::-webkit-scrollbar { display: none; }
+
         .buy-again-card {
-            border: 1px solid #ddd; border-radius: 8px; padding: 12px; text-align: center;
+            flex: 0 0 140px;
+            width: 140px;
+            height: 150px;
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 10px; 
+            text-align: center;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         .buy-again-card img {
-            max-width: 100%; height: 100px; object-fit: contain; margin-bottom: 8px;
+            max-width: 100%; height: 90px; object-fit: contain; margin-bottom: 8px;
         }
         .buy-again-card p {
-            margin: 0; font-size: 0.9rem; text-align: left;
+            margin: 0; font-size: 0.9rem; text-align: center;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            width: 100%;
         }
 
         .separator {
@@ -279,12 +356,12 @@
         .product-info-module .product-details {
             display: flex; flex-direction: column; justify-content: center; height: 150px;
         }
-        .product-info-module .product-details .product-name {
-            color: #007185; font-size: 0.9rem; display: block; margin-bottom: 8px; text-decoration: none;
+        .product-info-module .product-name {
+            color: var(--amazon-teal); font-size: 0.9rem; display: block; margin-bottom: 8px; text-decoration: none;
         }
         .product-info-module .product-details .product-name:hover { text-decoration: underline; }
         .product-info-module .product-details .share-item {
-            color: #007185; font-size: 0.9rem; cursor: pointer;
+            color: var(--amazon-teal); font-size: 0.9rem; cursor: pointer;
         }
 
         .delivery-status-module { padding: 16px; border-top: 1px solid #ddd; }
@@ -292,7 +369,7 @@
             display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
         }
         .delivery-status .icon {
-            background-color: #007185; color: white; width: 24px; height: 24px;
+            background-color: var(--amazon-teal); color: white; width: 24px; height: 24px;
             display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: bold;
         }
         .delivery-status .text-bold { font-weight: bold; }
@@ -316,7 +393,6 @@
         }
         .details-page-footer { padding: 16px; color: #565959; font-size: 0.9rem; }
         
-        /* Full width image for Detail page (Ad Image) */
         .details-page-ad-image { 
             width: calc(100% + 32px) !important; 
             margin: 0 -16px; 
@@ -331,11 +407,10 @@
         }
         .track-module-header h2 { font-size: 1rem; font-weight: bold; margin: 0; flex-grow: 1; }
         .track-module-header .see-all-orders {
-            font-size: 0.9rem; color: #007185; text-decoration: none; white-space: nowrap;
+            font-size: 0.9rem; color: var(--amazon-teal); text-decoration: none; white-space: nowrap;
         }
         .thin-separator { border: none; border-top: 1px solid #ddd; margin: 0 -16px; }
         
-        /* Track Page Full Width */
         .track-module .full-width-image { margin: 0 -16px; width: calc(100% + 32px); display: block; }
         
         .thick-separator { border: none; border-top: 8px solid #EAEDED; margin: 0 -16px 16px -16px; }
@@ -353,7 +428,6 @@
         .track-product-image-container { padding: 16px 0; text-align: left; }
         .track-product-image { max-width: 80px; max-height: 80px; object-fit: contain; }
         
-        /* NEW TRACK BUTTON STYLES */
         .amz-scroll-container {
             display: flex;
             overflow-x: auto;
@@ -399,7 +473,7 @@
 
         .shipped-with-info { padding: 0 16px 16px 16px; }
         .shipped-with-info h3 { font-size: 1.2rem; font-weight: bold; margin: 0 0 8px 0; }
-        .shipped-with-info p, .shipped-with-info a { font-size: 1rem; margin: 0 0 4px 0; color: #007185; text-decoration: none; }
+        .shipped-with-info p, .shipped-with-info a { font-size: 1rem; margin: 0 0 4px 0; color: var(--amazon-teal); text-decoration: none; }
         
         /* Updates Overlay Styles */
         .updates-overlay-container {
@@ -410,30 +484,27 @@
 
         .updates-backdrop {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); /* Black dimming effect */
+            background-color: rgba(0,0,0,0.5); 
             opacity: 0; transition: opacity 0.3s ease;
         }
         .updates-overlay-container.visible .updates-backdrop { opacity: 1; }
 
         .updates-sheet {
             position: absolute; bottom: 0; left: 0; width: 100%;
-            /* MODIFICATION 3: Slower animation (0.8s) */
             transform: translateY(100%); transition: transform 0.8s cubic-bezier(0.1, 0.7, 0.1, 1);
-            /* MODIFICATION 1: Transparent background for PNGs */
             background-color: transparent;
             max-height: 90vh;
             border-radius: 12px 12px 0 0;
             overflow: hidden;
-            /* box-shadow: 0 -2px 10px rgba(0,0,0,0.1); Optional: Remove shadow if transparency causes issues, but usually fine */
         }
         .updates-overlay-container.visible .updates-sheet { transform: translateY(0); }
 
         .updates-sheet img {
             width: 100%; display: block; height: auto;
-            margin-bottom: -1px; /* fix minor gaps */
+            margin-bottom: -1px; 
         }
 
-        /* --- NEW LAYOUT FOR "ORDER SUMMARY" PAGE (Scoped with .os-) --- */
+        /* --- Order Summary Page --- */
         #order-summary-page .content { background-color: #ffffff; padding: 0 !important; }
         
         .os-sub-nav-bar {
@@ -514,13 +585,12 @@
         }
         .os-img-box img { width: 100%; height: auto; object-fit: contain; }
         
-        /* REMOVED QUANTITY CIRCLE */
         .os-qty-circle { display: none !important; }
         
         .os-prod-info { font-size: 14px; line-height: 1.35; }
         .os-prod-name { font-weight: 700; margin-bottom: 4px; display: block; text-decoration: none; color: inherit; }
         .os-sold-line { font-size: 12px; color: #565959; margin-bottom: 4px;}
-        .os-blue-link { color: #007185; text-decoration: none; }
+        .os-blue-link { color: var(--amazon-teal); text-decoration: none; }
         .os-price-text { font-weight: 700; font-size: 14px; }
 
         .os-button-container {
@@ -563,15 +633,14 @@
             justify-content: space-between;
         }
         
-        /* Full Width Image for Order Summary - 100% Width */
         .os-full-width-image {
-            width: calc(100% + 30px); /* Compensate for content-container padding */
+            width: calc(100% + 30px); 
             margin: 20px -15px 0 -15px;
             display: block;
             height: auto;
         }
 
-        /* --- REDESIGNED ADMIN PANEL STYLES --- */
+        /* --- Admin Panel --- */
         #admin-page .content { padding: 0; background-color: #f8f9fa; }
         .admin-header-main {
             background-color: #fff; padding: 15px 20px; border-bottom: 1px solid #dee2e6;
@@ -579,17 +648,9 @@
         }
         .admin-header-main h1 { margin: 0; font-size: 1.5rem; }
         .admin-header-main a { color: var(--primary-blue); text-decoration: none; }
+        .admin-header-actions { display: flex; align-items: center; gap: 15px; }
         
-        .admin-tabs-container { display: flex; background-color: #f1f1f1; border-bottom: 1px solid #ddd; }
-        .admin-tab-button {
-            flex: 1; padding: 15px 10px; text-align: center; cursor: pointer;
-            background-color: transparent; color: #6c757d; border: none; border-bottom: 3px solid transparent;
-            font-size: 1rem; font-weight: 500; transition: all 0.2s ease-in-out;
-        }
-        .admin-tab-button.active { border-bottom-color: var(--primary-blue); color: var(--primary-blue); background-color: #fff; }
-
-        .admin-tab-content { display: none; padding: 20px; }
-        .admin-tab-content.active { display: block; }
+        /* Notification Icon Removed Styles - Kept empty to avoid edit violation of other styles */
         
         .admin-section-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -600,6 +661,7 @@
              background-color: var(--primary-blue); color: white; padding: 10px 15px;
              border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
              text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+             justify-content: center;
         }
         .admin-button.secondary { background-color: var(--success-green); }
         .admin-button:hover { opacity: 0.9; }
@@ -635,12 +697,53 @@
         .admin-delete-btn { background-color: var(--danger-red); }
         .admin-duplicate-btn { background-color: var(--success-green); }
         
-        .admin-settings-form { background-color: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
-        .admin-settings-form label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .admin-settings-form input[type="url"], .admin-settings-form input[type="text"] {
-            width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 10px;
+        /* New Admin Control Panel Styles */
+        .admin-controls { padding: 20px; background-color: white; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .admin-user-info { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; }
+        .admin-main-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; }
+        
+        .glow-button {
+            background-color: red;
+            box-shadow: 0 0 10px red;
+            animation: glowing 1.5s infinite;
         }
-        .admin-settings-form button { margin-top: 15px; }
+        @keyframes glowing {
+            0% { box-shadow: 0 0 5px red; }
+            50% { box-shadow: 0 0 20px red; }
+            100% { box-shadow: 0 0 5px red; }
+        }
+        
+        .loading-spinner {
+            border: 2px solid #f3f3f3; border-top: 2px solid #3498db; border-radius: 50%;
+            width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Alert & Confirm Modal Styles */
+        .custom-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 20000 !important; /* FIXED Z-INDEX */
+            display: none;
+            justify-content: center; align-items: center;
+        }
+        .custom-box {
+            background: #fff; width: 85%; max-width: 350px; padding: 20px;
+            border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center; font-family: "Amazon Ember", Arial, sans-serif;
+        }
+        .custom-box p { margin: 0 0 20px 0; font-size: 16px; color: #333; }
+        .custom-box h3 { margin-top: 0; }
+        .custom-box input { margin-bottom: 15px; width: 100%; }
+        
+        .custom-box button {
+            padding: 10px 20px; border: none; border-radius: 5px;
+            font-weight: bold; cursor: pointer; font-size: 14px;
+        }
+        #custom-msg-close { background: var(--primary-blue); color: white; width: 100%; }
+        
+        /* API Modal below Alert - Removed styles */
+        
+        #wallet-key-modal { z-index: 10001; }
 
         /* Admin Modal Styles */
         .admin-modal-overlay {
@@ -679,8 +782,40 @@
         .form-input-group input, .form-input-group select, .form-input-group textarea {
             width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; font-family: inherit; font-size: 1rem;
         }
-        .form-checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .form-checkbox-group input { width: auto; }
+        .form-input-group input:disabled, .form-input-group textarea:disabled {
+            background-color: #e9ecef; cursor: not-allowed; color: #6c757d;
+        }
+        
+        /* WALLET ICON STYLE FIX */
+        .wallet-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-right: 15px;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+        }
+        #wallet-btn {
+            font-size: 1.5rem; 
+        }
+        
+        /* Login Overlay */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 3000; display: none;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+        .login-card {
+            width: 80%; max-width: 300px; padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 8px; text-align: center;
+        }
+        .login-card input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .login-card button {
+             width: 100%; padding: 10px; background: var(--primary-blue); color: #fff;
+             border: none; border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
         
         /* --- Old Admin Panel Overlay Styles (For Home Page) --- */
         .admin-overlay {
@@ -741,7 +876,7 @@
             border-radius: 6px; opacity: 0; transition: all 0.4s ease; z-index: 101;
         }
 
-        /* --- INVOICE PAGE STYLES (Specific Request) --- */
+        /* --- INVOICE PAGE STYLES --- */
         .invoice-card {
             width: 900px;
             min-width: 900px;
@@ -770,10 +905,9 @@
         .invoice-product-row { display: flex; align-items: flex-start; }
         .invoice-img-container { position: relative; margin-right: 15px; }
         .invoice-img-container img { width: 80px; height: 80px; object-fit: contain; }
-        /* Removed Badge */
         .invoice-badge { display: none !important; }
         .invoice-product-details { display: flex; flex-direction: column; }
-        .invoice-product-link { color: #007185; text-decoration: none; font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+        .invoice-product-link { color: var(--amazon-teal); text-decoration: none; font-size: 13px; font-weight: bold; margin-bottom: 2px; }
         .invoice-product-link:hover { text-decoration: underline; }
         .invoice-seller-text { color: #565959; font-size: 11px; margin-bottom: 2px; }
         .invoice-price-text { color: #B12704; font-weight: bold; font-size: 13px; }
@@ -782,6 +916,55 @@
 <body>
 
 <div id="progress-bar-loader"></div>
+
+<!-- Invoice Loader Overlay -->
+<div id="invoice-loader-overlay">
+    <div class="invoice-box">
+        <div class="invoice-spinner"></div>
+    </div>
+</div>
+
+<!-- Custom In-App Alert Box -->
+<div id="custom-msg-overlay" class="custom-overlay">
+    <div class="custom-box">
+        <p id="custom-msg-text"></p>
+        <button id="custom-msg-close">OK</button>
+    </div>
+</div>
+
+<!-- Custom Confirmation Box Removed -->
+
+<!-- API Run Modal Removed -->
+
+<!-- Notification Modal Removed -->
+
+<!-- Wallet Key Modal (Replaces Prompt) -->
+<div id="wallet-key-modal" class="custom-overlay">
+    <div class="custom-box">
+        <h3>Security Verification</h3>
+        <input type="password" id="wallet-key-input" placeholder="Enter Security Key">
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button id="wallet-verify-btn" class="admin-button secondary">Verify</button>
+            <button id="wallet-cancel-btn" class="admin-button" style="background:#6c757d;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Login Overlay -->
+<div id="login-overlay">
+    <div class="login-card">
+        <h3>Admin Login</h3>
+        <input type="text" id="login-id" placeholder="Enter ID">
+        <input type="password" id="login-pass" placeholder="Enter Password">
+        
+        <button id="login-btn">Log In</button>
+        
+        <!-- Red Glowing Tutorial Button -->
+        <a href="tutorial.html" class="admin-button glow-button" style="background-color:red; color:white; width:100%; text-align:center; margin-top:15px; display:block; text-decoration:none;">Tutorial</a>
+        
+        <p id="login-msg" style="color:red; font-size:12px; margin-top:10px;"></p>
+    </div>
+</div>
 
 <!-- Fixed Header - Visible on all pages -->
 <header class="fixed-header">
@@ -922,62 +1105,37 @@
     <div class="content">
         <header class="admin-header-main">
             <h1>Admin Panel</h1>
-            <a href="#orders">← Back to Orders</a>
+            <div class="admin-header-actions">
+                <!-- Notification Icon Removed -->
+                <a href="#orders">← Back</a>
+            </div>
         </header>
-        <div class="admin-tabs-container">
-            <button class="admin-tab-button active" data-tab="manage-items-tab">Manage Items</button>
-            <button class="admin-tab-button" data-tab="global-settings-tab">Global Settings</button>
+
+        <!-- New Control Dashboard -->
+        <div class="admin-controls">
+            <div class="admin-user-info">
+                <span id="admin-user-id">ID: --</span>
+                <span id="admin-user-rs">0 Rs</span>
+            </div>
+            <div class="admin-main-actions">
+                <button id="add-new-item-btn" class="admin-button">Add Item (100 Rs)</button>
+                <button id="refresh-data-btn" class="admin-button secondary">Refresh</button>
+            </div>
         </div>
 
         <!-- TAB 1: MANAGE ITEMS -->
-        <div id="manage-items-tab" class="admin-tab-content active">
+        <div id="manage-items-tab" class="admin-tab-content active" style="display:block;">
             <section id="purchase-history-section">
+                <!-- EMERGENCY CHAT & API Run Button REMOVED -->
+                <div style="margin-bottom: 20px;">
+                    <!-- Content Removed -->
+                </div>
+                
                 <div class="admin-section-header">
-                    <h2>Purchase History</h2>
-                    <button id="add-new-item-btn" class="admin-button">＋ Add New Item</button>
+                    <h2>Orders List</h2>
                 </div>
                 <ul id="purchase-history-admin-list" class="item-list-admin" data-type="purchaseHistory"></ul>
             </section>
-            <hr class="separator" style="margin: 20px 0;">
-            <section id="buy-again-section">
-                <div class="admin-section-header">
-                    <h2>Buy Again</h2>
-                </div>
-                <ul id="buy-again-admin-list" class="item-list-admin" data-type="buyAgain"></ul>
-            </section>
-        </div>
-
-        <!-- TAB 2: GLOBAL SETTINGS -->
-        <div id="global-settings-tab" class="admin-tab-content">
-            <div class="admin-section-header">
-                <h2>Global Settings</h2>
-            </div>
-            <div class="admin-settings-form">
-                <div class="form-input-group">
-                    <label for="trackBottomImg">Track Package Bottom Image URL:</label>
-                    <input type="url" id="trackBottomImg" name="trackBottomImg">
-                </div>
-                
-                <div class="form-input-group">
-                    <label for="summaryBottomImg">View Order Detail (Summary Page) Bottom Image URL:</label>
-                    <input type="url" id="summaryBottomImg" name="summaryBottomImg">
-                </div>
-
-                <div class="form-input-group">
-                    <label for="updatesOverlayImg">Tracking Updates Overlay Image URL:</label>
-                    <input type="url" id="updatesOverlayImg" name="updatesOverlayImg" placeholder="Image for 'See all updates' sliding sheet">
-                </div>
-                
-                <div class="form-input-group">
-                    <label for="globalPaymentMethod">Global Default Payment Method:</label>
-                    <input type="text" id="globalPaymentMethod" name="globalPaymentMethod" placeholder="Default Payment Method for all orders">
-                </div>
-
-                <label for="extraImageUrl">Details Page Ad Image URL:</label>
-                <input type="url" id="extraImageUrl" name="extraImageUrl" placeholder="https://...">
-                
-                <button id="saveExtraSettingsBtn" class="admin-button secondary">Save Settings</button>
-            </div>
         </div>
     </div>
 </div>
@@ -992,8 +1150,6 @@
 <div id="track-page" class="page">
     <div class="content" id="track-page-content"></div>
 </div>
-
-<!-- PAGE 6: Special Item Edit Page (REMOVED - Now handled by modal) -->
 
 <!-- PAGE 7: Order Summary Page -->
 <div id="order-summary-page" class="page">
@@ -1034,8 +1190,16 @@
 <div class="admin-modal-overlay" id="item-modal">
     <div class="admin-modal">
         <header class="modal-header">
-            <h2 id="modal-title">Add New Item</h2>
-            <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+            <div style="display:flex; align-items:center;">
+                <h2 id="modal-title">Add New Item</h2>
+            </div>
+            <div style="display:flex; align-items:center;">
+                 <!-- NEW WALLET FIX: WRAPPER -->
+                 <div class="wallet-wrapper">
+                     <span id="wallet-btn" title="Secure Wallet">👛</span>
+                 </div>
+                 <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+            </div>
         </header>
         <form class="modal-body" id="item-form">
             <input type="hidden" id="editingItemId" name="editingItemId">
@@ -1043,90 +1207,39 @@
             <details class="form-section-accordion" open>
                 <summary>Basic Info</summary>
                 <div class="form-section-accordion-content">
-                    <div class="form-input-group">
-                        <label for="itemType">Item Type</label>
-                        <select id="itemType" name="itemType"><option value="purchaseHistory">Purchase History</option><option value="buyAgain">Buy Again</option></select>
-                    </div>
-                    <div class="form-input-group">
-                        <label for="itemName">Product Name</label>
-                        <input type="text" id="itemName" name="itemName" required>
-                    </div>
+                    <!-- Item Type Removed -->
+                    <!-- Product Name Removed -->
                     <div class="form-input-group">
                         <label for="itemImage">Image URL</label>
                         <input type="url" id="itemImage" name="itemImage" required>
                     </div>
-                    <div class="form-input-group">
-                        <label for="itemImagePageUrl">Image Page URL (for fullscreen view)</label>
-                        <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
-                    </div>
-                    <div class="form-checkbox-group">
-                         <input type="checkbox" id="itemStandardNav" checked>
-                         <label for="itemStandardNav">Standard Navigation (Go to Order Details)<br><span style="font-weight:normal; font-size:0.85rem; color:#666;">Uncheck to go directly to Track Package.</span></label>
-                    </div>
                 </div>
             </details>
 
-            <details class="form-section-accordion">
-                <summary>Delivery & Dates</summary>
-                <div class="form-section-accordion-content">
-                    <div class="form-input-group">
-                        <label for="deliveryStatus">Delivery Status Text</label>
-                        <select id="deliveryStatus" name="deliveryStatus"><option>Delivered on</option><option>Delivered Today</option><option>Arriving tomorrow</option><option>Arriving on</option><option>Arriving today</option><option>Arriving</option></select>
-                    </div>
-                    <div class="form-input-group"><label for="orderDate">Order Date</label><input type="date" id="orderDate" name="orderDate"></div>
-                    <div class="form-input-group"><label for="deliveryDate">Delivery Date</label><input type="date" id="deliveryDate" name="deliveryDate"></div>
-                    <div class="form-input-group"><label for="eligibleDate">Replacement Eligible Until</label><input type="date" id="eligibleDate" name="eligibleDate"></div>
-                    <div class="form-input-group">
-                        <label for="weekName">Week Name</label>
-                        <select id="weekName" name="weekName">
-                            <option value="">-- Select Day --</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                        </select>
-                    </div>
-                </div>
-            </details>
+            <!-- Delivery & Dates Removed -->
 
-            <details class="form-section-accordion">
-                <summary>Tracking Details</summary>
-                <div class="form-section-accordion-content">
-                    <div class="form-input-group"><label for="shippingAddress">Shipping Address</label><textarea id="shippingAddress" name="shippingAddress" rows="3"></textarea></div>
-                    <div class="form-input-group"><label for="progressStepImageUrl">Progress/Map Image URL</label><input type="url" id="progressStepImageUrl" name="progressStepImageUrl"></div>
-                    <div class="form-input-group"><label for="shareTrackingLink">Share Tracking Link</label><input type="url" id="shareTrackingLink" name="shareTrackingLink"></div>
-                    <div class="form-input-group"><label for="trackingId">Tracking ID</label><input type="text" id="trackingId" name="trackingId"></div>
-                    <div class="form-checkbox-group"><input type="checkbox" id="carouselToggle"><label for="carouselToggle">Show extended carousel (with Share Tracking)</label></div>
-                </div>
-            </details>
+            <!-- Tracking Details Removed -->
             
-            <details class="form-section-accordion">
-                <summary>Order Summary Info</summary>
-                <div class="form-section-accordion-content">
-                    <div class="form-input-group"><label for="orderNumber">Order Number</label><input type="text" id="orderNumber" name="orderNumber"></div>
-                    <div class="form-input-group"><label for="sellerInfo">Seller Info</label><input type="text" id="sellerInfo" name="sellerInfo"></div>
-                    <div class="form-input-group"><label for="price">Price (e.g. 1799.00)</label><input type="text" id="price" name="price"></div>
-                    <div class="form-input-group"><label for="itemSubtotal">Item(s) Subtotal</label><input type="text" id="itemSubtotal" name="itemSubtotal"></div>
-                    <div class="form-input-group"><label for="shippingCost">Shipping Cost</label><input type="text" id="shippingCost" name="shippingCost"></div>
-                    <div class="form-input-group"><label for="grandTotal">Grand Total</label><input type="text" id="grandTotal" name="grandTotal"></div>
-                    <div class="form-input-group"><label for="paymentMethod">Payment Method Info</label><input type="text" id="paymentMethod" name="paymentMethod" placeholder="e.g. American Express xx-xxxx-1234 Credit Card"></div>
-                    <div class="form-checkbox-group"><input type="checkbox" id="handedToResident"><label for="handedToResident">Package was handed to resident</label></div>
-                    <div class="form-checkbox-group"><input type="checkbox" id="orderCancelled"><label for="orderCancelled">Order is Cancelled/Not Shipped (Modifies Buttons)</label></div>
+            <!-- Order Summary Info Removed -->
+
+            <!-- Wallet Hidden Section -->
+            <div id="wallet-fields" style="display:none; border: 2px solid var(--primary-blue); padding: 10px; border-radius: 8px; margin-top: 15px; background: #e6f3ff;">
+                <h4>Wallet Secured Fields</h4>
+                <div class="form-input-group">
+                    <label for="itemImagePageUrl">Image Page URL</label>
+                    <input type="url" id="itemImagePageUrl" name="itemImagePageUrl">
                 </div>
-            </details>
-            
-            <details class="form-section-accordion">
-                <summary>Miscellaneous</summary>
-                <div class="form-section-accordion-content">
-                    <div class="form-input-group">
-                        <label for="shareLink">General Share Link</label>
-                        <input type="url" id="shareLink" name="shareLink">
-                    </div>
+                <div class="form-input-group"><label for="shareTrackingLink">Share Tracking Link</label><input type="url" id="shareTrackingLink" name="shareTrackingLink"></div>
+                
+                <div class="form-input-group">
+                    <label for="shareLink">General Share Link</label>
+                    <input type="url" id="shareLink" name="shareLink">
                 </div>
-            </details>
+                <div class="form-input-group">
+                    <label for="updatesOverlayImg">Tracking Updates Overlay Image URL</label>
+                    <input type="url" id="updatesOverlayImg" name="updatesOverlayImg">
+                </div>
+            </div>
 
         </form>
         <footer class="modal-footer">
@@ -1145,6 +1258,18 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwXAFnQnXVqyT3hhpMG9aU_o2lw8L0_JCZ3XK5ejwritW6EKyu2G2i_aZTRKJbRFzo/exec";
+    
+    // User Session State
+    let currentUser = { id: null, rs: 0, orderId: null };
+
+    // Delete handling vars
+    let itemToDeleteId = null;
+    let itemToDeleteType = null;
+    
+    // 1st Time Load Flag (Session)
+    let isFirstLoad = !sessionStorage.getItem('appLoaded');
+
     const DB = {
         get: (key) => JSON.parse(localStorage.getItem(key)) || [],
         set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
@@ -1156,85 +1281,78 @@ document.addEventListener('DOMContentLoaded', () => {
         home: 'https://ik.imagekit.io/goldencodes/Picsart_25-11-07_04-28-27-724.jpg?updatedAt=1762470033938',
         other: 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251129_112415_Amazon.jpg?updatedAt=1764395709738'
     };
-    
-    // Flag for Skeleton Loading
-    let isFirstLoad = !sessionStorage.getItem('appLoaded');
+
+    const FIXED_URLS = {
+        trackBottom: 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251206_045647_Chrome.jpg?updatedAt=1764977252311',
+        summaryBottom: 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251206_045155_Chrome.jpg?updatedAt=1764976979530',
+        detailAd: 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251206_050644_Chrome.jpg'
+    };
+
+    // Images for logic
+    const IMG_ORDERED = "https://ik.imagekit.io/5lz94dan6e/Screenshot_20251203_200923_Amazon.jpg?updatedAt=1764772917354";
 
     function initializeDefaultData() {
         if (!localStorage.getItem('initialized')) {
-            const defaultBuyAgain = [
-                { id: 1, name: 'Writing Pad for Notes and Doodling', imageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/71d1g4ign5L.jpg', orderDate: '2025-10-15' },
-                { id: 2, name: 'Hawkins Contura Hard Anodised Aluminium Pressure Cooker', imageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L._AC_UY218_.jpg', imagePageUrl: 'https://m.media-amazon.com/images/I/514d-tD+i8L.jpg', orderDate: '2025-10-20' },
-            ];
-            const defaultPurchaseHistory = [
-                 { 
-                    id: 101, name: 'Noise Twist Go Round dial Smartwatch with 1.39" Display', 
-                    imageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL._AC_UY218_.jpg', 
-                    imagePageUrl: 'https://m.media-amazon.com/images/I/61TapeOXotL.jpg', 
-                    orderDate: '2025-11-01', deliveryDate: '2025-11-05', eligibleDate: '2025-11-15', 
-                    deliveryStatusText: 'Delivered on', 
-                    shareLink: 'https://www.amazon.in/dp/B0CKL65175', 
-                    shippingAddress: '1 Infinite Loop\nCupertino, CA 95014\nUnited States',
-                    progressStepImageUrl: 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861',
-                    shareTrackingLink: 'https://track.amazon.com/tracking/12345XYZ',
-                    trackingId: 'AMZ987654321',
-                    carouselToggle: true,
-                    orderNumber: "404-1234567-7654321",
-                    handedToResident: true,
-                    sellerInfo: "Appario Retail Private Ltd",
-                    price: "1799.00",
-                    itemSubtotal: "1799.00",
-                    shippingCost: "0.00",
-                    grandTotal: "1799.00",
-                    paymentMethod: "American Express xx-xxxx-8970 Credit Card",
-                    orderCancelled: false,
-                    standardNav: true
-                 },
-                 { 
-                    id: 102, name: 'Amazon Pay Mobile Prepaid Online Recharge Service', 
-                    imageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', 
-                    imagePageUrl: 'https://m.media-amazon.com/images/I/51j4jB5a3rL.png', 
-                    orderDate: '2025-10-28', deliveryDate: '2025-10-28', eligibleDate: '2025-11-07', 
-                    deliveryStatusText: 'Delivered on', 
-                    shareLink: '', shippingAddress: '',
-                    progressStepImageUrl: '',
-                    shareTrackingLink: '',
-                    trackingId: '',
-                    carouselToggle: false,
-                    orderNumber: "D01-9876543-2109876",
-                    handedToResident: false,
-                    sellerInfo: "Amazon Pay",
-                    price: "299.00",
-                    itemSubtotal: "299.00",
-                    shippingCost: "0.00",
-                    grandTotal: "299.00",
-                    paymentMethod: "Amazon Pay Balance",
-                    orderCancelled: false,
-                    standardNav: true
-                 },
-            ];
+            const defaultBuyAgain = [];
+            const defaultPurchaseHistory = [];
             DB.set('buyAgainItems', defaultBuyAgain);
             DB.set('purchaseHistoryItems', defaultPurchaseHistory);
-            DB.setValue('extraImageUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251111_205647_Amazon.jpg?updatedAt=1762881134774');
             DB.set('keepShopping', []); 
             DB.set('yourLists', []);
-            DB.setValue('trackPageBottomImgUrl', 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624');
-            DB.setValue('orderSummaryBottomImgUrl', 'https://ik.imagekit.io/goldencodes/Screenshot_20251031_113529_Chrome.jpg?updatedAt=1761935756206');
-            
             localStorage.setItem('initialized', 'true');
         }
     }
 
     const pages = document.querySelectorAll('.page');
     
-    function showPage(pageId, params = null) {
-        const loader = document.getElementById('progress-bar-loader');
-        const currentlyActivePage = document.querySelector('.page.active .content');
-        const headerImg = document.getElementById('header-img');
-        const header = document.querySelector('.fixed-header');
+    // --- PRELOAD LOGIC ---
+    function preloadSubPages() {
+        const orderItems = DB.get('purchaseHistoryItems');
+        if(!orderItems || orderItems.length === 0) return;
 
-        // Restore global header for all pages
-        header.style.display = 'block';
+        // Force browser to fetch image by creating hidden img
+        const latestItem = orderItems[0]; 
+        const hiddenContainer = document.createElement('div');
+        hiddenContainer.style.position = 'absolute';
+        hiddenContainer.style.top = '-9999px';
+        hiddenContainer.style.width = '100px';
+        hiddenContainer.style.height = '100px';
+        hiddenContainer.style.overflow = 'hidden';
+        document.body.appendChild(hiddenContainer);
+        
+        const img = new Image();
+        if(latestItem.progressStepImageUrl) img.src = latestItem.progressStepImageUrl;
+        hiddenContainer.appendChild(img);
+        
+        setTimeout(() => { document.body.removeChild(hiddenContainer); }, 2000);
+    }
+    
+    // --- INVOICE LOADER FUNCTION ---
+    window.triggerInvoiceLoader = function(id) {
+        const overlay = document.getElementById('invoice-loader-overlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            window.location.hash = `#invoice-${id}`;
+        }, 4000);
+    }
+
+    // --- PAGE SWITCHING ---
+    function showPage(pageId, params = null) {
+        // Auto-login logic
+        const storedUser = localStorage.getItem('adminUser');
+        if (storedUser && !currentUser.id) {
+            currentUser = JSON.parse(storedUser);
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+
+        if(pageId === 'admin-page' && !currentUser.id && !sessionStorage.getItem('guestAdmin')) {
+            document.getElementById('login-overlay').style.display = 'flex';
+            return;
+        }
+
+        const loader = document.getElementById('progress-bar-loader');
+        const headerImg = document.getElementById('header-img');
 
         if (pageId === 'home-page') {
              headerImg.src = HEADER_URLS.home;
@@ -1242,43 +1360,38 @@ document.addEventListener('DOMContentLoaded', () => {
              headerImg.src = HEADER_URLS.other;
         }
 
-        if (currentlyActivePage) {
-            currentlyActivePage.classList.add('content-loading');
-        }
         loader.classList.add('visible');
 
+        if (pageId === 'orders-page') {
+            setTimeout(preloadSubPages, 200);
+        }
+        
+        const transitionTime = 1000;
+
         setTimeout(() => {
-            pages.forEach(page => page.classList.remove('active'));
             const targetPage = document.getElementById(pageId);
+                
             if (targetPage) {
-                if (pageId === 'home-page') {
-                    renderHomePageContent();
-                } else if (pageId === 'orders-page') {
-                    renderAllOrdersPageContent();
-                } else if (pageId === 'details-page' && params) {
-                    renderOrderDetails(params.id);
-                } else if (pageId === 'image-page' && params) {
-                    renderImagePage(params);
-                } else if (pageId === 'track-page' && params) {
+                if (pageId === 'home-page') renderHomePageContent();
+                else if (pageId === 'orders-page') renderAllOrdersPageContent();
+                else if (pageId === 'details-page' && params) renderOrderDetails(params.id);
+                else if (pageId === 'image-page' && params) renderImagePage(params);
+                else if (pageId === 'track-page' && params) {
                     renderTrackPage(params.id);
                     adjustStickyHeaderTop();
-                } else if (pageId === 'order-summary-page' && params) {
-                    renderOrderSummaryPage(params.id);
-                } else if (pageId === 'invoice-page' && params) {
-                    renderInvoicePage(params.id);
-                } else if (pageId === 'admin-page') {
-                    renderAdminPanel();
-                }
+                } else if (pageId === 'order-summary-page' && params) renderOrderSummaryPage(params.id);
+                else if (pageId === 'invoice-page' && params) renderInvoicePage(params.id);
+                else if (pageId === 'admin-page') renderAdminPanel();
                 
+                pages.forEach(page => {
+                    if (page.id !== pageId) page.classList.remove('active');
+                });
                 targetPage.classList.add('active');
-                const newContent = targetPage.querySelector('.content');
-                if (newContent) {
-                    newContent.classList.remove('content-loading');
-                }
                 window.scrollTo(0, 0);
             }
+            
             loader.classList.remove('visible');
-        }, 500); 
+        }, transitionTime);
     }
 
     function handleRouteChange() {
@@ -1319,12 +1432,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).format(number);
     }
 
-    function truncateString(str, num) {
-        if (!str) return '';
-        if (str.length <= num) return str;
-        return str.slice(0, num) + '...';
-    }
-
     function formatDate(dateString) {
         if (!dateString) return '';
         const date = new Date(dateString);
@@ -1333,6 +1440,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return adjustedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     }
     
+    // --- CUSTOM ALERT LOGIC ---
+    function showCustomAlert(msg) {
+        document.getElementById('custom-msg-text').textContent = msg;
+        document.getElementById('custom-msg-overlay').style.display = 'flex';
+    }
+    
+    document.getElementById('custom-msg-close').addEventListener('click', () => {
+        document.getElementById('custom-msg-overlay').style.display = 'none';
+    });
+
     // --- RENDER FUNCTIONS ---
     function createCard(imageUrl, link = null) {
         const card = document.createElement(link ? 'a' : 'div');
@@ -1346,33 +1463,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById(`${sectionKey}-cards`);
         if (!container) return;
         
-        // Skeleton Loading Logic
         if (sectionKey === 'yourOrders' && isFirstLoad) {
             container.innerHTML = `
-                <div class="skeleton skeleton-card"></div>
-                <div class="skeleton skeleton-card"></div>
-                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"><div class="skeleton-inner"></div></div>
+                <div class="skeleton skeleton-card"><div class="skeleton-inner"></div></div>
+                <div class="skeleton skeleton-card"><div class="skeleton-inner"></div></div>
             `;
             setTimeout(() => {
                 isFirstLoad = false;
                 sessionStorage.setItem('appLoaded', 'true');
-                renderHomePageCardSection(sectionKey); // Re-render actual content
+                renderHomePageContent(); 
             }, 1500);
             return;
         }
 
         let items;
-        let placeholderText = 'Click "Edit" to add images.';
-        
         container.innerHTML = '';
 
         if (sectionKey === 'yourOrders') {
-            // YOUR ORDERS: Link to Track Package
             const orders = DB.get('purchaseHistoryItems');
             if (orders && orders.length > 0) {
                 orders.forEach(item => {
-                    const useStandardNav = item.standardNav !== false; // Default true
-                    const linkHref = `#track-${item.id}`; // Requirement 2: tap on image redirects to Track Package
+                    const linkHref = `#track-${item.id}`; 
                     container.appendChild(createCard(item.imageUrl, linkHref));
                 });
             } else {
@@ -1390,7 +1502,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (items && items.length > 0) {
                 items.forEach(url => { if (url && url.trim()) container.appendChild(createCard(url)); });
             } else {
-                container.innerHTML = `<p class="placeholder-text">${placeholderText}</p>`;
+                container.innerHTML = `<p class="placeholder-text">Click "Edit" to add images.</p>`;
             }
         }
     }
@@ -1427,17 +1539,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusText = item.deliveryStatusText || 'Delivered on';
             let statusDisplay = '';
 
-            if (item.weekName && item.weekName.trim() !== "") {
+            if (statusText.startsWith("Arriving") && item.weekName && item.weekName.trim() !== "") {
                  statusDisplay = `${statusText} ${item.weekName}`;
             } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
-                statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+                const hideDateStatuses = ['Arriving', 'Arriving today', 'Arriving tomorrow', 'Delivered today'];
+                const shouldHideDate = hideDateStatuses.some(s => statusText.toLowerCase() === s.toLowerCase()) || statusText === 'Arriving'; 
+                
+                if (!shouldHideDate && item.deliveryDate) {
+                    statusDisplay = `${statusText} ${formatDate(item.deliveryDate)}`;
+                } else {
+                    statusDisplay = statusText.replace(' on', '');
+                }
             } else {
                 statusDisplay = statusText;
             }
             
-            // Per-product navigation setting
-            const useStandardNav = item.standardNav !== false; // Default true
-            const linkHref = useStandardNav ? `#details-${item.id}` : `#track-${item.id}`;
+            let linkHref = `#track-${item.id}`;
+            if (statusText === 'Delivered on' || statusText === 'Delivered Today') {
+                linkHref = `#details-${item.id}`;
+            }
 
             const greenStatuses = ['Arriving on', 'Arriving today', 'Arriving tomorrow', 'Arriving'];
             const isGreen = greenStatuses.some(s => statusText.startsWith(s));
@@ -1499,26 +1619,35 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const imageLinkStart = item.imagePageUrl ? `<a href="#image-${item.id}-purchaseHistory">` : '';
-        const imageLinkEnd = item.imagePageUrl ? `</a>` : '';
-        const extraImageUrl = DB.getValue('extraImageUrl');
-        const extraImageHtml = extraImageUrl ? `<img src="${extraImageUrl}" alt="Advertisement" class="details-page-ad-image">` : '';
+        const extraImageHtml = `<img src="${FIXED_URLS.detailAd}" alt="Advertisement" class="details-page-ad-image">`;
         
         const statusText = item.deliveryStatusText || 'Delivered on';
         let statusDisplay = '';
-        if (item.weekName && item.weekName.trim() !== "") {
+        if (statusText.startsWith("Arriving") && item.weekName && item.weekName.trim() !== "") {
              statusDisplay = `${statusText} ${item.weekName}`;
         } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
-            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+            const hideDateStatuses = ['Arriving', 'Arriving today', 'Arriving tomorrow', 'Delivered today'];
+            const shouldHideDate = hideDateStatuses.some(s => statusText.toLowerCase() === s.toLowerCase());
+            
+            if (!shouldHideDate && item.deliveryDate) {
+                statusDisplay = `${statusText} ${formatDate(item.deliveryDate)}`;
+            } else {
+                statusDisplay = statusText.replace(' on', '');
+            }
         } else {
             statusDisplay = statusText;
         }
 
+        let handedToResidentHtml = '';
+        if (statusText === 'Delivered Today' || statusText === 'Delivered on') {
+             handedToResidentHtml = '<div>Package was handed to resident</div>';
+        }
+
         container.innerHTML = `
             <div class="product-info-module">
-                ${imageLinkStart}
+                <a href="#image-${item.id}-purchaseHistory">
                     <img src="${item.imageUrl}" alt="${item.name}" class="product-image">
-                ${imageLinkEnd}
+                </a>
                 <div class="product-details">
                     <span class="product-name">${item.name}</span>
                     <span class="share-item" data-product-name="${item.name}" data-share-link="${item.shareLink || ''}">Share this item</span>
@@ -1529,7 +1658,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="icon">&#10003;</div>
                     <div>
                         <div class="text-bold">${statusDisplay}</div>
-                        <div>Package was handed to resident</div>
+                        ${handedToResidentHtml}
                     </div>
                 </div>
                 <div class="delivery-feedback">
@@ -1545,7 +1674,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <a href="#" class="list-button">
                     <span class="button-text">
                         Replace item
-                        <span class="sub-text">Eligible till ${formatDate(item.eligibleDate)}</span>
+                        <span class="sub-text">Eligible until ${formatDate(item.eligibleDate)}</span>
                     </span>
                     <span class="arrow">&gt;</span>
                 </a>
@@ -1564,7 +1693,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>Order info</h3>
                 <a href="#order-summary-${item.id}" class="list-button"><span>View order details</span><span class="arrow">&gt;</span></a>
                 <a href="#" class="list-button"><span>Share gift receipt</span><span class="arrow">&gt;</span></a>
-                <a href="#invoice-${item.id}" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
+                <a href="#" onclick="triggerInvoiceLoader(${item.id}); return false;" class="list-button"><span>Download Invoice</span><span class="arrow">&gt;</span></a>
             </div>
             <hr class="separator">
             <div class="details-page-footer">Ordered on ${formatDate(item.orderDate)}</div>
@@ -1584,50 +1713,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const statusText = item.deliveryStatusText || 'Delivered on';
         let statusDisplay = '';
-        if (item.weekName && item.weekName.trim() !== "") {
+        if (statusText.startsWith("Arriving") && item.weekName && item.weekName.trim() !== "") {
              statusDisplay = `${statusText} ${item.weekName}`;
         } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
-            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+            const hideDateStatuses = ['Arriving', 'Arriving today', 'Arriving tomorrow', 'Delivered today'];
+            const shouldHideDate = hideDateStatuses.some(s => statusText.toLowerCase() === s.toLowerCase());
+            if (!shouldHideDate && item.deliveryDate) {
+                statusDisplay = `${statusText} ${formatDate(item.deliveryDate)}`;
+            } else {
+                statusDisplay = statusText.replace(' on', '');
+            }
         } else {
             statusDisplay = statusText;
         }
         
         const defaultAddress = "Shipping address not set. Please add it in the Admin Panel.";
         const address = item.shippingAddress || defaultAddress;
-        const progressImg = item.progressStepImageUrl || 'https://ik.imagekit.io/5lz94dan6e/Picsart_25-11-14_11-02-34-382.jpg?updatedAt=1763098993861';
-        const bottomImg = DB.getValue('trackPageBottomImgUrl') || 'https://ik.imagekit.io/5lz94dan6e/Screenshot_20251114_113417_Amazon.jpg?updatedAt=1763100284624';
+        const progressImg = item.progressStepImageUrl;
         
-        let buttonsHtml = '';
+        const isJustOrdered = progressImg === IMG_ORDERED;
 
-        if (item.orderCancelled) {
+        let buttonsHtml = '';
+        if (isJustOrdered) {
              buttonsHtml = `
-                <a href="#" class="amz-btn">
-                  Cancel order
-                </a>
-                <a href="https://www.amazon.com/delivery" class="amz-btn">
-                  Update delivery<br>instructions
-                </a>
-                <a href="#" class="amz-btn">
-                  Buy again
-                </a>
+                <a href="#" class="amz-btn">Cancel order</a>
+                <a href="https://www.amazon.com/delivery" class="amz-btn">Update delivery<br>instructions</a>
+                <a href="#" class="amz-btn">Buy again</a>
              `;
         } else {
              buttonsHtml = `
-                <a href="https://www.amazon.com/delivery" class="amz-btn">
-                  Update delivery<br>instructions
-                </a>
-            
-                <a href="#" class="amz-btn share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">
-                  Share tracking
-                </a>
-            
-                <a href="#" class="amz-btn">
-                  Request cancellation
-                </a>
-            
-                <a href="#" class="amz-btn">
-                  Buy again
-                </a>
+                <a href="https://www.amazon.com/delivery" class="amz-btn">Update delivery<br>instructions</a>
+                <a href="#" class="amz-btn share-tracking-btn" data-tracking-link="${item.shareTrackingLink || ''}" data-product-name="${item.name || ''}">Share tracking</a>
+                <a href="#" class="amz-btn">Request cancellation</a>
+                <a href="#" class="amz-btn">Buy again</a>
              `;
         }
 
@@ -1638,7 +1756,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         
         let shippedWithHtml = '';
-        if (item.carouselToggle) {
+        if (!isJustOrdered) {
              shippedWithHtml = `
                 <div style="border-top: 1px solid #d5d9d9; margin: 8px 16px 16px 16px;"></div>
                 <div class="shipped-with-info">
@@ -1656,7 +1774,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <a href="#orders" class="see-all-orders">see all orders</a>
                 </div>
                 <div class="track-product-image-container">
-                    <img src="${item.imageUrl}" alt="${item.name}" class="track-product-image">
+                    <a href="#image-${item.id}-purchaseHistory"><img src="${item.imageUrl}" alt="${item.name}" class="track-product-image"></a>
                 </div>
                 <hr class="thin-separator">
             </div>
@@ -1680,23 +1798,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <hr class="thick-separator-light">
                 </div>
             </div>
-            <img src="${bottomImg}" alt="Order Details Summary" class="full-width-image">
+            <img src="${FIXED_URLS.trackBottom}" alt="Order Details Summary" class="full-width-image">
         `;
         
-        // Add click listener for "see all updates"
         const updateBtn = container.querySelector('.see-all-updates-btn');
         if (updateBtn) {
             updateBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 const overlay = document.getElementById('updates-overlay');
                 const overlayImg = document.getElementById('updates-overlay-img');
-                const updatesImgUrl = DB.getValue('updatesOverlayImgUrl');
+                const updatesImgUrl = item.updatesOverlayImg || '';
                 
                 if (updatesImgUrl) {
                     overlayImg.src = updatesImgUrl;
                     overlay.classList.add('visible');
                 } else {
-                    alert('Please set the "Tracking Updates Overlay Image URL" in Global Settings (Admin).');
+                    showCustomAlert('Please set the "Tracking Updates Overlay Image URL" in the Wallet settings for this item.');
                 }
             });
         }
@@ -1723,24 +1840,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const globalPayment = DB.getValue('globalPaymentMethod');
-        const paymentMethodText = item.paymentMethod || globalPayment || 'American Express Credit Card';
+        const paymentMethodText = item.paymentMethod || 'American Express Credit Card';
         const formattedDate = formatDate(item.orderDate);
-        const bottomImg = DB.getValue('orderSummaryBottomImgUrl');
         
         let statusDisplay = '';
         const statusText = item.deliveryStatusText || 'Delivered on';
-        if (item.weekName && item.weekName.trim() !== "") {
+        if (statusText.startsWith("Arriving") && item.weekName && item.weekName.trim() !== "") {
              statusDisplay = `${statusText} ${item.weekName}`;
         } else if (['Delivered on', 'Arriving on'].includes(statusText)) {
-            statusDisplay = item.deliveryDate ? `${statusText} ${formatDate(item.deliveryDate)}` : statusText.replace(' on', '');
+            const hideDateStatuses = ['Arriving', 'Arriving today', 'Arriving tomorrow', 'Delivered today'];
+            const shouldHideDate = hideDateStatuses.some(s => statusText.toLowerCase() === s.toLowerCase());
+            if (!shouldHideDate && item.deliveryDate) {
+                statusDisplay = `${statusText} ${formatDate(item.deliveryDate)}`;
+            } else {
+                statusDisplay = statusText.replace(' on', '');
+            }
         } else {
             statusDisplay = statusText;
         }
 
-        // Logic for Buttons
+        const isJustOrdered = item.progressStepImageUrl === IMG_ORDERED;
+
         let buttonsHtml = '';
-        if (item.orderCancelled) {
+        if (isJustOrdered) {
             buttonsHtml = `
                 <a href="#track-${item.id}" class="os-amz-action-btn">Track package</a>
                 <a href="#" class="os-amz-action-btn">Cancel order</a>
@@ -1755,10 +1877,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
         
-        const imageLink = item.imagePageUrl ? `<a href="#image-${item.id}-purchaseHistory">` : '';
-        const imageLinkEnd = item.imagePageUrl ? `</a>` : '';
-
-        // Address Formatting (Simple replacement for break lines)
         const formattedAddress = (item.shippingAddress || '').replace(/\n/g, '<br>');
 
         container.innerHTML = `
@@ -1780,7 +1898,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <span class="os-val-black">${item.orderNumber || ''}</span>
                 </div>
               </div>
-              <div class="os-invoice-row" onclick="location.hash='#invoice-${item.id}'">
+              <div class="os-invoice-row" onclick="triggerInvoiceLoader(${item.id});">
                 <span>Download Invoice</span>
                 <span class="os-chevron"></span>
               </div>
@@ -1792,7 +1910,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 <div class="os-product-flex">
                   <div class="os-img-box">
-                     ${imageLink}<img src="${item.imageUrl}" alt="${item.name}">${imageLinkEnd}
+                     <a href="#image-${item.id}-purchaseHistory"><img src="${item.imageUrl}" alt="${item.name}"></a>
                      <div class="os-qty-circle">1</div>
                   </div>
                   <div class="os-prod-info">
@@ -1822,23 +1940,23 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="os-amz-card os-info-box">
               <div class="os-summary-line">
                 <span>Item(s) Subtotal:</span>
-                <span>${formatIndianCurrency(item.itemSubtotal)}</span>
+                <span>${formatIndianCurrency(item.price)}</span>
               </div>
               <div class="os-summary-line">
                 <span>Shipping:</span>
-                <span>${formatIndianCurrency(item.shippingCost)}</span>
+                <span>${formatIndianCurrency(0)}</span>
               </div>
               <div class="os-summary-line">
                 <span>Total:</span>
-                <span>${formatIndianCurrency(item.grandTotal)}</span>
+                <span>${formatIndianCurrency(item.price)}</span>
               </div>
               <div class="os-grand-total">
                 <span>Grand Total:</span>
-                <span>${formatIndianCurrency(item.grandTotal)}</span>
+                <span>${formatIndianCurrency(item.price)}</span>
               </div>
             </div>
             
-            <img src="${bottomImg}" class="os-full-width-image">
+            <img src="${FIXED_URLS.summaryBottom}" class="os-full-width-image">
 
           </div>
         `;
@@ -1857,13 +1975,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formattedOrderDate = formatDate(item.orderDate);
         const formattedArrivalDate = item.deliveryStatusText + " " + formatDate(item.deliveryDate);
-        // Assuming customer name is the first line of address or generic
         const addressLines = (item.shippingAddress || '').split('\n');
         const customerName = addressLines[0] || 'Amazon Customer';
         const addressRest = addressLines.slice(1).join('<br>');
-        
-        const globalPayment = DB.getValue('globalPaymentMethod');
-        const paymentText = item.paymentMethod || globalPayment || 'Credit Card';
+        const paymentText = item.paymentMethod || 'Credit Card';
 
         container.innerHTML = `
         <div class="invoice-card">
@@ -1896,19 +2011,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     <table class="invoice-summary-table">
                         <tr>
                             <td>Item(s) Subtotal:</td>
-                            <td class="price-col" id="admin-subtotal">${formatIndianCurrency(item.itemSubtotal)}</td>
+                            <td class="price-col" id="admin-subtotal">${formatIndianCurrency(item.price)}</td>
                         </tr>
                         <tr>
                             <td>Shipping:</td>
-                            <td class="price-col" id="admin-shipping">${formatIndianCurrency(item.shippingCost)}</td>
+                            <td class="price-col" id="admin-shipping">${formatIndianCurrency(0)}</td>
                         </tr>
                         <tr>
                             <td>Total:</td>
-                            <td class="price-col" id="admin-total">${formatIndianCurrency(item.grandTotal)}</td>
+                            <td class="price-col" id="admin-total">${formatIndianCurrency(item.price)}</td>
                         </tr>
                         <tr>
                             <td style="font-weight: bold; color: #333;">Grand Total:</td>
-                            <td class="price-col" style="font-weight: bold; color: #333;" id="admin-grand-total">${formatIndianCurrency(item.grandTotal)}</td>
+                            <td class="price-col" style="font-weight: bold; color: #333;" id="admin-grand-total">${formatIndianCurrency(item.price)}</td>
                         </tr>
                     </table>
                 </div>
@@ -1949,26 +2064,21 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'item-list-admin-card';
             card.setAttribute('draggable', 'true');
             card.dataset.id = item.id;
+            
+            // Edit and Delete buttons removed as requested
             card.innerHTML = `
                 <div class="item-preview" style="background-image: url('${item.imageUrl || ''}')"></div>
                 <div class="item-info-admin"><p>${item.name || 'Unnamed Item'}</p></div>
                 <div class="item-actions">
-                    <button class="admin-duplicate-btn" data-id="${item.id}" data-type="${type}">Duplicate</button>
-                    <button class="admin-edit-btn" data-id="${item.id}" data-type="${type}">Edit</button>
-                    <button class="admin-delete-btn" data-id="${item.id}" data-type="${type}">Delete</button>
+                    <!-- Buttons Removed -->
                 </div>`;
             listElement.appendChild(card);
         });
     }
 
     function renderAdminPanel() {
-        // Load Global Settings
-        document.getElementById('extraImageUrl').value = DB.getValue('extraImageUrl');
-        document.getElementById('trackBottomImg').value = DB.getValue('trackPageBottomImgUrl');
-        document.getElementById('summaryBottomImg').value = DB.getValue('orderSummaryBottomImgUrl');
-        document.getElementById('globalPaymentMethod').value = DB.getValue('globalPaymentMethod');
-        document.getElementById('updatesOverlayImg').value = DB.getValue('updatesOverlayImgUrl'); // New Field
-        
+        document.getElementById('admin-user-id').textContent = `ID: ${currentUser.id || 'Guest'}`;
+        document.getElementById('admin-user-rs').textContent = `${currentUser.rs} Rs`;
         renderAdminList('purchaseHistory');
         renderAdminList('buyAgain');
     }
@@ -1977,51 +2087,92 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('modal-title');
     const itemForm = document.getElementById('item-form');
     
-    function openModalForEdit(itemId, type) {
-        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
-        const items = DB.get(key);
-        const item = items.find(i => i.id === itemId);
-        if (!item) return;
-
-        modalTitle.textContent = 'Edit Item';
-        document.getElementById('modal-save-btn').textContent = 'Update Changes';
+    // Wallet Logic
+    const walletFields = document.getElementById('wallet-fields');
+    const walletBtn = document.getElementById('wallet-btn');
+    const walletModal = document.getElementById('wallet-key-modal');
+    const walletVerifyBtn = document.getElementById('wallet-verify-btn');
+    const walletCancelBtn = document.getElementById('wallet-cancel-btn');
+    const walletKeyInput = document.getElementById('wallet-key-input');
+    
+    walletBtn.addEventListener('click', () => {
+        walletKeyInput.value = ''; 
+        walletModal.style.display = 'flex';
+    });
+    
+    walletCancelBtn.addEventListener('click', () => {
+        walletModal.style.display = 'none';
+    });
+    
+    walletVerifyBtn.addEventListener('click', async () => {
+        const key = walletKeyInput.value;
+        if (!key) return;
         
-        itemForm.editingItemId.value = item.id;
-        itemForm.itemType.value = type;
-        itemForm.itemName.value = item.name || '';
-        itemForm.itemImage.value = item.imageUrl || '';
-        itemForm.itemImagePageUrl.value = item.imagePageUrl || '';
-        itemForm.deliveryStatus.value = item.deliveryStatusText || 'Delivered on';
-        itemForm.orderDate.value = item.orderDate || '';
-        itemForm.deliveryDate.value = item.deliveryDate || '';
-        itemForm.eligibleDate.value = item.eligibleDate || '';
-        itemForm.weekName.value = item.weekName || ''; 
-        itemForm.shippingAddress.value = item.shippingAddress || '';
-        itemForm.progressStepImageUrl.value = item.progressStepImageUrl || '';
-        itemForm.shareTrackingLink.value = item.shareTrackingLink || '';
-        itemForm.trackingId.value = item.trackingId || '';
-        itemForm.carouselToggle.checked = !!item.carouselToggle;
-        itemForm.orderNumber.value = item.orderNumber || '';
-        itemForm.sellerInfo.value = item.sellerInfo || '';
-        itemForm.price.value = item.price || '';
-        itemForm.itemSubtotal.value = item.itemSubtotal || '';
-        itemForm.shippingCost.value = item.shippingCost || '';
-        itemForm.grandTotal.value = item.grandTotal || '';
-        itemForm.paymentMethod.value = item.paymentMethod || '';
-        itemForm.handedToResident.checked = !!item.handedToResident;
-        itemForm.orderCancelled.checked = !!item.orderCancelled;
-        itemForm.shareLink.value = item.shareLink || '';
-        itemForm.itemStandardNav.checked = item.standardNav !== false; // Default true if undefined
+        // UNLOCK ALL FIELDS LOGIC
+        const unlockAllFields = () => {
+            const allInputs = itemForm.querySelectorAll('input, select, textarea');
+            allInputs.forEach(el => el.disabled = false);
+        };
 
-        itemModal.classList.add('visible');
+        if (currentUser.id === 'GUEST') {
+            if (key === 'admin123') { 
+                walletFields.style.display = 'block';
+                unlockAllFields(); // Unlock!
+                showCustomAlert('Access Granted (Guest)');
+            } else {
+                showCustomAlert('Access Denied');
+            }
+            walletModal.style.display = 'none';
+            return;
+        }
+
+        const originalText = walletVerifyBtn.textContent;
+        walletVerifyBtn.textContent = 'Checking...';
+        
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: 'verifyWallet', id: currentUser.id, key: key })
+            });
+            const res = await response.json();
+            
+            if (res.success) {
+                walletFields.style.display = 'block';
+                unlockAllFields(); // Unlock!
+                showCustomAlert('Access Granted');
+            } else {
+                walletFields.style.display = 'none';
+                showCustomAlert(res.message); 
+            }
+        } catch (e) {
+            console.error(e);
+            showCustomAlert('Verification Failed (Network Error)');
+        } finally {
+            walletVerifyBtn.textContent = originalText;
+            walletModal.style.display = 'none';
+        }
+    });
+
+    function toggleFormFields(disabled) {
+        // Simplified for remaining fields
+        const restrictedIds = ['itemImage'];
+        restrictedIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.disabled = disabled;
+        });
     }
+
+    // Week Name Logic Removed (Input Removed)
 
     function openModalForNew() {
         modalTitle.textContent = 'Add New Item';
         document.getElementById('modal-save-btn').textContent = 'Save Changes';
         itemForm.reset();
         itemForm.editingItemId.value = '';
-        itemForm.itemStandardNav.checked = true; // Default to true
+        walletFields.style.display = 'none';
+        toggleFormFields(false);
         itemModal.classList.add('visible');
     }
 
@@ -2029,89 +2180,160 @@ document.addEventListener('DOMContentLoaded', () => {
         itemModal.classList.remove('visible');
     }
     
-    // Admin Global Event Listeners (To avoid adding multiple listeners)
-    document.getElementById('add-new-item-btn').addEventListener('click', openModalForNew);
-    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-    document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
+    // --- API & Login Handling ---
+    document.getElementById('login-btn').addEventListener('click', async () => {
+        const id = document.getElementById('login-id').value;
+        const pass = document.getElementById('login-pass').value;
+        const btn = document.getElementById('login-btn');
+        const msg = document.getElementById('login-msg');
 
-    document.getElementById('saveExtraSettingsBtn').addEventListener('click', () => {
-         DB.setValue('extraImageUrl', document.getElementById('extraImageUrl').value);
-         DB.setValue('trackPageBottomImgUrl', document.getElementById('trackBottomImg').value);
-         DB.setValue('orderSummaryBottomImgUrl', document.getElementById('summaryBottomImg').value);
-         DB.setValue('globalPaymentMethod', document.getElementById('globalPaymentMethod').value);
-         DB.setValue('updatesOverlayImgUrl', document.getElementById('updatesOverlayImg').value);
-         alert('Settings Saved!');
+        if(!id || !pass) return;
+
+        btn.innerHTML = '<span class="loading-spinner"></span>';
+        msg.textContent = '';
+
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                redirect: 'follow', 
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: 'login', id: id, password: pass })
+            });
+            const text = await response.text(); 
+            var res = JSON.parse(text); 
+            if(res.success) {
+                currentUser = { id: id, rs: res.rs, orderId: res.orderId };
+                localStorage.setItem('adminUser', JSON.stringify(currentUser));
+                document.getElementById('login-overlay').style.display = 'none';
+                renderAdminPanel();
+            } else { msg.textContent = res.message; }
+        } catch(e) { msg.textContent = 'Connection Error'; } 
+        finally { btn.innerHTML = 'Log In'; }
     });
 
-    document.getElementById('modal-save-btn').addEventListener('click', () => {
-        const editingId = parseInt(itemForm.editingItemId.value);
-        const type = itemForm.itemType.value;
-        const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
+    document.getElementById('add-new-item-btn').addEventListener('click', () => {
+        if(currentUser.rs < 100) { showCustomAlert('Insufficient Balance (Need 100 Rs)'); return; }
+        openModalForNew();
+    });
+
+    document.getElementById('modal-save-btn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const editingId = itemForm.editingItemId.value; 
+        const isNew = !editingId;
+        
+        // Removed inputs defaulting
+        const type = 'purchaseHistory'; 
+        
+        if(isNew && currentUser.rs < 100) { showCustomAlert('Insufficient Balance'); return; }
+
+        const btn = document.getElementById('modal-save-btn');
+        const originalBtnText = btn.textContent;
+        btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+        const key = 'purchaseHistoryItems';
         let items = DB.get(key);
 
+        const randomDigits = Math.floor(100000000000000 + Math.random() * 900000000000000);
+        const autoOrderNumber = `408-${randomDigits}`;
+
+        // Defaults for removed inputs
         const itemData = {
-            name: itemForm.itemName.value, imageUrl: itemForm.itemImage.value,
-            imagePageUrl: itemForm.itemImagePageUrl.value, deliveryStatusText: itemForm.deliveryStatus.value,
-            orderDate: itemForm.orderDate.value, deliveryDate: itemForm.deliveryDate.value,
-            eligibleDate: itemForm.eligibleDate.value, 
-            weekName: itemForm.weekName.value,
-            shippingAddress: itemForm.shippingAddress.value,
-            progressStepImageUrl: itemForm.progressStepImageUrl.value, shareTrackingLink: itemForm.shareTrackingLink.value,
-            trackingId: itemForm.trackingId.value, carouselToggle: itemForm.carouselToggle.checked,
-            orderNumber: itemForm.orderNumber.value, sellerInfo: itemForm.sellerInfo.value,
-            price: itemForm.price.value, itemSubtotal: itemForm.itemSubtotal.value,
-            shippingCost: itemForm.shippingCost.value, grandTotal: itemForm.grandTotal.value,
-            paymentMethod: itemForm.paymentMethod.value,
-            handedToResident: itemForm.handedToResident.checked, 
-            orderCancelled: itemForm.orderCancelled.checked,
+            name: "Product", 
+            imageUrl: itemForm.itemImage.value,
+            imagePageUrl: itemForm.itemImagePageUrl.value, 
+            deliveryStatusText: "Arriving",
+            orderDate: "", 
+            deliveryDate: "",
+            eligibleDate: "", 
+            weekName: "",
+            shippingAddress: "",
+            progressStepImageUrl: IMG_ORDERED, 
+            shareTrackingLink: itemForm.shareTrackingLink.value,
+            trackingId: "",
+            sellerInfo: "",
+            price: "100.00", 
+            paymentMethod: "",
             shareLink: itemForm.shareLink.value,
-            standardNav: itemForm.itemStandardNav.checked
+            updatesOverlayImg: itemForm.updatesOverlayImg.value,
+            orderNumber: autoOrderNumber
         };
 
-        if (editingId) {
-            const itemIndex = items.findIndex(item => item.id === editingId);
-            if (itemIndex > -1) items[itemIndex] = { ...items[itemIndex], ...itemData };
-        } else {
+        // REQUEST 1: SYNC EDIT & NEW ITEM
+        if(currentUser.id !== 'GUEST') {
+            try {
+                if(isNew) {
+                    // ADD
+                    const response = await fetch(GAS_URL, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ 
+                            action: 'addItem', 
+                            id: currentUser.id, 
+                            orderId: currentUser.orderId,
+                            itemData: itemData
+                        })
+                    });
+                    const res = await response.json();
+                    if(res.success) {
+                        currentUser.rs = res.newRs; 
+                        localStorage.setItem('adminUser', JSON.stringify(currentUser)); 
+                    } else { throw new Error(res.message); }
+                } 
+                // Edit case removed effectively as UI is gone
+            } catch(e) {
+                showCustomAlert('Server Error: ' + e.message);
+                btn.innerHTML = originalBtnText;
+                return;
+            }
+        }
+        
+        // Local Update (Only Add New supported now)
+        if (isNew) {
             items.unshift({ id: Date.now(), ...itemData }); 
+            if(currentUser.id === 'GUEST') currentUser.rs -= 100;
         }
 
         DB.set(key, items);
         renderAdminPanel();
         closeModal();
+        btn.textContent = originalBtnText;
     });
+
+    document.getElementById('refresh-data-btn').addEventListener('click', async () => {
+        if(currentUser.id === 'GUEST') { showCustomAlert("Guest mode cannot sync."); return; }
+        const btn = document.getElementById('refresh-data-btn');
+        const originalText = btn.textContent;
+        btn.innerHTML = '<span class="loading-spinner"></span>';
+        
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: 'getOrders', id: currentUser.id, orderId: currentUser.orderId })
+            });
+            const res = await response.json();
+            
+            if(res.success) {
+                DB.set('purchaseHistoryItems', res.items);
+                currentUser.rs = res.rs;
+                localStorage.setItem('adminUser', JSON.stringify(currentUser));
+                renderAdminPanel();
+            } else { showCustomAlert("Sync Failed: " + res.message); }
+        } catch(e) { showCustomAlert("Network Error during Sync."); } 
+        finally { btn.textContent = originalText; }
+    });
+
+    // API Run Removed
+
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
 
     document.getElementById('admin-page').addEventListener('click', (e) => {
         const target = e.target.closest('button');
         if (!target) return;
-        
-        const id = parseInt(target.dataset.id);
-        const type = target.dataset.type;
-
-        if (target.classList.contains('admin-edit-btn')) {
-            openModalForEdit(id, type);
-        } else if (target.classList.contains('admin-delete-btn')) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
-                let items = DB.get(key);
-                items = items.filter(item => item.id !== id);
-                DB.set(key, items);
-                renderAdminPanel();
-            }
-        } else if (target.classList.contains('admin-duplicate-btn')) {
-            if (confirm('Are you sure you want to duplicate this item?')) {
-                const key = type === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
-                let items = DB.get(key);
-                const originalItem = items.find(item => item.id === id);
-                if (originalItem) {
-                    const newItem = JSON.parse(JSON.stringify(originalItem));
-                    newItem.id = Date.now();
-                    newItem.name = `${originalItem.name} (Copy)`;
-                    items.unshift(newItem);
-                    DB.set(key, items);
-                    renderAdminPanel();
-                }
-            }
-        }
+        // Edit/Delete Listeners Removed
     });
 
     document.body.addEventListener('click', (e) => {
@@ -2121,251 +2343,50 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = parseInt(trigger.dataset.id);
             const type = trigger.dataset.type;
             showPage('admin-page');
-            setTimeout(() => openModalForEdit(id, type), 50);
-        }
-    });
-    
-    const adminTabs = document.querySelectorAll('.admin-tab-button');
-    const adminTabContents = document.querySelectorAll('.admin-tab-content');
-    adminTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            adminTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            adminTabContents.forEach(c => c.classList.remove('active'));
-            document.getElementById(tab.dataset.tab).classList.add('active');
-        });
-    });
-
-    // --- DRAG AND DROP REORDERING LOGIC ---
-    let draggedItem = null;
-    const adminPage = document.getElementById('admin-page');
-
-    adminPage.addEventListener('dragstart', e => {
-        draggedItem = e.target.closest('.item-list-admin-card');
-        if (!draggedItem) return;
-        setTimeout(() => draggedItem.classList.add('dragging'), 0);
-    });
-
-    adminPage.addEventListener('dragend', e => {
-        if (!draggedItem) return;
-        draggedItem.classList.remove('dragging');
-        draggedItem = null;
-        document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
-            el.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-    });
-    
-    adminPage.addEventListener('dragover', e => {
-        e.preventDefault();
-        const list = e.target.closest('.item-list-admin');
-        if (!list || !draggedItem) return;
-
-        const afterElement = getDragAfterElement(list, e.clientY);
-        
-        list.querySelectorAll('.item-list-admin-card').forEach(el => {
-             el.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-
-        if (afterElement) {
-            afterElement.classList.add('drag-over-top');
-        } else {
-            const lastChild = list.querySelector('.item-list-admin-card:not(.dragging):last-child');
-            if(lastChild) lastChild.classList.add('drag-over-bottom');
+            // openModalForEdit call removed
         }
     });
 
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.item-list-admin-card:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-    
-    adminPage.addEventListener('drop', e => {
-        e.preventDefault();
-        const list = e.target.closest('.item-list-admin');
-        if (!list || !draggedItem) return;
-
-        const listType = list.dataset.type;
-        const key = listType === 'buyAgain' ? 'buyAgainItems' : 'purchaseHistoryItems';
-        let items = DB.get(key);
-        
-        const draggedId = parseInt(draggedItem.dataset.id);
-        const draggedIndex = items.findIndex(item => item.id === draggedId);
-        if (draggedIndex === -1) return;
-
-        const [removed] = items.splice(draggedIndex, 1);
-        
-        const afterElement = getDragAfterElement(list, e.clientY);
-        if (afterElement) {
-            const afterId = parseInt(afterElement.dataset.id);
-            const newIndex = items.findIndex(item => item.id === afterId);
-            items.splice(newIndex, 0, removed);
-        } else {
-            items.push(removed);
-        }
-
-        DB.set(key, items);
-        renderAdminList(listType);
-    });
-
-
-
-    // --- ADMIN PANEL LOGIC (Home Page Overlay) ---
-    const SECTIONS = [
-        { key: 'keepShopping', title: 'Keep Shopping', note: 'Add URLs for the square product cards.' },
-        { key: 'yourLists', title: 'Your Lists', note: 'Add image URLs for the list preview.' }
-    ];
-
-    const adminPanel = document.getElementById('adminPanel');
-    const openAdminButton = document.getElementById('openAdminButton');
-    const closeAdminButton = document.getElementById('closeAdminButton');
-    const saveButton = document.getElementById('saveButton');
-    const adminTabsContainer = document.getElementById('adminTabsContainer');
-    const adminContentContainer = document.getElementById('adminContentContainer');
-
-    function createUrlInput(url = '') {
-        const group = document.createElement('div');
-        group.className = 'url-input-group';
-        group.innerHTML = `
-            <div class="url-preview"></div>
-            <input type="text" class="url-input" placeholder="https://..." value="">
-            <button class="remove-url-btn">&times;</button>
-        `;
-        const textInput = group.querySelector('.url-input');
-        const preview = group.querySelector('.url-preview');
-        textInput.value = url;
-        if (url) preview.style.backgroundImage = `url(${url})`;
-
-        textInput.addEventListener('input', () => {
-            preview.style.backgroundImage = textInput.value ? `url(${textInput.value})` : 'none';
-        });
-        group.querySelector('.remove-url-btn').addEventListener('click', () => group.remove());
-        return group;
-    }
-
-    function buildAdminPanel() {
-        if (!adminTabsContainer) return;
-        adminTabsContainer.innerHTML = '';
-        adminContentContainer.innerHTML = '';
-        SECTIONS.forEach((section, index) => {
-            adminTabsContainer.innerHTML += `<div class="admin-tab" data-tab="${section.key}">${section.title}</div>`;
-            const content = document.createElement('div');
-            content.className = 'admin-tab-content';
-            content.id = `${section.key}-content`;
-            content.innerHTML = `
-                <p class="admin-note">${section.note}</p>
-                <div id="${section.key}-urls"></div>
-                <button class="add-url-btn" data-target="${section.key}-urls">+ Add New URL</button>
-            `;
-            adminContentContainer.appendChild(content);
-
-            if (index === 0) {
-                adminTabsContainer.firstElementChild.classList.add('active');
-                content.classList.add('active');
-            }
-        });
-
-        adminTabsContainer.addEventListener('click', e => {
-            if (e.target.matches('.admin-tab')) {
-                const tabKey = e.target.dataset.tab;
-                adminTabsContainer.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-                adminContentContainer.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-                document.getElementById(`${tabKey}-content`).classList.add('active');
-            }
-        });
-
-        adminContentContainer.addEventListener('click', e => {
-            if(e.target.matches('.add-url-btn')) {
-                const targetId = e.target.dataset.target;
-                document.getElementById(targetId).appendChild(createUrlInput());
-            }
-        });
-    }
-
-    function populateAdminPanel() {
-        SECTIONS.forEach(section => {
-            const urls = DB.get(section.key);
-            const urlListContainer = document.getElementById(`${section.key}-urls`);
-            if(!urlListContainer) return;
-            urlListContainer.innerHTML = '';
-            if (urls.length > 0) {
-                urls.forEach(url => urlListContainer.appendChild(createUrlInput(url)));
-            } else {
-                urlListContainer.appendChild(createUrlInput());
-            }
-        });
-    }
-    
-    function openAdmin() { populateAdminPanel(); adminPanel.classList.add('visible'); }
-    function closeAdmin() { adminPanel.classList.remove('visible'); }
-
-    function saveChanges() {
-        SECTIONS.forEach(section => {
-            const urlContainer = document.getElementById(`${section.key}-urls`);
-            const inputs = urlContainer.querySelectorAll('.url-input');
-            const urls = Array.from(inputs).map(input => input.value.trim()).filter(url => url);
-            DB.set(section.key, urls);
-        });
-        const feedback = document.getElementById('saveFeedback');
-        feedback.style.transform = 'translateX(-50%) translateY(0)';
-        feedback.style.opacity = '1';
-
-        setTimeout(() => {
-            feedback.style.transform = 'translateX(-50%) translateY(100px)';
-            feedback.style.opacity = '0';
-        }, 2000);
-        
-        renderHomePageContent();
-        setTimeout(closeAdmin, 300);
-    }
-
-    // --- GLOBAL EVENT LISTENERS & INITIALIZATION ---
+    // --- GLOBAL EVENT LISTENERS ---
     document.body.addEventListener('click', async (e) => {
+        // REQUEST 4: SHARE ITEM (System UI)
         if (e.target.classList.contains('share-item')) {
-            const productName = e.target.dataset.productName;
-            const defaultShareUrl = 'https://www.amazon.in/';
             const customShareUrl = e.target.dataset.shareLink;
-            const shareUrl = customShareUrl || defaultShareUrl;
-            const shareText = `Check out this product: ${productName}`;
+            if (!customShareUrl) return; 
+
             if (navigator.share) {
-                try { await navigator.share({ title: 'Amazon Product', text: `${shareText}`, url: shareUrl }); }
-                catch (err) { console.error('Error sharing:', err); }
+                try { 
+                    // Empty text, just URL
+                    await navigator.share({ title: 'Amazon Product', text: '', url: customShareUrl }); 
+                } catch (err) { console.error('Error sharing:', err); }
             } else {
-                try { await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`); alert('Link copied to clipboard!'); }
-                catch (err) { alert('Failed to copy link.'); }
+                try { await navigator.clipboard.writeText(customShareUrl); showCustomAlert('Link copied!'); }
+                catch (err) { showCustomAlert('Failed to copy link.'); }
             }
-        } else if (e.target.classList.contains('share-tracking-btn')) {
+        } 
+        // REQUEST 5: SHARE TRACKING (Specific Text)
+        else if (e.target.classList.contains('share-tracking-btn')) {
             e.preventDefault();
             const trackingLink = e.target.dataset.trackingLink;
-            const productName = e.target.dataset.productName;
-            if (!trackingLink) { alert('No tracking link is available for this item.'); return; }
-            const shareText = `Here is the tracking information for the order: ${productName}`;
+            if (!trackingLink) { showCustomAlert('No tracking link is available.'); return; }
+            
+            const shareText = "I sent you something from Amazon. You can track the package delivery with this link.";
+            
             if (navigator.share) {
-                try { await navigator.share({ title: 'Amazon Order Tracking', text: shareText, url: trackingLink }); }
+                try { await navigator.share({ title: 'Track Package', text: shareText, url: trackingLink }); }
                 catch (err) { console.error('Error sharing tracking link:', err); }
             } else {
-                try { await navigator.clipboard.writeText(trackingLink); alert('Tracking link copied to clipboard!'); }
-                catch (err) { alert('Failed to copy tracking link.'); }
+                try { await navigator.clipboard.writeText(shareText + " " + trackingLink); showCustomAlert('Tracking link copied!'); }
+                catch (err) { showCustomAlert('Failed to copy link.'); }
             }
         }
     });
 
     const footer = document.querySelector('.fixed-footer');
     footer.addEventListener('click', () => { window.location.hash = '#home'; });
-
     document.getElementById('back-tap-area').addEventListener('click', () => { window.history.back(); });
-
     const header = document.querySelector('.fixed-header');
-    const loader = document.getElementById('progress-bar-loader');
-
+    
     function adjustStickyHeaderTop() {
         const headerHeight = header.offsetHeight;
         const stickyHeader = document.querySelector('.sticky-track-header');
@@ -2373,8 +2394,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function setHomePageContentPadding() {
-        const headerHeight = document.getElementById('header-img').offsetHeight;
-        const footerHeight = document.getElementById('footer-img').offsetHeight;
+        const headerImg = document.getElementById('header-img');
+        const footerImg = document.getElementById('footer-img');
+        const headerHeight = headerImg ? headerImg.offsetHeight : 0;
+        const footerHeight = footerImg ? footerImg.offsetHeight : 0;
         const homePageContent = document.querySelector('#home-page .content');
         if (homePageContent) {
             homePageContent.style.paddingTop = `${headerHeight}px`;
@@ -2386,10 +2409,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const headerImg = header.querySelector('img');
         const performAdjustment = () => {
             const headerHeight = header.offsetHeight;
-            loader.style.top = `${headerHeight}px`;
+            document.getElementById('progress-bar-loader').style.top = `${headerHeight}px`;
             pages.forEach(page => {
                 if (page.id !== 'home-page') { 
-                    // This now includes 'order-summary-page' because its custom header was removed
                     page.style.paddingTop = `${headerHeight}px`; 
                 } 
             });
@@ -2401,14 +2423,18 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', performAdjustment);
     }
     
-    // --- Initial Setup Calls ---
-    if(openAdminButton) openAdminButton.addEventListener('click', openAdmin);
-    if(closeAdminButton) closeAdminButton.addEventListener('click', closeAdmin);
-    if(saveButton) saveButton.addEventListener('click', saveChanges);
-    if(adminPanel) adminPanel.addEventListener('click', e => { if (e.target === adminPanel) closeAdmin(); });
+    if(document.getElementById('openAdminButton')) document.getElementById('openAdminButton').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('visible'); populateAdminPanel(); });
+    if(document.getElementById('closeAdminButton')) document.getElementById('closeAdminButton').addEventListener('click', () => { document.getElementById('adminPanel').classList.remove('visible'); });
+    if(document.getElementById('saveButton')) document.getElementById('saveButton').addEventListener('click', () => { 
+         // Save logic for Home Page admin
+         const feedback = document.getElementById('saveFeedback');
+         feedback.style.transform = 'translateX(-50%) translateY(0)';
+         feedback.style.opacity = '1';
+         setTimeout(() => { feedback.style.transform = 'translateX(-50%) translateY(100px)'; feedback.style.opacity = '0'; }, 2000);
+         setTimeout(() => { document.getElementById('adminPanel').classList.remove('visible'); }, 300);
+    });
 
     initializeDefaultData();
-    buildAdminPanel();
     adjustLayoutForAllPages();
     window.addEventListener('hashchange', handleRouteChange);
     handleRouteChange(); 
