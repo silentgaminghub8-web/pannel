@@ -1590,7 +1590,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 buyContainer.innerHTML += `
                     <div class="buy-again-card">
                         <img src="${item.imageUrl}" alt="${item.name}">
-                        <p>${item.name}</p> 
                     </div>`;
             });
         }
@@ -2350,7 +2349,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- HOME PAGE ADMIN PANEL LOGIC (RESTORED) ---
     const adminConfig = [
         { id: 'keepShopping', title: 'Keep Shopping', type: 'url-list' },
-        { id: 'yourLists', title: 'Your Lists', type: 'url-list', limit: 2 }
+        { id: 'yourLists', title: 'Your Lists', type: 'url-list', limit: 2 },
+        { id: 'buyAgainItems', title: 'Buy Again', type: 'url-list' } // Added Buy Again here
     ];
     
     // Temporary storage for admin panel changes
@@ -2368,7 +2368,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         adminConfig.forEach((section, index) => {
             // Load current data into temp
-            tempAdminData[section.id] = [...DB.get(section.id)];
+            let rawData = DB.get(section.id);
+            
+            // Special handling for Buy Again (Objects to URLs)
+            if (section.id === 'buyAgainItems') {
+                tempAdminData[section.id] = rawData.map(item => item.imageUrl);
+            } else {
+                tempAdminData[section.id] = [...rawData];
+            }
 
             // Create Tab
             const tab = document.createElement('div');
@@ -2537,7 +2544,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if(document.getElementById('saveButton')) document.getElementById('saveButton').addEventListener('click', () => { 
          // Save logic for Home Page admin
          Object.keys(tempAdminData).forEach(key => {
-             DB.set(key, tempAdminData[key]);
+             if (key === 'buyAgainItems') {
+                 // Convert URLs back to Objects for Buy Again
+                 const urlList = tempAdminData[key];
+                 const objectList = urlList.map((url, index) => ({
+                     id: Date.now() + index, // Simple unique ID generation
+                     imageUrl: url,
+                     name: 'Product' 
+                 }));
+                 DB.set(key, objectList);
+             } else {
+                 DB.set(key, tempAdminData[key]);
+             }
          });
          renderHomePageContent(); // Refresh home page view
          
