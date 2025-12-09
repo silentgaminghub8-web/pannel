@@ -2346,6 +2346,114 @@ document.addEventListener('DOMContentLoaded', () => {
             // openModalForEdit call removed
         }
     });
+    
+    // --- HOME PAGE ADMIN PANEL LOGIC (RESTORED) ---
+    const adminConfig = [
+        { id: 'keepShopping', title: 'Keep Shopping', type: 'url-list' },
+        { id: 'yourLists', title: 'Your Lists', type: 'url-list', limit: 2 }
+    ];
+    
+    // Temporary storage for admin panel changes
+    let tempAdminData = {};
+
+    function populateAdminPanel() {
+        const tabsContainer = document.getElementById('adminTabsContainer');
+        const contentContainer = document.getElementById('adminContentContainer');
+        
+        if (!tabsContainer || !contentContainer) return;
+        
+        tabsContainer.innerHTML = '';
+        contentContainer.innerHTML = '';
+        tempAdminData = {}; // Reset temp data
+
+        adminConfig.forEach((section, index) => {
+            // Load current data into temp
+            tempAdminData[section.id] = [...DB.get(section.id)];
+
+            // Create Tab
+            const tab = document.createElement('div');
+            tab.className = `admin-tab ${index === 0 ? 'active' : ''}`;
+            tab.textContent = section.title;
+            tab.dataset.target = section.id;
+            tab.addEventListener('click', switchAdminTab);
+            tabsContainer.appendChild(tab);
+
+            // Create Content Area
+            const content = document.createElement('div');
+            content.className = `admin-tab-content ${index === 0 ? 'active' : ''}`;
+            content.id = `admin-content-${section.id}`;
+            contentContainer.appendChild(content);
+
+            renderAdminSection(section.id);
+        });
+    }
+
+    function switchAdminTab(e) {
+        const targetId = e.target.dataset.target;
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(`admin-content-${targetId}`).classList.add('active');
+    }
+
+    function renderAdminSection(sectionId) {
+        const container = document.getElementById(`admin-content-${sectionId}`);
+        const sectionConfig = adminConfig.find(s => s.id === sectionId);
+        const urls = tempAdminData[sectionId];
+        
+        container.innerHTML = '';
+        
+        // Note
+        const note = document.createElement('p');
+        note.className = 'admin-note';
+        note.textContent = sectionConfig.limit ? `Maximum ${sectionConfig.limit} items allowed.` : 'Add valid image URLs.';
+        container.appendChild(note);
+
+        // List existing URLs
+        urls.forEach((url, index) => {
+            const row = document.createElement('div');
+            row.className = 'url-input-group';
+            
+            const preview = document.createElement('div');
+            preview.className = 'url-preview';
+            preview.style.backgroundImage = `url(${url})`;
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'url-input';
+            input.value = url;
+            input.addEventListener('input', (e) => {
+                urls[index] = e.target.value;
+                preview.style.backgroundImage = `url(${e.target.value})`;
+            });
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-url-btn';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.addEventListener('click', () => {
+                urls.splice(index, 1);
+                renderAdminSection(sectionId);
+            });
+
+            row.appendChild(preview);
+            row.appendChild(input);
+            row.appendChild(removeBtn);
+            container.appendChild(row);
+        });
+
+        // Add Button
+        if (!sectionConfig.limit || urls.length < sectionConfig.limit) {
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-url-btn';
+            addBtn.textContent = '+ Add New Image URL';
+            addBtn.addEventListener('click', () => {
+                urls.push('');
+                renderAdminSection(sectionId);
+            });
+            container.appendChild(addBtn);
+        }
+    }
 
     // --- GLOBAL EVENT LISTENERS ---
     document.body.addEventListener('click', async (e) => {
@@ -2425,8 +2533,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if(document.getElementById('openAdminButton')) document.getElementById('openAdminButton').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('visible'); populateAdminPanel(); });
     if(document.getElementById('closeAdminButton')) document.getElementById('closeAdminButton').addEventListener('click', () => { document.getElementById('adminPanel').classList.remove('visible'); });
+    
     if(document.getElementById('saveButton')) document.getElementById('saveButton').addEventListener('click', () => { 
          // Save logic for Home Page admin
+         Object.keys(tempAdminData).forEach(key => {
+             DB.set(key, tempAdminData[key]);
+         });
+         renderHomePageContent(); // Refresh home page view
+         
          const feedback = document.getElementById('saveFeedback');
          feedback.style.transform = 'translateX(-50%) translateY(0)';
          feedback.style.opacity = '1';
